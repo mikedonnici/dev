@@ -1,0 +1,28 @@
+package main
+
+import "fmt"
+
+func main() {
+
+	fmt.Println(pow(2, 4))
+
+}
+
+// power is a recursive function for calculating x^n, faster than multiplying by itself n times
+// See here: https://simple.wikipedia.org/wiki/Exponentiation_by_squaring
+func pow(x, n uint64) uint64 {
+
+	if n == 0 {
+		return 1
+	}
+
+	if n == 1 {
+		return x
+	}
+
+	if n%2 == 0 {
+		return pow(x*x, n/2)
+	}
+
+	return x * pow(x*x, (n-1)/2)
+}
