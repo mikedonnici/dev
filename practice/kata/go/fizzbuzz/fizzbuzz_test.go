@@ -7,7 +7,6 @@ import (
 )
 
 func TestDivisibleByThree(t *testing.T) {
-
 	cases := []struct {
 		n int
 		e bool
@@ -27,8 +26,7 @@ func TestDivisibleByThree(t *testing.T) {
 }
 
 func TestDivisibleByFive(t *testing.T) {
-
-	cases := []struct{
+	cases := []struct {
 		n int
 		e bool
 	}{
@@ -47,8 +45,7 @@ func TestDivisibleByFive(t *testing.T) {
 }
 
 func TestDivisibleByThreeAndFive(t *testing.T) {
-
-	cases := []struct{
+	cases := []struct {
 		n int
 		e bool
 	}{
@@ -61,6 +58,30 @@ func TestDivisibleByThreeAndFive(t *testing.T) {
 	for _, c := range cases {
 		if DivisibleByThreeAndFive(c.n) != c.e {
 			log.Fatal(fmt.Sprintf("%v should be divisible by 3 and 5, got %v", c.n, c.e))
+		}
+	}
+}
+
+func TestFizzBuzz(t *testing.T) {
+	cases := []struct {
+		n      int
+		expect string
+	}{
+		{1, "1"},
+		{3, "Fizz"},
+		{5, "Buzz"},
+		{15, "FizzBuzz"},
+		{14, "14"},
+		{18, "Fizz"},
+		{21, "Fizz"},
+		{25, "Buzz"},
+		{30, "FizzBuzz"},
+	}
+
+	for _, c := range cases {
+		s := FizzBuzz(c.n)
+		if s != c.expect {
+			t.Fatal(fmt.Sprintf("Expected %s, got %s", c.expect, s))
 		}
 	}
 }
