@@ -45,100 +45,100 @@ var successTestCases = []struct {
 			},
 		},
 	},
-	//{
-	//	name: "three nodes in reverse order",
-	//	input: []Record{
-	//		{ID: 2, Parent: 0},
-	//		{ID: 1, Parent: 0},
-	//		{ID: 0},
-	//	},
-	//	expected: &Node{
-	//		ID: 0,
-	//		Children: []*Node{
-	//			{ID: 1},
-	//			{ID: 2},
-	//		},
-	//	},
-	//},
-	//{
-	//	name: "more than two children",
-	//	input: []Record{
-	//		{ID: 3, Parent: 0},
-	//		{ID: 2, Parent: 0},
-	//		{ID: 1, Parent: 0},
-	//		{ID: 0},
-	//	},
-	//	expected: &Node{
-	//		ID: 0,
-	//		Children: []*Node{
-	//			{ID: 1},
-	//			{ID: 2},
-	//			{ID: 3},
-	//		},
-	//	},
-	//},
-	//{
-	//	name: "binary tree",
-	//	input: []Record{
-	//		{ID: 5, Parent: 1},
-	//		{ID: 3, Parent: 2},
-	//		{ID: 2, Parent: 0},
-	//		{ID: 4, Parent: 1},
-	//		{ID: 1, Parent: 0},
-	//		{ID: 0},
-	//		{ID: 6, Parent: 2},
-	//	},
-	//	expected: &Node{
-	//		ID: 0,
-	//		Children: []*Node{
-	//			{
-	//				ID: 1,
-	//				Children: []*Node{
-	//					{ID: 4},
-	//					{ID: 5},
-	//				},
-	//			},
-	//			{
-	//				ID: 2,
-	//				Children: []*Node{
-	//					{ID: 3},
-	//					{ID: 6},
-	//				},
-	//			},
-	//		},
-	//	},
-	//},
-	//{
-	//	name: "unbalanced tree",
-	//	input: []Record{
-	//		{ID: 5, Parent: 2},
-	//		{ID: 3, Parent: 2},
-	//		{ID: 2, Parent: 0},
-	//		{ID: 4, Parent: 1},
-	//		{ID: 1, Parent: 0},
-	//		{ID: 0},
-	//		{ID: 6, Parent: 2},
-	//	},
-	//	expected: &Node{
-	//		ID: 0,
-	//		Children: []*Node{
-	//			{
-	//				ID: 1,
-	//				Children: []*Node{
-	//					{ID: 4},
-	//				},
-	//			},
-	//			{
-	//				ID: 2,
-	//				Children: []*Node{
-	//					{ID: 3},
-	//					{ID: 5},
-	//					{ID: 6},
-	//				},
-	//			},
-	//		},
-	//	},
-	//},
+	{
+		name: "three nodes in reverse order",
+		input: []Record{
+			{ID: 2, Parent: 0},
+			{ID: 1, Parent: 0},
+			{ID: 0},
+		},
+		expected: &Node{
+			ID: 0,
+			Children: []*Node{
+				{ID: 1},
+				{ID: 2},
+			},
+		},
+	},
+	{
+		name: "more than two branch",
+		input: []Record{
+			{ID: 3, Parent: 0},
+			{ID: 2, Parent: 0},
+			{ID: 1, Parent: 0},
+			{ID: 0},
+		},
+		expected: &Node{
+			ID: 0,
+			Children: []*Node{
+				{ID: 1},
+				{ID: 2},
+				{ID: 3},
+			},
+		},
+	},
+	{
+		name: "binary tree",
+		input: []Record{
+			{ID: 5, Parent: 1},
+			{ID: 3, Parent: 2},
+			{ID: 2, Parent: 0},
+			{ID: 4, Parent: 1},
+			{ID: 1, Parent: 0},
+			{ID: 0},
+			{ID: 6, Parent: 2},
+		},
+		expected: &Node{
+			ID: 0,
+			Children: []*Node{
+				{
+					ID: 1,
+					Children: []*Node{
+						{ID: 4},
+						{ID: 5},
+					},
+				},
+				{
+					ID: 2,
+					Children: []*Node{
+						{ID: 3},
+						{ID: 6},
+					},
+				},
+			},
+		},
+	},
+	{
+		name: "unbalanced tree",
+		input: []Record{
+			{ID: 5, Parent: 2},
+			{ID: 3, Parent: 2},
+			{ID: 2, Parent: 0},
+			{ID: 4, Parent: 1},
+			{ID: 1, Parent: 0},
+			{ID: 0},
+			{ID: 6, Parent: 2},
+		},
+		expected: &Node{
+			ID: 0,
+			Children: []*Node{
+				{
+					ID: 1,
+					Children: []*Node{
+						{ID: 4},
+					},
+				},
+				{
+					ID: 2,
+					Children: []*Node{
+						{ID: 3},
+						{ID: 5},
+						{ID: 6},
+					},
+				},
+			},
+		},
+	},
 }
 
 var failureTestCases = []struct {
@@ -152,36 +152,36 @@ var failureTestCases = []struct {
 			{ID: 1, Parent: 0},
 		},
 	},
-	//{
-	//	name: "no root node",
-	//	input: []Record{
-	//		{ID: 1, Parent: 0},
-	//	},
-	//},
-	//{
-	//	name: "duplicate node",
-	//	input: []Record{
-	//		{ID: 0, Parent: 0},
-	//		{ID: 1, Parent: 0},
-	//		{ID: 1, Parent: 0},
-	//	},
-	//},
-	//{
-	//	name: "duplicate root",
-	//	input: []Record{
-	//		{ID: 0, Parent: 0},
-	//		{ID: 0, Parent: 0},
-	//	},
-	//},
-	//{
-	//	name: "non-continuous",
-	//	input: []Record{
-	//		{ID: 2, Parent: 0},
-	//		{ID: 4, Parent: 2},
-	//		{ID: 1, Parent: 0},
-	//		{ID: 0},
-	//	},
-	//},
+	{
+		name: "no root node",
+		input: []Record{
+			{ID: 1, Parent: 0},
+		},
+	},
+	{
+		name: "duplicate node",
+		input: []Record{
+			{ID: 0, Parent: 0},
+			{ID: 1, Parent: 0},
+			{ID: 1, Parent: 0},
+		},
+	},
+	{
+		name: "duplicate root",
+		input: []Record{
+			{ID: 0, Parent: 0},
+			{ID: 0, Parent: 0},
+		},
+	},
+	{
+		name: "non-continuous",
+		input: []Record{
+			{ID: 2, Parent: 0},
+			{ID: 4, Parent: 2},
+			{ID: 1, Parent: 0},
+			{ID: 0},
+		},
+	},
 	//{
 	//	name: "cycle directly",
 	//	input: []Record{
@@ -222,7 +222,7 @@ func (n Node) String() string {
 
 func TestMakeTreeSuccess(t *testing.T) {
 	for _, tt := range successTestCases {
-		actual, err := BuildFast(tt.input)
+		actual, err := Build(tt.input)
 		if err != nil {
 			var _ error = err
 			t.Fatalf("Build for test case %q returned error %q. Error not expected.",
@@ -275,7 +275,7 @@ func BenchmarkTwoTree(b *testing.B) {
 	}
 }
 
-// Each node but the root node and leaf nodes has ten children.
+// Each node but the root node and leaf nodes has ten branch.
 func makeTenTreeRecords() []Record {
 	records := make([]Record, 10000)
 	for i := range records {

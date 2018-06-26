@@ -3,6 +3,7 @@ package tree
 import (
 	"errors"
 	"fmt"
+	"reflect"
 )
 
 type Record struct {
@@ -20,7 +21,7 @@ func (m Mismatch) Error() string {
 	return "c"
 }
 
-func Build(records []Record) (*Node, error) {
+func BuildOld(records []Record) (*Node, error) {
 	if len(records) == 0 {
 		return nil, nil
 	}
@@ -90,31 +91,166 @@ func Build(records []Record) (*Node, error) {
 	return root, nil
 }
 
-func BuildFast(records []Record) (*Node, error) {
+func Build(records []Record) (*Node, error) {
 
 	if len(records) == 0 {
 		return nil, nil
-
 	}
 
-	//root := &Node{} // ID 0, ParentID 0
-	//tree := []*Node{root}
+	err := validateData(records)
+	if err != nil {
+		return nil, err
+	}
 
-	tree := children(records, 0)
 
-
+	tree := branch(&Node{}, records)
 	return tree, nil
 }
 
-// children returns the child nodes of the node id
-func children(records []Record, id int) *Node {
-	root := &Node{}
+func validateData(records []Record) error {
+
+	err := rootCheck(records)
+	if err != nil {
+		return err
+	}
+
+	err = duplicateCheck(records)
+	if err != nil {
+		return err
+	}
+
+	err = continuous(records)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
+
+// rootCheck checks for the presence of a valid root node in the records
+func rootCheck(records []Record) error {
 	for _, r := range records {
-		if r.Parent == id {
-			n.Children = append(n.Children, children(records, r.ID))
+		if r.ID == 0 { // root node
+			if r.Parent != 0 {
+				return errors.New("Root node cannot have a parent id")
+			}
+			return nil
 		}
 	}
+
+	return errors.New("No root node found")
+}
+
+func duplicateCheck(records []Record) error {
+
+	for ai, av := range records {
+		for bi, bv := range records {
+			if ai == bi { // skip same record comparison
+				continue
+			}
+			if reflect.DeepEqual(av, bv) {
+				return errors.New("Duplicate records found")
+			}
+		}
+	}
+
+	return nil
+}
+
+// continuous checks for missing ID in record sequence
+func continuous(records []Record) error {
+
+	var highestID int
+
+	for _, r := range records {
+		if r.ID > highestID {
+			highestID = r.ID
+		}
+	}
+
+	for i := 0; i < highestID; i++ {
+		for _, r := range records {
+			if r.ID == i {
+				break
+			}
+			return errors.New("non continuous")
+		}
+	}
+
+	return nil
+}
+
+// orphanCheck checks for orphaned records
+func orphanCheck(records []Record) error {
+
+	fmt.Println("########################################")
+
+	for ai, av := range records {
+
+		if av.ID == 0 { // skip root
+			continue
+		}
+
+		fmt.Println("Looking for parents of", av)
+		parent := false
+		for bi, bv := range records {
+			if ai == bi { // skip same record comparison
+				continue
+			}
+			fmt.Print("\t", bv)
+			if av.Parent == bv.ID {
+				fmt.Println("\tfound!")
+				parent = true
+			}
+			if parent == true {
+				break
+			}
+		}
+		if parent == false {
+			fmt.Println("\tNOT found!")
+			return errors.New("Found orphaned record")
+		}
+	}
+
+	return nil
+}
+
+// branch returns the parent with child nodes attached
+func branch(root *Node, records []Record) *Node {
+
+	if len(records) <  1 {
+		return root
+	}
+
+	for _, r := range records {
+		if r.Parent == root.ID && r.ID != 0 {
+			root.Children  = append(root.Children, &Node{ID: r.ID})
+			root.Children = sortChildren(root.Children)
+		}
+	}
+
+	// recursively add branches
+	for _, c := range root.Children {
+		branch(c, records)
+	}
+
 	return root
+}
+
+// sortChildren does a bubble sort a slice of Node based on Node.ID
+func sortChildren(children []*Node) []*Node {
+
+	l := len(children)
+
+	for i := 0; i < l; i++ {
+		for j := 0; j < (l - 1 - i); j++ {
+			if children[j].ID > children[j+1].ID {
+				children[j], children[j+1] = children[j+1], children[j]
+			}
+		}
+	}
+
+	return children
 }
 
 func chk(n *Node, m int) (err error) {
