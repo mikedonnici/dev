@@ -38,7 +38,7 @@ func TestHelloHandler(t *testing.T) {
 	is.Equal(body, "hello") // body should be "hello"
 }
 
-func TestHelloMikeHandler(t *testing.T) {
+func TestHelloNameHandler(t *testing.T) {
 	is := is.New(t)
 	srv := New("")
 	r, err := http.NewRequest("GET", "/hello/mike", nil)
@@ -46,6 +46,8 @@ func TestHelloMikeHandler(t *testing.T) {
 	w := httptest.NewRecorder()
 	srv.ServeHTTP(w,r)
 	is.Equal(w.Code, 200) // status not 200 OK
+	body := w.Body.String()
+	is.Equal(body, "hello mike")
 }
 
 func TestHelloJSONHandler(t *testing.T) {

@@ -24,7 +24,7 @@ func New(port string) *server {
 func (s *server)routes() {
 	s.router.Handle("/", s.handleIndex())
 	s.router.Handle("/hello", s.handleHello())
-	s.router.Handle("/hello/mike", s.handleHelloMike())
+	s.router.Handle("/hello/{name}", s.handleHelloName())
 	s.router.Handle("/hello.json", s.handleHelloJSON())
 	s.router.Handle("/admin/{token}", s.admin(s.handleAdmin()))
 }
@@ -46,9 +46,9 @@ func (s *server) handleHello() http.HandlerFunc {
 	}
 }
 
-func (s *server) handleHelloMike() http.HandlerFunc {
+func (s *server) handleHelloName() http.HandlerFunc {
 	return func(w http.ResponseWriter, r *http.Request) {
-		io.WriteString(w, "hello mike")
+		io.WriteString(w, "hello " + mux.Vars(r)["name"])
 	}
 }
 
