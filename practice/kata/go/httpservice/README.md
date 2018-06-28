@@ -2,19 +2,25 @@
 
 My own exercise, inspired by [Mat Ryer's article](https://medium.com/statuscode/how-i-write-go-http-services-after-seven-years-37c208122831).
 
-Write a web server package called `webapp` with the following end points:
+Use TDD to write a web server package called `webapp`, 2-3 pomodoros :)
+
+It should have the following end points:
+
+## /notfound
+
+* does not exist, returns 404
 
 ## /
 
-* redirects to /hello (302)
+* redirects to /hello, returns 301
 
 ## /hello
 
 * Says 'hello'
 
-## /hello/mike
+## /hello/{name}
 
-* Says 'hello mike'
+* Says 'hello {name}'
 
 ## /hello.json
 
@@ -36,12 +42,4 @@ Write a web server package called `webapp` with the following end points:
 
 * as above but with incorrrect token `abc124`
 * middleware responds with 401 Unauthorized code
-
-
-Include tests, try with TDD :)
-
-
-
-
-
 
