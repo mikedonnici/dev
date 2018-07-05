@@ -15,24 +15,28 @@ import (
 
 const defaultPort = "8080"
 
-func init() {
-	envr.New("appEnv", []string{
-		"MYSQL_DSN",
-		"MYSQL_DBNAME",
-		"MYSQL_DESC",
-		"MONGO_DSN",
-		"MONGO_DBNAME",
-		"MONGO_DESC",
-	}).Auto()
-}
+//func init() {
+//	envr.New("appEnv", []string{
+//		"MYSQL_DSN",
+//		"MYSQL_DBNAME",
+//		"MYSQL_DESC",
+//		"MONGO_DSN",
+//		"MONGO_DBNAME",
+//		"MONGO_DESC",
+//	}).Auto()
+//}
 
 func main() {
 
 	var err error
 
+	// flags
 	portFlag := flag.String("p", "", "Specify port number (optional)")
+	cfgFlag := flag.String("c", "", "Specify cfg file (optional - will override env vars)")
 	flag.Parse()
-	fmt.Println(*portFlag)
+
+	port := setPort(*portFlag)
+	setEnv(*cfgFlag)
 
 	// Setup datastore
 	d := datastore.New()
@@ -54,11 +58,8 @@ func main() {
 		log.Fatalf("Datastore could not connect to MongoDB")
 	}
 
-	// Set port number
-	port := setPort(*portFlag)
-	srv := server.NewServer(port, d)
-
 	// Start server
+	srv := server.NewServer(port, d)
 	log.Println("server listening on port " + port)
 	log.Fatal(srv.Start())
 }
@@ -72,4 +73,26 @@ func setPort(port string) string {
 		return port
 	}
 	return defaultPort
+}
+
+func setEnv(cfg string) {
+
+	// declare required env vars
+	e := envr.New("appEnv", []string{
+		"MYSQL_DSN",
+		"MYSQL_DBNAME",
+		"MYSQL_DESC",
+		"MONGO_DSN",
+		"MONGO_DBNAME",
+		"MONGO_DESC",
+	})
+
+	// use cfg file if present
+	if cfg != "" {
+		fmt.Println("Setting env from", cfg)
+		e.Files = []string{cfg}
+	}
+	e.Auto()
+
+	fmt.Println(e.V)
 }
