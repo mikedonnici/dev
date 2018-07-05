@@ -27,26 +27,8 @@ func NewConnection(dsn, dbname, desc string) (*Connection, error) {
 		return m, err
 	}
 
-	m.Session, err = sql.Open("mysql", m.DSN)
-	return m, err
-}
-
-// Connect establishes the Session using the specified connection string - handy for testing.
-func (m *Connection) Connect() error {
-
-	var err error
-
 	m.Session, err = sql.Open("mysql", m.DSN + m.DBName)
-	if err != nil {
-		return errors.Wrap(err, "mysql.Connect() sql.Open()")
-	}
-
-	err = m.Session.Ping()
-	if err != nil {
-		return errors.Wrap(err, "mysql.Connect() ping")
-	}
-
-	return nil
+	return m, err
 }
 
 // Close terminates the Session - don't really need?
@@ -56,13 +38,13 @@ func (m *Connection) Connect() error {
 
 func (m *Connection) checkFields() error {
 	if m.DSN == "" {
-		return errors.New("Connection.DSN (data source name / connection string) is not set")
+		return errors.New("MySQL DSN (data source name / connection string) not set")
 	}
 	if m.DBName == "" {
-		return errors.New("Connection.DBName is not set")
+		return errors.New("MySQL db name not set")
 	}
 	if m.Desc == "" {
-		return errors.New("Connection.Desc is not set")
+		return errors.New("MySQL desc not set")
 	}
 	return nil
 }

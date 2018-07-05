@@ -1,8 +1,8 @@
 package server_test
 
 import (
-	"testing"
 	"net/http/httptest"
+	"testing"
 
 	"github.com/matryer/is"
 	"github.com/mikedonnici/dev/go/code-organisation/httpservice/server"
@@ -17,4 +17,3 @@ func TestNewServer(t *testing.T) {
 	s.ServeHTTP(w, r)
 	is.Equal(w.Code, 200) // expected 200 ok
 }
-

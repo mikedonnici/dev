@@ -1,15 +1,17 @@
 package server_test
 
 import (
-	"testing"
 	"log"
-	"strings"
 	"net/http/httptest"
+	"strings"
+	"testing"
 
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/testdata"
 	"github.com/matryer/is"
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/server"
 	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mongo"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mysql"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/server"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/testdata"
 )
 
 var testDB = testdata.New()
@@ -62,18 +64,16 @@ func teardownDatabases() {
 
 // datastoreConnectMySQL connects the datastore to the MySQL test database
 func datastoreConnectMySQL() error {
-	ds.MySQL.DSN = testdata.MySQLDSN
-	ds.MySQL.DBName = testDB.DBName
-	ds.MySQL.Desc = "test"
-	return ds.MySQL.Connect()
+	var err error
+	ds.MySQL, err = mysql.NewConnection(testdata.MySQLDSN, testDB.DBName, "test")
+	return err
 }
 
 // datastoreConnectMongoDB connects the datastore to the test Mongo database
 func datastoreConnectMongoDB() error {
-	ds.Mongo.DSN = testdata.MongoDSN
-	ds.Mongo.DBName = testDB.DBName
-	ds.Mongo.Desc = "test"
-	return ds.Mongo.Connect()
+	var err error
+	ds.Mongo, err = mongo.NewConnection(testdata.MongoDSN, testDB.DBName, "test")
+	return err
 }
 
 func groupTestPersonByID(t *testing.T) {

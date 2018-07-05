@@ -1,11 +1,11 @@
 package mysql
 
 import (
-	"testing"
 	"log"
+	"testing"
 
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/testdata"
 	"github.com/matryer/is"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/testdata"
 )
 
 var data = testdata.New()

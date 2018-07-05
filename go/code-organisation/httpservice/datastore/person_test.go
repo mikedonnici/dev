@@ -1,12 +1,14 @@
 package datastore_test
 
 import (
-	"testing"
 	"log"
+	"testing"
 
 	"github.com/matryer/is"
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/testdata"
 	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mongo"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mysql"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/testdata"
 )
 
 var testDB = testdata.New()
@@ -32,8 +34,8 @@ func TestPerson(t *testing.T) {
 	if err != nil {
 		log.Fatalln(err)
 	}
-	
-	t.Run("group", func(t *testing.T){
+
+	t.Run("group", func(t *testing.T) {
 		t.Run("testPersonByID", testPersonByID)
 		t.Run("testPersonByOID", testPersonByOID)
 		t.Run("testPeople", testPeople)
@@ -57,18 +59,16 @@ func teardownDatabases() {
 
 // datastoreConnectMySQL connects the datastore to the MySQL test database
 func datastoreConnectMySQL() error {
-	ds.MySQL.DSN = testdata.MySQLDSN
-	ds.MySQL.DBName = testDB.DBName
-	ds.MySQL.Desc = "test"
-	return ds.MySQL.Connect()
+	var err error
+	ds.MySQL, err = mysql.NewConnection(testdata.MySQLDSN, testDB.DBName, "test mysql db")
+	return err
 }
 
 // datastoreConnectMongoDB connects the datastore to the test Mongo database
 func datastoreConnectMongoDB() error {
-	ds.Mongo.DSN = testdata.MongoDSN
-	ds.Mongo.DBName = testDB.DBName
-	ds.Mongo.Desc = "test"
-	return ds.Mongo.Connect()
+	var err error
+	ds.Mongo, err = mongo.NewConnection(testdata.MongoDSN, testDB.DBName, "test")
+	return err
 }
 
 // Test fetch person
@@ -113,6 +113,6 @@ func testPersonByOID(t *testing.T) {
 func testPeople(t *testing.T) {
 	is := is.New(t)
 	xp, err := ds.People()
-	is.NoErr(err)            // error fetching people
+	is.NoErr(err)        // error fetching people
 	is.Equal(len(xp), 5) // expected 5 people records
 }

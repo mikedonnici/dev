@@ -2,14 +2,14 @@
 package datastore
 
 import (
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mysql"
 	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mongo"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mysql"
 )
 
 // Datastore contains connections to the data sources required for the service
 type Datastore struct {
-	MySQL mysql.Connection
-	Mongo mongo.Connection
+	MySQL *mysql.Connection
+	Mongo *mongo.Connection
 }
 
 // New returns a pointer to a Datastore

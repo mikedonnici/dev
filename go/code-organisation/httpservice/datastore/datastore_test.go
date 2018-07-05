@@ -28,7 +28,6 @@ package datastore_test
 //	m.Run()
 //}
 
-
 //// Test a direct query
 //func TestFetchMySQL(t *testing.T) {
 //	is := is.New(t)

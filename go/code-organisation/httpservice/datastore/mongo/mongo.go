@@ -14,12 +14,12 @@ type Connection struct {
 	Session *mgo.Session
 }
 
-func NewConnection(dsn, dbname, desc string) (Connection, error) {
+func NewConnection(dsn, dbname, desc string) (*Connection, error) {
 
-	m := Connection{
-		DSN: dsn,
+	m := &Connection{
+		DSN:    dsn,
 		DBName: dbname,
-		Desc: desc,
+		Desc:   desc,
 	}
 	err := m.checkFields()
 	if err != nil {
@@ -30,35 +30,20 @@ func NewConnection(dsn, dbname, desc string) (Connection, error) {
 	return m, err
 }
 
-// Connect to Mongo
-func (m *Connection) Connect() error {
-	err := m.checkFields()
-	if err != nil {
-		return err
-	}
-	m.Session, err = mgo.Dial(m.DSN)
-	return err
-}
-
 // Collection returns a pointer to the collection specified by name
 func (m *Connection) Collection(name string) (*mgo.Collection, error) {
 	return m.Session.DB(m.DBName).C(name), nil
 }
 
-// Close terminates the Session
-//func (m *MongoDBConnection) Close() {
-//	m.Session.Close()
-//}
-
 func (m *Connection) checkFields() error {
 	if m.DSN == "" {
-		return errors.New("MongoDBConnection.DSN (data source name / connection string) is not set")
+		return errors.New("MongoDB DSN (data source name / connection string) not set")
 	}
 	if m.DBName == "" {
-		return errors.New("MongoDBConnection.DBName is not set")
+		return errors.New("MongoDB db name not set")
 	}
 	if m.Desc == "" {
-		return errors.New("MongoDBConnection.Desc is not set")
+		return errors.New("MongoDB desc not set")
 	}
 	return nil
 }

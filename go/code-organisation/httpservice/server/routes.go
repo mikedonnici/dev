@@ -1,13 +1,13 @@
 package server
 
 import (
+	"encoding/json"
+	"errors"
+	"fmt"
+	"github.com/gorilla/mux"
+	"gopkg.in/mgo.v2/bson"
 	"io"
 	"net/http"
-	"github.com/gorilla/mux"
-	"encoding/json"
-	"fmt"
-	"gopkg.in/mgo.v2/bson"
-	"errors"
 )
 
 func (s *server) routes() {

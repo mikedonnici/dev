@@ -26,4 +26,3 @@ func TestNewConnection(t *testing.T) {
 	_, err := NewConnection(testdata.MongoDSN, "test", "test mongo db")
 	is.NoErr(err)
 }
-
