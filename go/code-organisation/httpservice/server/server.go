@@ -8,16 +8,27 @@ import (
 )
 
 type server struct {
-	store  *datastore.Datastore
+	port   string
 	router *mux.Router
+	store  *datastore.Datastore
 }
 
-// Start fires up the http server on the specified port and associates it with the specified datastore.
-func Start(port string, store *datastore.Datastore) error {
-	s := server{
-		store: store,
+// NewServer returns a pointer to an initialised server with a connected datastore
+func NewServer(port string, store *datastore.Datastore) *server {
+	s := &server{
+		port:   port,
+		store:  store,
 		router: mux.NewRouter(),
 	}
 	s.routes()
-	return http.ListenAndServe(":" + port, s.router)
+	return s
+}
+
+// Start fires up the http server
+func (s *server) Start() error {
+	return http.ListenAndServe(":"+s.port, s.router)
+}
+
+func (s *server) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	s.router.ServeHTTP(w, r)
 }

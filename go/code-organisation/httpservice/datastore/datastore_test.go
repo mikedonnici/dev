@@ -1,36 +1,32 @@
 package datastore_test
 
-import (
-	"log"
-	"testing"
-
-	"github.com/matryer/is"
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore"
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mysql"
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/testdata"
-	//"gopkg.in/mgo.v2/bson"
-)
-
-var data = testdata.New()
+//import (
+//	"log"
+//	"testing"
+//
+//	"github.com/mikedonnici/dev/go/code-organisation/httpservice/testdata"
+//)
+//
+//var store = testdata.New()
 
 // TestMain sets up test databases against which subsequent datastore tests can be run. These are torn
 // down once all of the tests have completed.
-func TestMain(m *testing.M) {
-
-	err := data.SetupMySQL()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer data.TearDownMySQL()
-
-	err = data.SetupMongoDB()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer data.TearDownMongoDB()
-
-	m.Run()
-}
+//func TestMain(m *testing.M) {
+//
+//	err := store.SetupMySQL()
+//	if err != nil {
+//		log.Fatalln(err)
+//	}
+//	defer store.TearDownMySQL()
+//
+//	err = store.SetupMongoDB()
+//	if err != nil {
+//		log.Fatalln(err)
+//	}
+//	defer store.TearDownMongoDB()
+//
+//	m.Run()
+//}
 
 
 //// Test a direct query
@@ -48,7 +44,7 @@ func TestMain(m *testing.M) {
 //	for _, c := range cases {
 //		q := `select firstname from people where id = ?`
 //		var name string
-//		data.MySQLSession.QueryRow(q, c.id).Scan(&name)
+//		store.MySQLSession.QueryRow(q, c.id).Scan(&name)
 //		is.Equal(name, c.firstName)
 //	}
 //}
@@ -73,7 +69,7 @@ func TestMain(m *testing.M) {
 //		var p person
 //		q := bson.M{"id": c.id}
 //		s := bson.M{"_id": 0, "firstname": 1}
-//		col := data.MongoDBSession.DB(data.DBName).C(testdata.MONGO_COLLECTION)
+//		col := store.MongoDBSession.DB(store.DBName).C(testdata.MONGO_COLLECTION)
 //		err := col.Find(q).Select(s).One(&p)
 //		is.NoErr(err)                      // error fetching from Mongo
 //		is.Equal(p.FirstName, c.firstName) // incorrect name

@@ -9,32 +9,78 @@ import (
 	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore"
 )
 
-// Test fetch person
-func TestPersonByID(t *testing.T) {
-	is := is.New(t)
+var testDB = testdata.New()
+var ds = datastore.New()
 
-	// create test MySQL database
-	data := testdata.New()
-	err := data.SetupMySQL()
+func TestPerson(t *testing.T) {
+
+	var err error
+
+	// install databases
+	err = setupDatabases()
 	if err != nil {
 		log.Fatalln(err)
 	}
-	defer data.TearDownMySQL()
+	defer teardownDatabases()
 
-	// create a datastore connected to the test database
-	ds := datastore.New()
+	// connect datastore
+	err = datastoreConnectMySQL()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	err = datastoreConnectMongoDB()
+	if err != nil {
+		log.Fatalln(err)
+	}
+	
+	t.Run("group", func(t *testing.T){
+		t.Run("testPersonByID", testPersonByID)
+		t.Run("testPersonByOID", testPersonByOID)
+		t.Run("testPeople", testPeople)
+	})
+}
+
+// setUpDatabases creates and populates test databases
+func setupDatabases() error {
+	err := testDB.SetupMySQL()
+	if err != nil {
+		return err
+	}
+	return testDB.SetupMongoDB()
+}
+
+// teardownDatabases cleans up the test databases
+func teardownDatabases() {
+	testDB.TearDownMySQL()
+	testDB.TearDownMongoDB()
+}
+
+// datastoreConnectMySQL connects the datastore to the MySQL test database
+func datastoreConnectMySQL() error {
 	ds.MySQL.DSN = testdata.MySQLDSN
-	ds.MySQL.DBName = data.DBName
+	ds.MySQL.DBName = testDB.DBName
 	ds.MySQL.Desc = "test"
-	err = ds.MySQL.Connect()
-	is.NoErr(err) // could not connect to test MySQL database
+	return ds.MySQL.Connect()
+}
+
+// datastoreConnectMongoDB connects the datastore to the test Mongo database
+func datastoreConnectMongoDB() error {
+	ds.Mongo.DSN = testdata.MongoDSN
+	ds.Mongo.DBName = testDB.DBName
+	ds.Mongo.Desc = "test"
+	return ds.Mongo.Connect()
+}
+
+// Test fetch person
+func testPersonByID(t *testing.T) {
+	is := is.New(t)
 
 	cases := []struct {
-		id        int
+		id        string
 		firstName string
 	}{
-		{id: 1, firstName: "Broderick"},
-		{id: 5, firstName: "Declan"},
+		{id: "1", firstName: "Broderick"},
+		{id: "5", firstName: "Declan"},
 	}
 
 	for _, c := range cases {
@@ -45,24 +91,8 @@ func TestPersonByID(t *testing.T) {
 }
 
 // Test fetch person from MongoDb by OID
-func TestPersonByOID(t *testing.T) {
+func testPersonByOID(t *testing.T) {
 	is := is.New(t)
-
-	// create test MySQL database
-	data := testdata.New()
-	err := data.SetupMongoDB()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	//defer data.TearDownMongoDB()
-
-	// create a datastore connected to the test database
-	ds := datastore.New()
-	ds.Mongo.DSN = testdata.MongoDSN
-	ds.Mongo.DBName = data.DBName
-	ds.Mongo.Desc = "test"
-	err = ds.Mongo.Connect()
-	is.NoErr(err) // could not connect to test MySQL database
 
 	cases := []struct {
 		oid       string
@@ -74,7 +104,15 @@ func TestPersonByOID(t *testing.T) {
 
 	for _, c := range cases {
 		p, err := ds.PersonByOID(c.oid)
-		is.NoErr(err)                      // error fetching person by id
+		is.NoErr(err)                      // error fetching person by object id
 		is.Equal(p.FirstName, c.firstName) // incorrect first name
 	}
+}
+
+// Test fetch people
+func testPeople(t *testing.T) {
+	is := is.New(t)
+	xp, err := ds.People()
+	is.NoErr(err)            // error fetching people
+	is.Equal(len(xp), 5) // expected 5 people records
 }

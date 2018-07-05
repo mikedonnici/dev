@@ -41,6 +41,7 @@ func main() {
 	}
 
 	port := "8080" // get from env
+	srv := server.NewServer(port, d)
 	log.Println("server listening on port " + port)
-	log.Fatal(server.Start(port, d))
+	log.Fatal(srv.Start())
 }
