@@ -44,6 +44,14 @@ Finally, if the deployment environment allows for env vars to be set via
 a control panel or similar (eg Heroku)then no configuration file needs
 to be specified.
 
+**Port Number**
+
+If a `PORT` env var is present in the deployment environment then the
+server will listen on that port. This is the case for Heroku and similar.
+
+Otherwise, port number can be specified with an optional `-p` flag, or
+left to the default of 8080.
+
 ## Testing
 
 Most of the integration tests are run against real databases with a
