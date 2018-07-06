@@ -3,6 +3,7 @@ package testdata
 const CREATE_MYSQL_DB = `CREATE DATABASE IF NOT EXISTS %s`
 
 const DROP_MYSQL_DB = `DROP DATABASE %s`
+
 const CREATE_MYSQL_TABLE = `CREATE TABLE %s.people (
   id int(9) unsigned NOT NULL AUTO_INCREMENT,
   firstname varchar(100) NOT NULL,

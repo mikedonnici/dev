@@ -40,6 +40,7 @@ func (t *TestStore) SetupMySQL() error {
 	var err error
 
 	t.MySQLSession, err = sql.Open("mysql", MySQLDSN)
+	time.Sleep(3 * time.Second) // give it a sec to connect to server
 	_, err = t.MySQLSession.Exec(fmt.Sprintf(CREATE_MYSQL_DB, t.DBName))
 	if err != nil {
 		return errors.Wrap(err, "Error creating test schema")
@@ -74,7 +75,7 @@ func (t *TestStore) SetupMySQL() error {
 }
 
 func (t *TestStore) TearDownMySQL() error {
-	_, err := t.MySQLSession.Exec(DROP_MYSQL_DB, t.DBName)
+	_, err := t.MySQLSession.Exec(fmt.Sprintf(DROP_MYSQL_DB, t.DBName))
 	if err != nil {
 		return errors.Wrap(err, "Error deleting MySQL test database")
 	}

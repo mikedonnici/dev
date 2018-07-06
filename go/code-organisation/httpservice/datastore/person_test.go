@@ -18,14 +18,14 @@ func TestPerson(t *testing.T) {
 
 	var err error
 
-	// install databases
+	// set up databases
 	err = setupDatabases()
 	if err != nil {
 		log.Fatalln(err)
 	}
 	defer teardownDatabases()
 
-	// connect datastore
+	// connect datastore to databases
 	err = datastoreConnectMySQL()
 	if err != nil {
 		log.Fatalln(err)
@@ -35,6 +35,7 @@ func TestPerson(t *testing.T) {
 		log.Fatalln(err)
 	}
 
+	// run tests
 	t.Run("group", func(t *testing.T) {
 		t.Run("testPersonByID", testPersonByID)
 		t.Run("testPersonByOID", testPersonByOID)
@@ -53,8 +54,14 @@ func setupDatabases() error {
 
 // teardownDatabases cleans up the test databases
 func teardownDatabases() {
-	testDB.TearDownMySQL()
-	testDB.TearDownMongoDB()
+	err := testDB.TearDownMySQL()
+	if err != nil {
+		log.Println(err)
+	}
+	err = testDB.TearDownMongoDB()
+	if err != nil {
+		log.Println(err)
+	}
 }
 
 // datastoreConnectMySQL connects the datastore to the MySQL test database

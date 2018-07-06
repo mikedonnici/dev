@@ -2,11 +2,11 @@
 # If this file is named .env then it will be used automatically.
 # Otherwise, can specify the env config file when starting the server, with the `-c` flag, eg:
 # server -c "./env_example.txt"
-# Don't commit *real* .env or simailar to the repo!
+# Don't commit *real* env stuff to the repo!
 
-MYSQL_DSN="aaaroot:password@tcp(localhost:3306)/"
-MYSQL_DBNAME="aaahttpservice"
-MYSQL_DESC="aaalocal dev"
-MONGO_DSN="aaamongodb://localhost"
-MONGO_DBNAME="aaaca8bb0b_test"
-MONGO_DESC="aaalocal mongo db"
+MYSQL_DSN="root:password@tcp(localhost:3306)/"
+MYSQL_DBNAME="httpservice"
+MYSQL_DESC="local dev"
+MONGO_DSN="mongodb://localhost"
+MONGO_DBNAME="ca8bb0b_test"
+MONGO_DESC="local mongo db"
