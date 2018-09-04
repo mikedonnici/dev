@@ -4,7 +4,7 @@
 
 Here's a nice little trick for showing test coverage in go.
 
-Put this in .bash_profile:
+Put this in .bashrc or .bash_profile:
 
 ```bash
 cover () { 
