@@ -1,34 +1,28 @@
 package bubblesort
 
 import (
-	"testing"
-	"reflect"
 	"fmt"
+	"log"
+	"reflect"
+	"testing"
 )
 
 func TestBubbleSort(t *testing.T) {
-	cases := []struct{
+	cases := []struct {
 		input []int
 		expect []int
 	}{
-		{
-			input: []int{2,1},
-			expect: []int{1,2},
-		},
-		{
-			input: []int{9,8,7,6,5,4,3,2,1},
-			expect: []int{1,2,3,4,5,6,7,8,9},
-		},
-		{
-			input: []int{1,1,1,1,3,2,1,1,1,1},
-			expect: []int{1,1,1,1,1,1,1,1,2,3},
-		},
+		{input: []int{3,2,1}, expect: []int{1,2,3}},
+		{input: []int{1,2,3}, expect: []int{1,2,3}},
+		{input: []int{1,2,1}, expect: []int{1,1,2}},
+		{input: []int{4,2,1}, expect: []int{1,2,4}},
+		{input: []int{1,5,2,7,9,4}, expect: []int{1,2,4,5,7,9}},
 	}
 
 	for _, c := range cases {
-		sorted := BubbleSort(c.input)
-		if !reflect.DeepEqual(sorted, c.expect) {
-			t.Fatalf(fmt.Sprintf("For input %v, expected %v, got %v", c.input, c.expect, sorted))
+		xi := BubbleSort(c.input)
+		if !reflect.DeepEqual(xi, c.expect) {
+			log.Fatal(fmt.Sprintf("input %v, expect %v", c.input, c.expect))
 		}
 	}
 }
