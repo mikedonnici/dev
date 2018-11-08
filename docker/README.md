@@ -1,5 +1,165 @@
 # Docker
 
+## Editions
+
+There are various editions of Docker for different OS and for cloud.
+
+On mac it is not supported natively so runs in a VM.
+
+## Linux Installation
+
+*Don't use package manager*
+
+Installation script here: https://get.docker.com/
+
+Install instruction at the top of the comments:above script:
+
+```bash
+$ curl -fsSL get.docker.com -o get-docker.sh
+$ sh get-docker.sh
+```
+
+Or, shorthand: `curl -sSL https://get.docker.com/ | sh`
+
+Docker required root access so will require `sudo` to run things. This is painful in local dev
+so to run docker as non-root user need to add user account to 'docker' group, eg:
+
+```bash
+$ sudo usermod -aG docker mike
+```
+
+*This won't work on Red Hat flavours of Linux.*
+
+[`docker-machine`](https://docs.docker.com/machine) and [`docker-compose`](https://docs.docker.com/compose/) are not installed automatically on Linux so need to 
+install those manually. 
+
+Check GitHub releases for latest version and there is a curl script to install.
+
+* [`docker-machine` releases](https://github.com/docker/machine/releases) 
+* [`docker-compose` releases](https://github.com/docker/compose/releases)
+
+**These will need to be manually updated.**
+
+## docker cli
+
+As the number of docker cli commands grew a *management command* format was introduced, ie `docker [command] [sub-command]`.
+
+For example:
+
+```bash
+$ docker container run
+```
+
+The old way still works for many commands, ie:
+
+```bash
+$ docker run
+```
+
+Newer commands will generally follow the *management command* format.
+
+## Image vs Container
+
+* An *image* is the blueprint for the application that will be run
+* A *container* is an instance of an *image*, running as a process
+
+Images are store in a *registry* such as [hub.docker.com](https://hub.docker.com)
+
+**A container is not a VM - it is a process running on the OS with limted access to resources**
+
+For example, if an nginx container is started in the background, thus:
+
+```bash
+$ docker container run --publish 80:80 --detach --name webserver nginx
+```
+
+The process running in the container can be listed with:
+
+```bash
+$ docker top [id...]
+```
+
+If `ps aux` is run on the host machine the same processes are visible - that is, they are not hidden inside a virtual container.
+
+## Running a container
+
+Use `docker container run ...` with various options
+
+For example:
+
+```bash
+$ docker container run --publish 80:80 --name webserver --detach nginx
+```
+
+This will start an nginx server in the background, mapping port 80 on the host to port 80 in the container. The `--name` flag gives the container a more convenient name that the generated, random id.
+
+There are many options - see `docker container run --help`.
+
+## Monitoring container processes
+
+Some CLI commands for looking at container processes:
+
+* `docker container top` - process list in one container
+* `docker container inspect` - config details for one container
+* `docker container stats` - performance stats for one or all containers
+
+## Running a shell in a container
+
+Can use the `-it` flag (**i**nteractive, **t**erminal) when a container is run.
+
+For example, run a container using the nginx image and start `bash` instead of the default command.
+
+```bash
+$ docker container run -it --name webserver nginx bash
+```
+
+If we `exit` bash the container stops. To restart the same container (bash is the start command), and connect interactively again, use the `-ai` flag (**a**ttach, **i**nteractive):
+
+```bash
+$ docker container start -ai webserver
+```
+
+To connect to an existing, running container use the `exec` command:
+
+For example, run bash on a container named *db1*:
+
+```bash
+$ docker container exec -it db1 bash
+```
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 ## Port Mapping
 
 ## Volumes
@@ -114,7 +274,10 @@ docker-compose ps
 ```
 
 
-        
+## Referencea and Resources
+
+* [Docker Cheatsheet](/dev/dcoker/Docker-CheatSheet-08.09.2016-0.pdf)
+* https://www.bretfisher.com/docker/
 
 
 
