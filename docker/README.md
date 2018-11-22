@@ -416,7 +416,7 @@ The `nicename` can be used to refence the volume, and also is used in the host s
 
 `-v` can also be used to create new volumes. If the name is ommitted a new volume is created and named with a hash.
 
-In some instances volumes need to be created ahread time time - that is, before the `run`. For example, as if a non-default volume driver is required.
+In some instances volumes need to be created ahead of time - that is, before the `run`. For example, as if a non-default volume driver is required.
 
 ### Bind mounting
 
@@ -436,10 +436,231 @@ $ docker container run ... -v /path/on/host:/path/in/container image
 $ docker container run ... -v $(pwd):/path/in/container image
 ```
 
-
-
-
 Bind mounts are very useful for local development when source files are changing frequently.
+
+## Docker Compose
+
+Docker compose is used to configure relationships between containers - ie an application ecosystem.
+
+It is good for local development and testing and not intended for production.
+
+Two components:
+
+* `docker-compose.yml` - configuration file
+* `docker-compose` - cli tool
+
+### docker-compose.yml
+
+Compose YAML has it's own versions which need to be specified as the first line in the file.
+
+`docker-compose.yml` is the default config gile name, however can use any file name with `-f`.
+
+```yaml
+version: '3.1'  # if no version is specificed then v1 is assumed. Recommend v2 minimum
+
+services:  # containers. same as docker run
+  servicename: # a friendly name. this is also DNS name inside network
+    image: # Optional if you use build:
+    command: # Optional replace the default CMD specified by the image
+    environment: # Optional, same as -e in docker run
+    volumes: # Optional, same as -v in docker run
+  servicename2:
+
+volumes: # Optional, same as docker volume create
+
+networks: # Optional, same as docker network create
+```
+
+### Building images with compose
+
+`docker-compose up` will build images if not found in cache
+
+`docker-compose build` will rebuild images
+
+`docker-compose up --build`
+
+This is good for complex build with lots of args.
+
+Note that `docker-compose` prepends the current directory name (project name) to networks and containers to avoid name conflicts.
+
+`docker-compose down` will remove the containers but not any volumes that were created. This is good for persistening data between container builds.
+
+`docker-compose down -v` will remove the containers *and* the associated  volumes.
+
+## Swarm mode: built-in orchestration
+
+* Swarm Mode is a clustering solution built inside Docker - not enabled by default.
+
+To see if swarm is active:
+
+```bash
+$ docker info
+```
+
+If inactive, initialise with:
+
+```bash
+$ docker swarm init
+```
+
+Key commands (use `--help` to see options):
+
+* `docker swarm`
+* `docker node`
+* `docker service`
+
+`docker service` replace the `docker run` command in a swarm.
+
+For example:
+
+```bash
+$ docker service create alpine ping 8.8.8.8
+```
+
+Outputs a *service* id (not a container id).
+
+To show services:
+
+```bash
+$ docker service ls
+```
+
+To drill down and see the **tasks* (ie containers) in the service, do:
+
+```bash
+$ docker service ps <service name>
+```
+
+Note that `docker container ls` still works and the container name has additional info related to the cluster. 
+
+To scale up the service:
+
+```bash
+$ docker service update pedantic_goldstine --replicas 3
+```
+
+`docker service update` has a lot of options to control nodes in a service. This is to faciliate the **blue-gree** pattern that allows updates to be rolled out without and service interuption.
+
+
+### Swarm services
+
+### Overlay multi-host networking
+
+Network setup with swarm is similar to a normal docker network except use `--driver overlay` to set up a swarm-wide bridge network. This means containers across different hosts can access each other as in a VLAN.
+
+It is only for container-to-container networking and can also enable encryption for all netwrok traffic.
+
+Services can be connected to multiple networks, depending an application architecture.
+
+Example - creating a Drupal service on multiple hosts:
+
+Create the network:
+
+```bash
+$ docker network create --driver overlay drupal-net
+$ docker network ls
+```
+
+Create the Postgres services
+
+```bash
+$ docker service create --name psql --network drupal-net -e POSTGRES_PASSWORD=password postgres
+$ docker service ls
+$ docker service ps psql
+$ docker container logs psql.[id/name]
+```
+
+Create Drupal service
+
+```bash
+$ docker service create --name drup --network drupal-net -p 8080:80 drupal
+$ docker service ls
+$ docker service ps drup
+```
+
+### Routing mesh
+
+The routing mesh routes ingress packets for a service to the proper task. 
+
+It load balances swarm services across their tasks.
+
+All external traffic can hit any IP as all nodes are listening.
+
+In the above example Postgres in installed on one node, and Drupal on another. However, Drupal reponds on any host IP within the swarm.
+
+This is a Layer 3 load balancer (TCP) so may need to use a proxy in fron to act as layer 4 web proxy.
+
+
+## Stacks: production grade compose
+
+`docker stack deploy`
+
+Does a lot of the setup automatically.
+
+Cannot do `build` in swarm, so the builds are normally done as part of a development pipeline.
+
+So on a local machine compose will ignore `deploy`, and on a production swarm compose will ignore `build`.
+
+Thus the same compose file can be applied to development and production environments.
+
+Don't need `docker-compose` on Swarm server.
+
+A *stack* is run on a single swarm.
+
+A stack file is a compose file - must be version 3 or later.
+
+Stack can be redeployed when the stack compose file is updated and they will rebuild whatever is necessary.
+
+## Secrets storage
+
+Easy and secure storage for env vars that are encrypted on disk and in transit.
+
+Swarm Raft DB is encrypted on disk and only stored on *Manager* nodes.
+
+Secrets are stored in Swarm and then assigned to particular services and only the containers in those services can see them.
+
+Local `docker-compose` can use file-based secrets using a workaround - not secure but allows for local use.
+
+Example - create secret from a file:
+
+```bash
+$ docker secret create psql_user psql_user.txt
+```
+
+Example - create a secret from the command line:
+
+```bash
+$ echo "myPassword" | docker secret create psql_pass -
+```
+
+To view secrets (not their values!):
+
+```bash
+$ docker secret ls
+```
+
+To assign the secrets to a service:
+
+```bash
+docker service create --name psql --secrete psql_user --secret psql_pass \
+  -e POSTGRESS_PASSWORD_FILE=/run/secrets/psql_pass \
+  -e POSTGRESS_USER_FILE=/run/secrets/psql_user \
+  postgres
+```
+
+Note that `/run/secrets/psql_*` are references to in-memory files.
+
+Also not that in the above example the Postgres images has implemented a way to access the user and pass values from a file by using a special env var. Otherwise would have to `cat` the value or something similar. Other images might not have this feature.
+
+Secrets are part of the immutable state of a container. So, if a secret is removed or added, the container is redeployed.
+
+For example:
+
+```bash
+$ docker service update --secret-rm psql_pass
+```
+
+Secrets require compose file version `3.1` or later.
 
 
 
@@ -595,10 +816,29 @@ docker-compose ps
 ```
 
 
-## Referencea and Resources
+## Tips and tricks
+
+Install git and clean up cache
+
+```dockerfile
+RUN apt-get update && apt-get install -y git \
+    && rm -rf /var/lib/apt/lists/*
+```
+
+Get only latest commit on a single branch
+
+```dockerfile
+RUN git clone --branch <branch name> --single-branch  --depth 1 <repo url>
+```
+
+
+
+## References and Resources
 
 * [Docker Cheatsheet](/dev/dcoker/Docker-CheatSheet-08.09.2016-0.pdf)
 * https://www.bretfisher.com/docker/
+* https://labs.play-with-docker.com/
+
 
 
 
