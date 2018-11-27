@@ -346,3 +346,112 @@ This pattern is used here: <https://github.com/mikedonnici/rtcl-api/blob/master/
 If the number or scale of helper functions becomes significant they can introduce their own bugs so may be worthwhile creating test helpers in a seperate sub package. This is also a handy for providing access to the helper functions for consumers of the package, for example: [httptest](https://golang.org/src/net/http/httptest/recorder_test.go)
 
 Another approach might be to create a `testing.go` file in the package directory.
+
+**ref:** <https://members.usegolang.com/twg/lessons/lesson-34>
+
+## Running Specific Tests
+
+Can run a specific test function, for example:
+
+```bash
+$ go test -v -run TestLog/log/testLogsByUserID
+=== RUN   TestLog
+=== RUN   TestLog/log
+=== RUN   TestLog/log/testLogsByUserID
+--- PASS: TestLog (0.12s)
+    --- PASS: TestLog/log (0.00s)
+        --- PASS: TestLog/log/testLogsByUserID (0.00s)
+PASS
+ok      github.com/mikedonnici/rtcl-api/datastore    0.126s
+```
+
+This will run the `testLogsByUserID` sub test within the `log` group, in the `TestLog` function, as shown below:
+
+```go
+func TestLog(t *testing.T) {
+
+    t.Run("log", func(t *testing.T) {
+        t.Run("testPingDB", testPingDB)
+        t.Run("testAddLog", testAddLog)
+        t.Run("testUpdateLog", testUpdateLog)
+        t.Run("testDeleteLog", testDeleteLog)
+        t.Run("testLogByID", testLogByID)
+        t.Run("testLogByIDNotFound", testLogByIDNotFound)
+        t.Run("testLogsByUserID", testLogsByUserID)
+    })
+}
+```
+
+The flag `-run TestLog/log/testLogsByUserID` behaves like a regular expresion so tests can be matches in various ways:can be used:
+
+```bash
+go test -v -run TestLog/log/testLogsByUserID # matches one test
+go test -v -run TestLog/log/testLog          # matches 3 tests
+go test -v -run TestLog/log                  # matches all tests
+```
+
+### Skipping Tests
+
+The `-short` flag can be used in combination with `t.Skip()` as required.
+
+For example:
+
+```bash
+go test -v -short
+```
+
+```go
+func TestThing(t *testing.T) {
+    if testing.Short() {
+        t.Skip()
+    }
+    t.Log("Run long tests")
+}
+```
+
+Could also create custom flags to control which tests are run, for example, `-integration` to run integration tests:
+
+(Example from <https://github.com/joncalhoun/twg/blob/master/skip/flag_test.go>)
+
+```go
+var integration = false
+
+func init() {
+    flag.BoolVar(&integration, "integration", false, "run database integration tests")
+}
+
+func TestMain(m *testing.M) {
+    flag.Parse()
+    if integration {
+        // setup integration stuff if you need to
+    }
+    result := m.Run()
+    if integration {
+        // teardown integration stuff if you need to
+    }
+    os.Exit(result)
+}
+
+func TestWithFlag(t *testing.T) {
+    if !integration {
+        t.Skip()
+    }
+    t.Log("Running the integration test...")
+}
+```
+
+### Specifying tests with build tags
+
+[Build tags](https://golang.org/pkg/go/build/) can also be used to specify a set of tests to include.
+
+For example:
+
+Integration tests for psql and mysql are separated into files: `tag_psql_test.go`, build tag `// +build psql` and `tag_mysql_test.go`, build tag `// +build mysql` respectively. The tests for each can then be specified as follows:
+
+```bash
+go test -v -tags=psql         # postgres tests
+go test -v -tags=mysql        # mysql tests
+go test -v -tags="psql mysql" # both
+```
+
+**ref**: <https://members.usegolang.com/twg/lessons/lesson-42>
