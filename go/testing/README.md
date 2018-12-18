@@ -17,13 +17,13 @@ Good tests have a **clear purpose**, such as:
 
 The go test tool compiles the code into an executable which is stored in a tmp folder, and cleaned up after the tests have completed.
 
-## Func naming conventions:
+## Func naming conventions
 
 ```go
 func TestType_method(t *testing.T){}
 ```
 
-## Var naming conventions:
+## Var naming conventions
 
 ```go
 arg := "argument to func being tested"
@@ -455,3 +455,229 @@ go test -v -tags="psql mysql" # both
 ```
 
 **ref**: <https://members.usegolang.com/twg/lessons/lesson-42>
+
+## Verbose flag
+
+The `-v` flag gives a more verbose output and will display output from `t.Log()`.
+
+To trigger actions when a _verbose_ testing is running, can do:
+
+```go
+if testing.Verbose() {
+ // ...
+}
+```
+
+## Code Coverage
+
+`-cover` flags gives coverage information:
+
+```bash
+go test -cover
+```
+
+`-coverprofile` stores coverage information in a file:
+
+```bash
+go test --coverprofile=cover.out
+```
+
+This file can then be used to provide information about coverage, using `go tool`:
+
+```bash
+go tool cover -func=cover.out
+```
+
+The above will show coverage info for each function, or use the `-html` flag to generate an html version:
+
+```bash
+go tool cover -html=cover.out
+```
+
+Here's a nice little trick!
+
+Put this in `.bashrc` / `.bash_profile`:
+
+```bash
+cover () {
+    t="/tmp/go-cover.$$.tmp"
+    go test -coverprofile=$t $@ && go tool cover -html=$t && unlink $t
+}
+```
+
+Run `cover` from within the package directory to show the coverage in the terminal, and also the html version.
+
+Refs:
+
+- <https://coderwall.com/p/rh-v5a/get-coverage-of-golang-test>
+- <https://stackoverflow.com/questions/10516662/how-to-measure-code-coverage-in-golang>
+- <https://blog.golang.org/cover>
+
+## Internal vs external tests
+
+Internal tests are written within the same package name.
+
+External tests are written as though from an _external_ package and use the packgage name convention: `pkgname_test`.
+
+Common naming convention to separate internal and external package test code into files named `pkgname_internal_test.go` and `pkgname_test.go` respectively.
+
+Generally, _external_ tests should be used wherever possible, because:
+
+- Implementation agnostic - won't break if implementation changes, less _brittle_
+- Helps with versioning - if tests do break then might need to bump major version
+- Provides better documentation/examples about how to use the package
+- Tends to lead to better package design - more user friendly
+
+External test can sometimes help to resolve cyclical dependencies.
+
+Using external tests means that the unexported types, methods, functions etc are _not_ available in test functions.
+
+If it is desirable to access an unexported value in an _external_ test the following convention is often used:
+
+- Create a filed called `export_test.go`
+- Assign this file to the _internal_ package name
+- Map the required values
+
+`export_test.go`
+
+```go
+package foo
+
+var Bar = bar
+```
+
+`foo_test.go`
+
+```go
+package foo_test
+
+func TestFoo(t *testing.T) {
+    got := Foo()
+    // ...
+}
+```
+
+Because this is an `_test` file the code will only be included in tests.
+
+Default should be to create _external_ tests, so _internal_ test are only necessary when something cannot be achieved using _external_ tests.
+
+## Global state
+
+Makes testing more difficult so _should be avoided wherever possible_.
+
+## Dependency injection
+
+Dependency injection is a just a design pattern that enables more _implementation-agnostic_ code.
+
+```go
+// without dependency injection
+func Demo1() {
+    logger := log.New(os.Stdout, "", log.Ldate|log.Ltime)
+    err := foo()
+    if err != nil {
+        logger.Println("foo() err =", err)
+    }
+}
+
+// with dependency injection
+func Demo2(logger *log.Logger) {
+    err := foo()
+    if err != nil {
+        logger.Println("foo() err =", err)
+    }
+}
+```
+
+The above example is still quite strict as it requires a very specific paramter be passed in to `Demo2()`.
+
+To make it _implementation-agnostic_ could pass in a logging function:
+
+```go
+func Demo3(logFn func(...interface{})) {
+    err := foo()
+    if err != nil {
+        logFn("foo() err =", err)
+    }
+}
+```
+
+Taken one step further, use an interface:
+
+```go
+type Logger interface {
+    Println(...interface{})
+    Printf(string, ...interface{})
+}
+
+// Call with:
+//  logger := log.New(...)
+//  Demo4(logger)
+func Demo4(logger Logger) {
+    err := foo()
+    if err != nil {
+        logger.Println("foo() err =", err)   // or...
+        logger.Printf("foo() err = %s\n", err)
+    }
+}
+```
+
+Can avoid having to pass the `Logger` in each time by using a struct:
+
+```go
+type Foo struct {
+    Logger interface {
+        Println(...interface{})
+        Printf(string, ...interface{})
+    }
+}
+
+func (f Foo) Demo5() {
+    err := foo()
+    if err != nil {
+        f.Logger.Println("foo() err =", err)   // or...
+        f.Logger.Printf("foo() err = %s\n", err)
+    }
+}
+```
+
+## DI and useful zero values / defaults
+
+Dependency injection requires the dependencies to be passed in (obviously). If, for example, a large code base was being changed over to DI it may be desirable for the functions that use the dependencies to be able to handle a zero value.
+
+For example:
+
+```go
+func Foo(bar Dependency) {
+    if bar == nil {
+        bar = DefaultBar()
+    }
+    // ...
+}
+```
+
+## Removing global state with DI
+
+Global variables should be avoided wherever possible and even unexported, package-level variables can create problems.
+
+Sometimes it is desirable to simplify code by create some type of package-level default value that is accessible to all functions.
+
+This can be done using a type, for example:
+
+```go
+type Foo struct {
+    Logger interface{
+        Println(...interface{})
+        Printf(string, ...interface{})
+    }
+}
+
+var defaultFoo Foo
+
+func Bar() {
+    defaultFoo.Bar()
+}
+```
+
+DI make writing tests easier and enables implementation -agnostic design patters such as _domain-driven design_.
+
+DI is not free and generally required more code to implement.
