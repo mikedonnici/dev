@@ -7,6 +7,6 @@ To `go get` all of the dependencies for a project run this command from within t
 go get -t ./...
 ```
 
-## Go Modules from v11.1
+## Go Modules from v1.11
 
 Good intro: <https://roberto.selbach.ca/intro-to-go-modules/>
