@@ -1,8 +1,11 @@
 {
-    "name": "Dev Notes",
+    "name": "devnotes",
     "version": "0.1.0",
     "description": "Mike's dev notes",
     "scripts": {
         "build": "vuepress build"
+    },
+    "dependencies": {
+        "vuepress": "^0.14.8"
     }
 }
