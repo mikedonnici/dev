@@ -1,0 +1,8 @@
+{
+    "name": "Dev Notes",
+    "version": "0.1.0",
+    "description": "Mike's dev notes",
+    "scripts": {
+        "build": "vuepress build"
+    }
+}
