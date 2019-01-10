@@ -1,6 +1,6 @@
-# Testing
+# Testing in Go
 
-_Notes from Jon Calhoun's testing with Go_
+_Notes sourced primarily from Jon Calhoun's: Test with Go course_
 
 Tests do the following:
 

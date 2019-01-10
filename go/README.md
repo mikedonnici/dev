@@ -1,6 +1,10 @@
 # Go
 
+- [Code organisation](./code-organisation/) - HTTP service example
+
 ## Learning Resources
+
+**[API Development](https://leanpub.com/b/golang-app-bundle)**
 
 **[Golang Bot](https://golangbot.com/learn-golang-series)** - Nice tutorial series on Go fundamentals
 
