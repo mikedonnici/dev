@@ -1,6 +1,11 @@
 # Go
 
 - [Code organisation](./code-organisation/) - HTTP service example
+- [Dependencies](./dependencies/)
+- [JWT](./jwt/)
+- [network-programming](./network-programming/)
+- [testing](./testing/)
+- [tooling](./tooling/)
 
 ## Learning Resources
 

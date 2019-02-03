@@ -681,3 +681,26 @@ func Bar() {
 DI make writing tests easier and enables implementation -agnostic design patters such as _domain-driven design_.
 
 DI is not free and generally required more code to implement.
+
+## Mocking
+
+Mocking is used in tests to pass a fake implementation of _something_ in order to run the tests. The _something_ might be an email client, database connection or similar - ie real-world things that may not be easy to run tests with.
+
+Some commonly used terms:
+
+- _Dummy_ - an object/value that will _not_ be used in a test. Not relevant in Go as can generally pass in `nil`.
+- _Stub_ - a limited implementation (of a func) that returns a bare minimum to simulate the behaviour of the actual function.
+- _Fake_ or _Double_ - next level from a _Stub_ in that it is closer the the real implementation.
+
+A _Spy_ and a _Mock_ are pretty much the same thing in Go. However, in general terms, a _Spy_ will report something going wrong and a _Mock_ will fail if something goes wrong. (eh?)
+
+In all cases mocking is a useful testing tool however it should not be relied on in favour of integration tests that can check if things are working in a more realistic way.
+
+Mocking is almost always done to make testing simpler, or make testing possible.
+
+Some third-party packages can be useful for generated mock code, for example:
+
+- <https://github.com/josharian/impl>
+- <https://github.com/matryer/moq>
+
+Good demo of faking an API : <https://members.usegolang.com/twg/lessons/lesson-71>
