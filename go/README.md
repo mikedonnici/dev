@@ -31,3 +31,5 @@
 
 [**RFD 106 Engineering Guide - Go Best Practices** - Joyent](https://github.com/joyent/rfd/blob/master/rfd/0106/README.adoc)
 
+[**Using Go Modules**](https://blog.golang.org/using-go-modules)
+
