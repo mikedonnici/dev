@@ -26,3 +26,6 @@
 **Go for Industrial Programming** - Peter Bourgon - [article](http://peter.bourgon.org/go-for-industrial-programming/) / [video](https://www.youtube.com/watch?v=PTE4VJIdHPg)
 
 [**Advanced testing with Go** - Mitchell Hashimoto](https://www.youtube.com/watch?v=8hQG7QlcLBk)
+
+[**RFD 106 Engineering Guide - Go Best Practices** - Joyent](https://github.com/joyent/rfd/blob/master/rfd/0106/README.adoc)
+
