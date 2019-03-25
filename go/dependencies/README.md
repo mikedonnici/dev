@@ -1,15 +1,6 @@
-# Go Dependencies
+# Go Modules
 
-To `go get` all of the dependencies for a project run this command from within the project folder:
-
-```bash
-# -t will include test dependencies
-go get -t ./...
-```
-
-## Go Modules
-
-Extract from <<https://blog.golang.org/using-go-modules>
+Extract from <https://blog.golang.org/using-go-modules>
 
 - A module is a collection of Go packages stored in a file tree with a `go.mod` file at its root
 - `go.mod` defines the **module path** which is the import path for the root directory and its _depedenency requirements_
@@ -66,7 +57,7 @@ Clean up unused dependencies:
 go mod tidy
 ```
 
-### Summary
+## Summary
 
 - `go mod init` creates a new module, initializing the go.mod file that describes it.
 - `go build`, `go test`, and other package-building commands add new dependencies to `go.mod` as needed.
