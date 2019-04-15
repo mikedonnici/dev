@@ -11,7 +11,7 @@
 
 - [Effective Go](https://golang.org/doc/effective_go.html)
 - [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments)
-
+ 
 ## Learning Resources
 
 **[API Development](https://leanpub.com/b/golang-app-bundle)**
@@ -37,4 +37,6 @@
 [**RFD 106 Engineering Guide - Go Best Practices** - Joyent](https://github.com/joyent/rfd/blob/master/rfd/0106/README.adoc)
 
 [**Using Go Modules**](https://blog.golang.org/using-go-modules)
+
+[**Idiomatic Go Resources**](https://medium.com/@dgryski/idiomatic-go-resources-966535376dba)
 
