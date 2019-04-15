@@ -7,6 +7,11 @@
 - [testing](./testing/)
 - [tooling](./tooling/)
 
+## Idiomatic Go
+
+- [Effective Go](https://golang.org/doc/effective_go.html)
+- [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments)
+
 ## Learning Resources
 
 **[API Development](https://leanpub.com/b/golang-app-bundle)**
