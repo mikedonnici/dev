@@ -40,3 +40,13 @@ print(next(itera))
 print(next(itera))
 print(next(itera))
 ```
+
+`enumerate()` returns an `enumerate` object that produces a sequence of tuples, each of which an index-value pair.
+
+`list()` creates a list from the `enumerate` object.
+
+```python
+eo = enumerate(['a', 'b', 'c'])
+print(list(eo))
+[(0, 'a'), (1, 'b'), (2, 'c')]
+```
