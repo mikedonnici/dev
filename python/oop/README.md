@@ -80,7 +80,7 @@ and / or functions of an object at runtime.
 Each python class and objects has a set of attributes that can be used to
 examine capability.
 
-#### \_\_dict__
+#### `__dict__`
 
 `objName.__dict__` contains a `dict` of _instance_ vars with keys named in
 the _mangled_ form: `_ClassName__varName`.
@@ -97,7 +97,7 @@ print(f._Foo__iVar) # instance var
 print(f._Foo__cVar) # class var
 ```
 
-#### \_\_name__
+#### `__name__`
 
 `ClassName.__name__` will return the string name of the class. **This attribute
 only exists in classes**.
@@ -111,7 +111,7 @@ obj = Foo()
 print(type(obj).__name__)
 ```
 
-#### \_\_module__
+#### `__module__`
 
 Returns a string that is the name of the module that contains
 the class - it works on both classes and objects:
@@ -124,18 +124,15 @@ obj = Foo()
 print(obj.__module__)
 ```
 
-#### \_\_bases__
+#### `__bases__`
 
 A tuple that contains classes (not class names) that are direct
 _superclasses_ of the class in question. **This attribute
 only exists in classes**.
 
+## Inheritance
 
-
-
-## Classes and Sub-classes
-
-Example:
+#### Class and subclass example:
 
 ```python
 class Stack:
@@ -159,14 +156,14 @@ class Stack:
 class AddingStack(Stack):
 
     def __init__(self):
-        """Sub class constructor needs to explicitly 
+        """Sub class constructor needs to explicitly
         call __init__() of super class"""
         Stack.__init__(self)
         self.__sum = 0
 
     def push(self, val):
-        """Sub class push() overrides super class function 
-        (polymorphism) but needs to call push() on the super 
+        """Sub class push() overrides super class function
+        (polymorphism) but needs to call push() on the super
         class to access __items. Note: self must be passed explicitly."""
         Stack.push(self, val)
         self.__sum += val
@@ -181,4 +178,89 @@ s1.push(2)
 s1.push(3)
 s1.push(4)
 print(s1.getSum())
+```
+
+#### `issubclass(ClassOne, ClassTwo)`
+
+Returns `True` if `ClassOne` is a subclass of `ClassTwo`.
+
+**Note:** A class is considered subclass of itself.
+
+#### `isinstance(objName, ClassName)`
+
+Returns `True` if `objName` is an instance of `ClassName` or any of its superclasses.
+
+#### `is` operator
+
+Returns `True` if two vars point to the same object:
+
+```python
+objOne is objTwo
+```
+
+#### `super()`
+
+The super and subclass example above shows how the subclass can call the superclass constructor with `SuperClassName.__init__(self, someVar)`. Using this method `self` must be passed explicitly.
+
+The same thing can be achieved using the `super()` function, however there is no need to pass `self`:
+
+```python
+class Foo():
+    def _init_(self, someVar):
+        self.someVar = someVar
+
+class SubFoo(Foo):
+    def __init__(self, someVar):
+        super().__init__(someVar)
+```
+
+Using `super()` does not require knowledge of the superclass name and provides access to all of the resources in the superclass.
+
+When accessing entities from an object, python will:
+
+1. Look at the object first, then
+1. Look at the class hierarchy, from bottom to top
+1. Raise an `<AttributeError>` exception
+
+#### Multiple Inheritance
+
+A class can inherit from more than one superclass:
+
+```python
+class Foo:
+    pass
+
+class Bar:
+    pass
+
+class FooBar(Foo, Bar):
+    pass
+```
+
+#### Overriding
+
+When a method or attribute is defined in a subclass with the same name as that in a superclass, the subclass property will _override_ that of the superclass.
+
+In the case of _multiple inheritance_ the properties of the superclasses are scanned from _left_ to _right_ in the subclass declaration and the first match is the one that will be accessed.
+
+For example:
+
+```python
+class Left:
+    var = "L"
+    varLeft = "LL"
+    def fun(self):
+        return "Left"
+
+class Right:
+    var = "R"
+    varRight = "RR"
+    def fun(self):
+        return "Right"
+
+class Sub(Left, Right):
+    pass
+
+obj = Sub()
+print(obj.var, obj.varLeft, obj.varRight, obj.fun())
 ```

@@ -1,8 +1,7 @@
 # Python Notes
 
-- [Iterators](./iterators/)
 - [Object-Oriented Programming](./oop/)
+- [Exceptions](./exceptions/)
+- [Generators](./generators/)
 
-## [Iterators](./iterators/)
-
-Notes on _iterators_ and _iterables_.
+## [Generators](./generators/)
