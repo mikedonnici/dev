@@ -3,6 +3,7 @@
 - [Code organisation](./code-organisation/) - HTTP service example
 - [Dependencies](./dependencies/)
 - [JWT](./jwt/)
+- [Interfaces](./interfaces/)
 - [network-programming](./network-programming/)
 - [testing](./testing/)
 - [tooling](./tooling/)

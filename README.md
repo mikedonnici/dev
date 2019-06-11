@@ -4,6 +4,7 @@
 - [Git](./git/)
 - [Go](./go/)
 - [Practice](./practice/)
+- [Python](./python/)
 - [TDD](./tdd/)
 - [Vue / Nuxt](./vue/)
 - [Workflow](./workflow/)
