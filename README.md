@@ -6,6 +6,7 @@
 - [Practice](./practice/)
 - [Python](./python/)
 - [TDD](./tdd/)
+- [UML](./uml/)
 - [Vue / Nuxt](./vue/)
 - [Workflow](./workflow/)
 

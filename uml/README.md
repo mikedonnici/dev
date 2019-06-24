@@ -170,3 +170,5 @@ _User stories_ might be captured on sticky notes or cards and are not intended t
 _Use cases_ are used in waterfall methodologies.
 
 ### Identify the classes
+
+...

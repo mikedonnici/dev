@@ -6,10 +6,10 @@ Example:
 
 ```python
 def outer(par):
-	loc = par
-	def inner():
-		return loc
-	return inner
+    loc = par
+    def inner():
+        return loc
+    return inner
 
 var = 1
 fun = outer(var)
@@ -20,17 +20,17 @@ In is example, `outer()` returns a _copy_ of `inner()` with all of the local var
 
 When `fun()` is called, `outer()` no longer exists but the closure contains a copy of the environment and hence the value of `loc` is available.
 
-In the above example the closure has no params, so is \_invoked\_ with no args. However, a closure can be created with params as well:
+In the above example the closure has no params, so is _invoked_ with no args. However, a closure can be created with params as well:
 
 ```python
 def makeclosure(par):
-	loc = par
-	def power(p):
-		return p ** loc
-	return power
+    loc = par
+    def power(p):
+        return p ** loc
+    return power
 
 fsqr = makeclosure(2)
 fcub = makeclosure(3)
 for i in range(5):
-	print(i, fsqr(i), fcub(i))
+    print(i, fsqr(i), fcub(i))
 ```
