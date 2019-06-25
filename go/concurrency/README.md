@@ -6,8 +6,7 @@ _Parallel execution_ is two programs running at exactly the same time - this req
 
 Parallel execution does not speed up an individual task but gives better overall throughput.
 
-The amount of benefit depends on the types of tasks being performed. Using a dishwashing metaphor: you cannot
-both wash and dry a dish at the same time.
+The amount of benefit depends on the types of tasks being performed. Using a dishwashing metaphor: you cannot both wash and dry a dish at the same time.
 
 Conversley, multi-core systems are only exploited when the programs running on them are designed for parallel execution.
 
@@ -19,23 +18,17 @@ Concurrent code tells the computer that it is ok to run certain instructions in 
 
 **Concurrent vs Parallel**
 
-Concurrent execution _*may*_ run in parallel (hardware permitting), but not necessarily. In concurrent execution the
-times that multiple tasks are actually running overlaps. However, it may be such that one task is _paused_ while another
-starts up. The processor time is divided up amongst the processes until they are all done. In effect, they are all _in progress_
-concurrently but not necessarily _running_ concurrently.
+Concurrent execution __may__ run in parallel (hardware permitting), but not necessarily. In concurrent execution the times that multiple tasks are actually running overlaps. However, it may be such that one task is _paused_ while another starts up. The processor time is divided up amongst the processes until they are all done. In effect, they are all _in progress_ concurrently but not necessarily _running_ concurrently.
 
-By contrast, parallel execution means that multiple tasks are _actually running_ at the same time. There is no pause in one
-so another can have processor time. Hence, this requires seperate physical hardware.
+By contrast, parallel execution means that multiple tasks are _actually running_ at the same time. There is no pause in one so another can have processor time. Hence, this requires seperate physical hardware.
 
-The process of deciding which core particular tasks will run on, and if they will be parallel or concurrent, is not controlled
-by the programmer. It is controlled by the operating system and hardware and the Go runtime scheduler.
+The process of deciding which core particular tasks will run on, and if they will be parallel or concurrent, is not controlled by the programmer. It is controlled by the operating system and hardware and the Go runtime scheduler.
 
 The programmer just decides what _can_ be done in parallel.
 
 **Concurency without Parallelism**
 
-Can still get improved performance with concurrent code on a single core. This is because the latency of other operations can
-be hidden. For example, memory operation, screen output, keyboard input, network activity and so on.
+Can still get improved performance with concurrent code on a single core. This is because the latency of other operations can be hidden. For example, memory operation, screen output, keyboard input, network activity and so on.
 
 So, while waiting on other operations, the program can move on to the next task. In simple terms, it is just using waiting time constructively.
 
@@ -46,10 +39,13 @@ A _process_ is an instance of a running program.
 A process has:
 
 - Memory
+
   - Virtual address space
   - Code and access to shared libraries
   - Stack, heap
+
 - Registers (small, single word pieces of memory)
+
   - program counter, data registers, stack pointers
 
 An _operating system_ essentially allows a lot of processes to execute concurrently. It manages the processes to ensure they don't intefer with eachother, and get fair use of system resources. This process is called _**scheduling**_.
@@ -88,26 +84,26 @@ For example:
 package main
 
 import (
-	"fmt"
-	"time"
+    "fmt"
+    "time"
 )
 
 func main() {
 
-	var x int
+    var x int
 
-	go func() {
-		time.Sleep(1 * time.Millisecond)
-		x = 1
-	}()
+    go func() {
+        time.Sleep(1 * time.Millisecond)
+        x = 1
+    }()
 
-	go func() {
-		time.Sleep(1 * time.Millisecond)
-		x = 2
-	}()
+    go func() {
+        time.Sleep(1 * time.Millisecond)
+        x = 2
+    }()
 
-	time.Sleep(1 * time.Millisecond)
-	fmt.Println(x)
+    time.Sleep(1 * time.Millisecond)
+    fmt.Println(x)
 }
 ```
 
@@ -154,18 +150,18 @@ Example:
 ```go
 func main() {
 
-	x := 1
+    x := 1
 
-	var wg sync.WaitGroup
-	wg.Add(1) 		// wait for one goroutine
+    var wg sync.WaitGroup
+    wg.Add(1)         // wait for one goroutine
 
-	go func() {
-		x = 2
-		wg.Done() 	// signal to the waitgroup
+    go func() {
+        x = 2
+        wg.Done()     // signal to the waitgroup
   }()
-	wg.Wait() 		// wait until all done
+    wg.Wait()         // wait until all done
 
-	fmt.Print(x) 		// should be 2
+    fmt.Print(x)         // should be 2
 }
 ```
 
@@ -190,18 +186,18 @@ Example:
 ```go
 func main() {
 
-	a, b, c, d := 1, 2, 3, 4
+    a, b, c, d := 1, 2, 3, 4
 
-	ch := make(chan int)
-	go sum(a, b, ch)
-	go sum(c, d, ch)
+    ch := make(chan int)
+    go sum(a, b, ch)
+    go sum(c, d, ch)
 
-	e, f := <-ch, <-ch
-	fmt.Println(e * f) // 21
+    e, f := <-ch, <-ch
+    fmt.Println(e * f) // 21
 }
 
 func sum(a, b int, ch chan int) {
-	ch <- a + b
+    ch <- a + b
 }
 ```
 
