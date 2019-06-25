@@ -16,10 +16,26 @@ func main() {
 		log.Fatalln(err)
 	}
 
-	fmt.Println(nums)
+	fmt.Println("Original list:", nums)
 
+	ch := make(chan int)
+
+	// get sub slices
 	xxi := subLists(nums, 4)
-	fmt.Println(xxi)
+	fmt.Println("Sub lists:", xxi)
+
+	for i := range xxi {
+		go chanSort(xxi[i], ch, i+1)
+	}
+
+	var merged []int
+	for range nums {
+		n := <- ch
+		merged = append(merged, n)
+	}	
+	fmt.Println("Merged:", merged)
+
+	fmt.Println("Merged and sorted:", bubbleSort(merged))
 
 }
 
@@ -30,8 +46,6 @@ func inputNumbers() ([]int, error) {
 	scanner := bufio.NewScanner(os.Stdin)
 	scanner.Scan()
 	l := scanner.Text()
-
-	// numLists = subLists(nums, 4)
 
 	return numbersFromLine(l)
 }
@@ -74,4 +88,57 @@ func subLists(nums []int, parts int) [][]int {
 	}
 
 	return result
+}
+
+// chanSort sorts a slice of integers and sends them 
+// over the channel in ascending order 
+func chanSort(nums []int, ch chan int, routineNumber int) {
+	fmt.Print("goroutine", routineNumber, "sort list", nums, "->")
+	nums = bubbleSort(nums)
+	fmt.Println(nums)
+	for i := 0; i < len(nums); i++ {
+		ch <- nums[i]
+	}
+}
+
+// bubblesort returns a slice integers in ascending order
+func bubbleSort(nums []int) []int {
+	for i := 0; i < len(nums); i++ {
+		for j := 0; j < len(nums) - i - 1; j++ {
+			if nums[j] > nums[j+1] {
+				nums[j], nums[j+1] = nums[j+1], nums[j]
+			}
+		}
+	}
+	return nums
+}
+
+// insert inserts a value at an appropriate place according to its value
+func insert(n int, nums []int) []int {
+
+	// n is first element
+	if len(nums) == 0 {
+		return []int{n}
+	}
+
+	// n lowest so first
+	if n < nums[0] {
+		return append([]int{n}, nums...)
+	}
+
+	// n somewhere in the middle
+	for i := range nums {
+		if n >= nums[i] {
+			var result []int
+			head := nums[:i]
+			tail := nums[i:]
+			result = append(result, head...)
+			result = append(result, n)
+			result = append(result, tail...)
+			return result
+		}
+	} 
+
+	// n is last
+	return append(nums, n) 
 }
