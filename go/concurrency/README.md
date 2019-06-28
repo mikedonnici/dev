@@ -18,7 +18,7 @@ Concurrent code tells the computer that it is ok to run certain instructions in 
 
 **Concurrent vs Parallel**
 
-Concurrent execution __may__ run in parallel (hardware permitting), but not necessarily. In concurrent execution the times that multiple tasks are actually running overlaps. However, it may be such that one task is _paused_ while another starts up. The processor time is divided up amongst the processes until they are all done. In effect, they are all _in progress_ concurrently but not necessarily _running_ concurrently.
+Concurrent execution **may** run in parallel (hardware permitting), but not necessarily. In concurrent execution the times that multiple tasks are actually running overlaps. However, it may be such that one task is _paused_ while another starts up. The processor time is divided up amongst the processes until they are all done. In effect, they are all _in progress_ concurrently but not necessarily _running_ concurrently.
 
 By contrast, parallel execution means that multiple tasks are _actually running_ at the same time. There is no pause in one so another can have processor time. Hence, this requires seperate physical hardware.
 
@@ -249,3 +249,103 @@ c := <- ch // ch is empty
 ```
 
 In general terms it is desirable to minimise blocking, for better performance.
+
+### Channel iteration
+
+Can iteratively read from a channel:
+
+```go
+for i := range ch {
+    fmt.Println(i)
+}
+```
+
+In this case the loop is exited when the sender explicitly closes the channel with `close(ch)`.
+
+### Reading from multiple channels
+
+In the case where data from all channels is required, this is straight forward:
+
+```go
+a := <- ch1
+b := <- ch2
+c = a * b
+```
+
+When data can be inbound on multiple channels, but _only one_ is required (ie. first come, first served) a `select` statement is used:
+
+```go
+select {
+    case a = <- ch1:
+        fmt.Println(a)
+    case b <- ch2
+        fmt.Println(b)
+}
+```
+
+A `select` statement is used to read the _first_ data from a set of channels without blocking on the channels that did not deliver the data first, or at all.
+
+`select` can also be used on outbound channels:
+
+```go
+select {
+    case a = <- chIn:
+        fmt.Println("Received", a)
+    case chOut <- b:
+        fmt.Print("Sent", b)
+}
+```
+
+In both examples the entire `select` statement blocks until one of the cases _unblocks_ and execution can resume.
+
+#### Using select with an _abort_ channel
+
+Can use a signal from a different channel to quite waiting on data from one or more other channels. For example:
+
+```go
+package main
+
+import (
+    "bufio"
+    "fmt"
+    "os"
+)
+
+func main() {
+
+    ch := make(chan string)
+    quit := make(chan int)
+    var rec string
+    var abort bool
+
+    for {
+        if abort {
+            break
+        }
+
+        go userInput(ch, quit)
+
+        select {
+        case rec = <-ch:
+            fmt.Println("Received on ch: ", rec)
+        case <-quit:
+            abort = true
+        }
+    }
+
+    fmt.Println("Received a signal on the quit channel")
+}
+
+func userInput(ch chan string, quit chan int) {
+    fmt.Print("Enter string, 'q' to quit: ")
+    scanner := bufio.NewScanner(os.Stdin)
+    scanner.Scan()
+    s := scanner.Text()
+    if s == "q" {
+        quit <- 1
+        return
+    }
+
+    ch <- s
+}
+```
