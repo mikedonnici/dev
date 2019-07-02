@@ -1,36 +1,55 @@
 # Concurrency in Go
 
-_Concurrency_ and _parallelism_ or _parallel execution_ are closely related, but not the same.
+_Concurrency_ and _parallelism_ or _parallel execution_ are closely related, 
+but not the same.
 
-_Parallel execution_ is two programs running at exactly the same time - this requires two processors / cores.
+_Parallel execution_ is two programs running at exactly the same time - this 
+requires two processors / cores.
 
-Parallel execution does not speed up an individual task but gives better overall throughput.
+Parallel execution does not speed up an individual task but gives better 
+overall  throughput.
 
-The amount of benefit depends on the types of tasks being performed. Using a dishwashing metaphor: you cannot both wash and dry a dish at the same time.
+The amount of benefit depends on the types of tasks being performed. Using a 
+ dishwashing metaphor: you cannot both wash and dry a dish at the same time.
 
-Conversley, multi-core systems are only exploited when the programs running on them are designed for parallel execution.
+Conversley, multi-core systems are only exploited when the programs running 
+on  them are designed for parallel execution.
 
 Improvements in hardware speed are slowing due to physical limitations.
 
-So, _concurrent_ programming is used to exploit multi-core systems and achieve improved performance.
+So, _concurrent_ programming is used to exploit multi-core systems and 
+achieve improved performance.
 
-Concurrent code tells the computer that it is ok to run certain instructions in parallel, if it is able to do so.
+Concurrent code tells the computer that it is ok to run certain instructions in 
+parallel, if it is able to do so.
 
 **Concurrent vs Parallel**
 
-Concurrent execution **may** run in parallel (hardware permitting), but not necessarily. In concurrent execution the times that multiple tasks are actually running overlaps. However, it may be such that one task is _paused_ while another starts up. The processor time is divided up amongst the processes until they are all done. In effect, they are all _in progress_ concurrently but not necessarily _running_ concurrently.
+Concurrent execution **may** run in parallel (hardware permitting), but not 
+necessarily. In concurrent execution the times that multiple tasks are 
+actually  running overlaps. However, it may be such that one task is _paused_
+  while another starts up. The processor time is divided up amongst the 
+  processes  until they are all done. In effect, they are all _in progress_  
+  concurrently but not necessarily _running_ concurrently.
 
-By contrast, parallel execution means that multiple tasks are _actually running_ at the same time. There is no pause in one so another can have processor time. Hence, this requires seperate physical hardware.
+By contrast, parallel execution means that multiple tasks are _actually 
+running_  at the same time. There is no pause in one so another can have 
+processor time. Hence, this requires seperate physical hardware.
 
-The process of deciding which core particular tasks will run on, and if they will be parallel or concurrent, is not controlled by the programmer. It is controlled by the operating system and hardware and the Go runtime scheduler.
+The process of deciding which core particular tasks will run on, and if they 
+will be parallel or concurrent, is not controlled by the programmer. It is 
+controlled by the operating system and hardware and the Go runtime scheduler.
 
 The programmer just decides what _can_ be done in parallel.
 
 **Concurency without Parallelism**
 
-Can still get improved performance with concurrent code on a single core. This is because the latency of other operations can be hidden. For example, memory operation, screen output, keyboard input, network activity and so on.
+Can still get improved performance with concurrent code on a single core. 
+This is because the latency of other operations can be hidden. For example, 
+memory operation, screen output, keyboard input, network activity and so on.
 
-So, while waiting on other operations, the program can move on to the next task. In simple terms, it is just using waiting time constructively.
+So, while waiting on other operations, the program can move on to the next 
+task. In simple terms, it is just using waiting time constructively.
 
 ## Processes
 
@@ -48,35 +67,66 @@ A process has:
 
   - program counter, data registers, stack pointers
 
-An _operating system_ essentially allows a lot of processes to execute concurrently. It manages the processes to ensure they don't intefer with eachother, and get fair use of system resources. This process is called _**scheduling**_.
+An _operating system_ essentially allows a lot of processes to execute 
+concurrently. It manages the processes to ensure they don't intefer with 
+eachother, and get fair use of system resources. This process is called 
+_**scheduling**_.
 
-For example, in Linux systems each process is generally allowed 20ms of processor time before the next processes gets a turn.
+For example, in Linux systems each process is generally allowed 20ms of 
+processor time before the next processes gets a turn.
 
-On a single-core system he processes are not _actually_ running in parallel, however they appear as they though they are because of scheduling.
+On a single-core system he processes are not _actually_ running in parallel, 
+however they appear as they though they are because of scheduling.
 
-There are many types of scheduling algorithms that allocate processor time based on _priorities_.
+There are many types of scheduling algorithms that allocate processor time 
+based on _priorities_.
 
-A **context switch** occurs when the OS switches from one process to another. During a context switch the _state_ (ie the context) is maintainedin memory for when the process is restarted. During a context switch it is the OS kernel code that is running, until the context has changed and the new process can run for its scheduled time.
+A **context switch** occurs when the OS switches from one process to another.
+ During a context switch the _state_ (ie the context) is maintained in memory 
+ for when the process is restarted. During a context switch it is the OS 
+ kernel code that is running, until the context has changed and the new 
+ process can run for its scheduled time.
 
-Context-switching takes time - writing the context to memory and then reading the next context from memory into registers. Memory access can be slow.
+Context-switching takes time - writing the context to memory and then reading
+ the next context from memory into registers. Memory access can be slow.
 
 ## Threads and Goroutines
 
-Threads are light-weight processes that share some common context. With this architecture changing threads still requires some context change, however the share part of the context does not have to be changed out for each thread. Thus, the _amount_ of context change is reduced so it is faster.
+Threads are light-weight processes that share some common context. With this 
+architecture changing threads still requires some context change, however the
+ share part of the context does not have to be changed out for each thread. 
+ Thus, the _amount_ of context change is reduced so it is faster.
 
-**Goroutines** are like threads. Multiple goroutines can be run within a main operating system thread. From the OS point of view it is executing a single thread, but within that thread Go is scheduling its own (sub)threads - goroutines.
+**Goroutines** are like threads. Multiple goroutines can be run within a main
+ operating system thread. From the OS point of view it is executing a single 
+ thread, but within that thread Go is scheduling its own (sub)threads - 
+ goroutines.
 
-This is manged by the **Go Runtime Scheduler**. This is like a mini OS and uses its own _logical processor_. By default, it uses a single logical processor and because it is all running on a single OS thread it is doing concurrency (not parallelism). However, multiple _logical processors_ can be used and then different goroutines can be run on different logical processors. In turn, these logical processors can be mapped to a different OS thread and if the system has multiple cores, these thread _may_ run in parallel.
+This is manged by the **Go Runtime Scheduler**. This is like a mini OS and 
+uses its own _logical processor_. By default, it uses a single logical 
+processor and because it is all running on a single OS thread it is doing 
+concurrency (not parallelism). However, multiple _logical processors_ can be 
+used and then different goroutines can be run on different logical processors
+. In turn, these logical processors can be mapped to a different OS thread 
+and if the system has multiple cores, these thread _may_ run in parallel.
 
-**Interleaving** refers to the unknown order in which concurrent process instructions may be scheduled. This can make debugging difficult as it is harder to reason about the state of concurrent processes than it is about sequential processes.
+**Interleaving** refers to the unknown order in which concurrent process 
+instructions may be scheduled. This can make debugging difficult as it is 
+harder to reason about the state of concurrent processes than it is about 
+sequential processes.
 
 ## Race conditions
 
-As interleaving is non-deterministic this can lead to a race condition - a situation where the outcome of a process will _depend_ on the interleaving. That is, the outcome of the process is _non-deterministic_ and can vary depending on the order in which the tasks are performed - effectively, a race.
+As interleaving is non-deterministic this can lead to a race condition - a 
+situation where the outcome of a process will _depend_ on the interleaving. 
+That is, the outcome of the process is _non-deterministic_ and can vary 
+depending on the order in which the tasks are performed - effectively, a race.
 
-The output of a process should almost definately be _deterministic_ so this is broken software.
+The output of a process should almost definately be _deterministic_ so this 
+is broken software.
 
-A race condition can only occur when more than one task has access to a common variable - that is, the tasks _communicate_ via a common variable.
+A race condition can only occur when more than one task has access to a 
+common variable - that is, the tasks _communicate_ via a common variable.
 
 For example:
 
@@ -129,17 +179,21 @@ func main() {
 }
 ```
 
-**Note:** when `main()` completes all goroutines exit - it does not wait for `foo()` to finish.
+**Note:** when `main()` completes all goroutines exit - it does not wait for 
+`foo()` to finish.
 
 ## Syncronisation
 
-Synchronisation is used to prevent undesirable interleaving by creating _global_ events whose execution is monitored by all threads, simultaneously.
+Synchronisation is used to prevent undesirable interleaving by creating 
+_global_ events whose execution is monitored by all threads, simultaneously.
 
-Synchronisation is necessary but it is, effectively, the opposite of concurrency and reduces performance.
+Synchronisation is necessary but it is, effectively, the opposite of 
+concurrency and reduces performance.
 
 The **`sync`** package contains functions to synchronise goroutines.
 
-`sync.WaitGroup` forces a goroutine to wait for a specified number of _other_ goroutines before it executes.
+`sync.WaitGroup` forces a goroutine to wait for a specified number of _other_
+ goroutines before it executes.
 
 - `Add()` increments the counter
 - `Done()` decrements the counter
@@ -169,11 +223,13 @@ func main() {
 
 ## Communication
 
-Goroutines usually work together to perform a larger task. This requires communication _between_ the goroutines.
+Goroutines usually work together to perform a larger task. This requires 
+communication _between_ the goroutines.
 
 Data is transferred between goroutines using _channels_.
 
-Channels are _typed_ and created using `make()`, and data is sent and received over a channel using the `<-` operator:
+Channels are _typed_ and created using `make()`, and data is sent and 
+received over a channel using the `<-` operator:
 
 ```go
 ch := make(chan int)
@@ -207,7 +263,11 @@ func sum(a, b int, ch chan int) {
 
 A channel is unbuffered by default and cannot hold data in transit.
 
-This means that only a single value can be moved through the channel at a time and that both the send and receive operation must complete before another value can move through the channel. That is, bother the send or receive operation will block until the opposite side of the channel has performed its operation.
+This means that only a single value can be moved through the channel at a 
+time and that both the send and receive operation must complete before 
+another value can move through the channel. That is, bother the send or 
+receive operation will block until the opposite side of the channel has 
+performed its operation.
 
 ```go
 // routine #1 and #2 are synchronous because of the unbuffered channel
@@ -220,7 +280,8 @@ ch <- 1
 x := <- ch
 ```
 
-Unbuffered channel communication is _synchronous_ and can be used in the same way as a `WaitGroup`:
+Unbuffered channel communication is _synchronous_ and can be used in the same
+ way as a `WaitGroup`:
 
 ```go
 // routine #1
@@ -233,7 +294,8 @@ ch <- 1
 
 Buffered channels can hold a specified number of values in transit.
 
-They only block when the buffer is _full_ at the sending side or _empty_ at the receiving side.
+They only block when the buffer is _full_ at the sending side or _empty_ at 
+the receiving side.
 
 ```go
 // routine #1
@@ -260,7 +322,8 @@ for i := range ch {
 }
 ```
 
-In this case the loop is exited when the sender explicitly closes the channel with `close(ch)`.
+In this case the loop is exited when the sender explicitly closes the channel
+ with `close(ch)`.
 
 ### Reading from multiple channels
 
@@ -272,7 +335,8 @@ b := <- ch2
 c = a * b
 ```
 
-When data can be inbound on multiple channels, but _only one_ is required (ie. first come, first served) a `select` statement is used:
+When data can be inbound on multiple channels, but _only one_ is required (ie
+. first come, first served) a `select` statement is used:
 
 ```go
 select {
@@ -283,7 +347,8 @@ select {
 }
 ```
 
-A `select` statement is used to read the _first_ data from a set of channels without blocking on the channels that did not deliver the data first, or at all.
+A `select` statement is used to read the _first_ data from a set of channels 
+without blocking on the channels that did not deliver the data first, or at all.
 
 `select` can also be used on outbound channels:
 
@@ -296,11 +361,13 @@ select {
 }
 ```
 
-In both examples the entire `select` statement blocks until one of the cases _unblocks_ and execution can resume.
+In both examples the entire `select` statement blocks until one of the cases 
+_unblocks_ and execution can resume.
 
 #### Using select with an _abort_ channel
 
-Can use a signal from a different channel to quite waiting on data from one or more other channels. For example:
+Can use a signal from a different channel to quite waiting on data from one 
+or more other channels. For example:
 
 ```go
 package main
@@ -349,3 +416,129 @@ func userInput(ch chan string, quit chan int) {
     ch <- s
 }
 ```
+
+## Mutual exclusion
+
+Multiple go routines accessing the same variable can interfere with each other.
+
+A program is _*concurrency-safe*_ when its concurrent routines do not 
+interfere with eachother.
+
+An operation on a shared variable may look safe, at the source code level, 
+for example:
+
+```go
+var i int // global
+
+func main() {
+    go inc()
+    go inc()
+    fmt.Print(i)
+}
+
+func inc() {
+	i = i + 1
+}
+```
+
+The expectation would be that, no matter how the interleaving happened between 
+the two goroutines, the outcome would be `i == 2`.
+
+However, interleaving happens at the _machine code_ level, and each of these
+operations would be further subdivided into subprocesses - read from memory to 
+register, update value, write from register to memory. If this was the case 
+there are 3 subroutines that can be interleaved in some way. If the _read_ 
+operation for both go routines happens first, then both will read the value 0,
+both will increment that value to 1 and both will write a 1 back to memory.  
+Thus, the outcome would be `i == 1` instead of the expected `i == 2`.
+ 
+Most developers are thinking at the source-code level and not at the 
+machine-code level so this type of scenario could create unexpected results.
+ 
+To make things safe need to restrict the interleavings so that goroutines 
+cannot write to the same variable at the same time - **mutual exclusion**.
+ 
+#### `sync.Mutex` 
+ 
+A `Mutex` can be used to ensure mutual exclusion. It uses a _binary 
+semaphore_ to indicate when a shared variable is in use or when it is 
+available.
+ 
+The `Lock()` method is called within the goroutine to signal that the 
+variable is in use. Any other goroutines trying to get a `Lock()` on the 
+same variable will _block_. 
+ 
+Once the goroutine has finished with the shared variable it calls `Unlock()`
+and the next blocked `Lock()` can proceed. That is, the variable can now be 
+locked by the next goroutine in the queue until it calls `Unlock()` and so on.
+
+#### `sync.Once`
+
+This is a type used when some type of initialisation is required for
+multiple goroutines. As there can be no reliable way to predict how
+goroutines will be scheduled, the `Once.Do()` method ensures that an
+initialisation function will be invoked only once, by the first
+goroutine in the schedule. All other invocations of `Do()` will block
+until the first has returned.
+
+Example:
+
+```go
+package main
+
+import (
+	"fmt"
+	"sync"
+)
+
+func main() {
+
+	var wg sync.WaitGroup
+	var first sync.Once
+
+	wg.Add(3)
+	go work(&wg, &first)
+	go work(&wg, &first)
+	go work(&wg, &first)
+	wg.Wait()
+
+}
+
+func setup() {
+	fmt.Println("Setting up...")
+}
+
+func work(wg *sync.WaitGroup, first *sync.Once) {
+	first.Do(setup)
+	fmt.Println("Working...")
+	wg.Done()
+}
+```
+<https://play.golang.org/p/9KNCf6IMv0H>
+
+## Deadlock
+
+One of the main complications with concurrent programming occurs when
+synchronisation code causes goroutines to depend on other goroutines.
+ 
+For example, one goroutine will put a value onto a channel, and another
+will read a value from the same channel. Or when a goroutine is waiting
+for an `Mutex.Unlock()` in order to execute `Mutext.Lock()`.
+ 
+These blocking dependencies become a problem when they become circular.
+This is **deadlock**.
+
+The go runtime will detect when _all_ routines are deadlocked, but not
+when a _subset_ of goroutines are deadlocked.
+
+A good example used to illustrate this is the [_Dining Philosophers
+Problem_](https://en.wikipedia.org/wiki/Dining_philosophers_problem).
+ 
+ 
+ 
+  
+ 
+ 
+ 
+ 
+
