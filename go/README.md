@@ -12,6 +12,7 @@
 
 - [Effective Go](https://golang.org/doc/effective_go.html)
 - [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments)
+- [Clean Go Code](https://github.com/Pungyeon/clean-go-article)
  
 ## Learning Resources
 
