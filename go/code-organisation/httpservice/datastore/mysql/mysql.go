@@ -11,16 +11,14 @@ import (
 type Connection struct {
 	DSN     string // Data source name, format: user:pass@tcp(hostname:3306)/ - exclude database name
 	DBName  string // Database name
-	Desc    string // Data source description to differentiate multiple sources
 	Session *sql.DB
 }
 
 // NewConnection returns a pointer to a Connection
-func NewConnection(dsn, dbname, desc string) (*Connection, error) {
+func NewConnection(dsn, dbName string) (*Connection, error) {
 	m := &Connection{
 		DSN:    dsn,
-		DBName: dbname,
-		Desc:   desc,
+		DBName: dbName,
 	}
 	err := m.checkFields()
 	if err != nil {
@@ -38,13 +36,10 @@ func NewConnection(dsn, dbname, desc string) (*Connection, error) {
 
 func (m *Connection) checkFields() error {
 	if m.DSN == "" {
-		return errors.New("MySQL DSN (data source name / connection string) not set")
+		return errors.New("MySQL DSN (store source name / connection string) not set")
 	}
 	if m.DBName == "" {
 		return errors.New("MySQL db name not set")
-	}
-	if m.Desc == "" {
-		return errors.New("MySQL desc not set")
 	}
 	return nil
 }

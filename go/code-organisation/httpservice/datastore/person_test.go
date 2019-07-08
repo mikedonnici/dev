@@ -1,39 +1,20 @@
 package datastore_test
 
 import (
-	"log"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/datastoretest"
 	"testing"
 
 	"github.com/matryer/is"
 	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore"
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mongo"
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mysql"
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/testdata"
 )
 
-var testDB = testdata.New()
-var ds = datastore.New()
+var personStore *datastore.Datastore
 
 func TestPerson(t *testing.T) {
 
-	var err error
-
-	// set up databases
-	err = setupDatabases()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	defer teardownDatabases()
-
-	// connect datastore to databases
-	err = datastoreConnectMySQL()
-	if err != nil {
-		log.Fatalln(err)
-	}
-	err = datastoreConnectMongoDB()
-	if err != nil {
-		log.Fatalln(err)
-	}
+	var teardown func()
+	personStore, teardown = datastoretest.Setup(t)
+	defer teardown()
 
 	// run tests
 	t.Run("group", func(t *testing.T) {
@@ -43,42 +24,6 @@ func TestPerson(t *testing.T) {
 	})
 }
 
-// setUpDatabases creates and populates test databases
-func setupDatabases() error {
-	err := testDB.SetupMySQL()
-	if err != nil {
-		return err
-	}
-	return testDB.SetupMongoDB()
-}
-
-// teardownDatabases cleans up the test databases
-func teardownDatabases() {
-	err := testDB.TearDownMySQL()
-	if err != nil {
-		log.Println(err)
-	}
-	err = testDB.TearDownMongoDB()
-	if err != nil {
-		log.Println(err)
-	}
-}
-
-// datastoreConnectMySQL connects the datastore to the MySQL test database
-func datastoreConnectMySQL() error {
-	var err error
-	ds.MySQL, err = mysql.NewConnection(testdata.MySQLDSN, testDB.DBName, "test mysql db")
-	return err
-}
-
-// datastoreConnectMongoDB connects the datastore to the test Mongo database
-func datastoreConnectMongoDB() error {
-	var err error
-	ds.Mongo, err = mongo.NewConnection(testdata.MongoDSN, testDB.DBName, "test")
-	return err
-}
-
-// Test fetch person
 func testPersonByID(t *testing.T) {
 	is := is.New(t)
 
@@ -91,7 +36,7 @@ func testPersonByID(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		p, err := ds.PersonByID(c.id)
+		p, err := personStore.PersonByID(c.id)
 		is.NoErr(err)                      // error fetching person by id
 		is.Equal(p.FirstName, c.firstName) // incorrect first name
 	}
@@ -110,7 +55,7 @@ func testPersonByOID(t *testing.T) {
 	}
 
 	for _, c := range cases {
-		p, err := ds.PersonByOID(c.oid)
+		p, err := personStore.PersonByOID(c.oid)
 		is.NoErr(err)                      // error fetching person by object id
 		is.Equal(p.FirstName, c.firstName) // incorrect first name
 	}
@@ -119,7 +64,7 @@ func testPersonByOID(t *testing.T) {
 // Test fetch people
 func testPeople(t *testing.T) {
 	is := is.New(t)
-	xp, err := ds.People()
+	xp, err := personStore.People()
 	is.NoErr(err)        // error fetching people
 	is.Equal(len(xp), 5) // expected 5 people records
 }

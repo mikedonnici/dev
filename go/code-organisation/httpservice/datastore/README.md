@@ -34,7 +34,7 @@ Examples:
 	ds := datastore.New()
 	ds.MongoDB = datastore.MongoDBConnection{
 		DSN:    "mongodb://localhost/mapp_demo",
-		DBName: "mapp_demo",
+		dbName: "mapp_demo",
 		Desc:   "Local MongoDB database",
 	}
 	err := ds.ConnectMongoDB()
@@ -61,7 +61,7 @@ Examples:
 	}
 	ds.MongoDB = datastore.MongoDBConnection{
 		DSN:    os.Getenv("MAPPCPD_MONGO_URL"),
-		DBName: os.Getenv("MAPPCPD_MONGO_DBNAME"),
+		dbName: os.Getenv("MAPPCPD_MONGO_DBNAME"),
 		Desc:   os.Getenv("MAPPCPD_MONGO_DESC"),
 	}
 

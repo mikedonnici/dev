@@ -10,16 +10,14 @@ import (
 type Connection struct {
 	DSN     string
 	DBName  string
-	Desc    string
 	Session *mgo.Session
 }
 
-func NewConnection(dsn, dbname, desc string) (*Connection, error) {
+func NewConnection(dsn, dbname string) (*Connection, error) {
 
 	m := &Connection{
 		DSN:    dsn,
 		DBName: dbname,
-		Desc:   desc,
 	}
 	err := m.checkFields()
 	if err != nil {
@@ -41,9 +39,6 @@ func (m *Connection) checkFields() error {
 	}
 	if m.DBName == "" {
 		return errors.New("MongoDB db name not set")
-	}
-	if m.Desc == "" {
-		return errors.New("MongoDB desc not set")
 	}
 	return nil
 }

@@ -23,6 +23,6 @@ func TestMain(m *testing.M) {
 
 func TestNewConnection(t *testing.T) {
 	is := is.New(t)
-	_, err := NewConnection(testdata.MongoDSN, "test", "test mongo db")
+	_, err := NewConnection(testdata.MongoDSN, "test")
 	is.NoErr(err)
 }
