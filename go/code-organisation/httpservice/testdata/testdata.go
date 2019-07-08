@@ -1,10 +1,10 @@
 package testdata
 
 import (
-	"fmt"
-	"encoding/json"
-	"time"
 	"database/sql"
+	"encoding/json"
+	"fmt"
+	"time"
 
 	"github.com/hashicorp/go-uuid"
 	"github.com/pkg/errors"
@@ -16,22 +16,24 @@ import (
 const MySQLDSN = "root:password@tcp(localhost:3306)/"
 const MongoDSN = "mongodb://localhost"
 
+// TestStore represents a set of database connections used to run tests.
+// testingStore est
 type TestStore struct {
-	DBName         string
+
 	MySQLSession   *sql.DB
 	MongoDBSession *mgo.Session
+
+	// DBName is an automatically generated name for all of the databases
+	DBName string
 }
 
-// New returns a pointer to a TestStore
+// New returns a pointer to a TestStore with a name for the test databases.
 func New() *TestStore {
-
 	s, _ := uuid.GenerateUUID()
 	n := fmt.Sprintf("%v_test", s[0:7])
-
-	t := TestStore{
+	return &TestStore{
 		DBName: n,
 	}
-	return &t
 }
 
 // SetupMySQL creates and populates the test MySQL database
@@ -46,31 +48,42 @@ func (t *TestStore) SetupMySQL() error {
 		return errors.Wrap(err, "Error creating test schema")
 	}
 
-	// connect session to newly create database
+	// connect session to newly create database, teardown if error
 	dsn := MySQLDSN + t.DBName
 	t.MySQLSession, err = sql.Open("mysql", dsn)
 	if err != nil {
-		t.TearDownMySQL()
-		return errors.Wrap(err, "Error connecting to the test database")
+		msg := fmt.Sprintf("SetupMySQL():\nsql.Open() err = %s\n", err)
+		err = t.TearDownMySQL()
+		if err != nil {
+			msg += fmt.Sprintf("TearDownMySQL() err = %s\n", err)
+		}
+		return errors.New(msg)
 	}
 
-	t.MySQLSession.Exec(fmt.Sprintf(CREATE_MYSQL_TABLE, t.DBName))
+	// create a table, teardown if error
+	_, err = t.MySQLSession.Exec(fmt.Sprintf(CREATE_MYSQL_TABLE, t.DBName))
 	if err != nil {
-		t.TearDownMySQL()
-		return errors.Wrap(err, "Error creating tables")
+		msg := fmt.Sprintf("SetupMySQL():\nExec() err = %s\n", err)
+		err = t.TearDownMySQL()
+		if err != nil {
+			msg += fmt.Sprintf("TearDownMySQL() err = %s\n", err)
+		}
+		return errors.Wrap(errors.New(msg), "Error creating tables")
 	}
 
+	// data into the table, teardown if error
 	_, err = t.MySQLSession.Exec(fmt.Sprintf(INSERT_MYSQL_DATA, t.DBName))
 	if err != nil {
-		t.TearDownMySQL()
-		return errors.Wrap(err, "Error inserting data")
+		msg := fmt.Sprintf("SetupMySQL():\nExec() err = %s\n", err)
+		err = t.TearDownMySQL()
+		if err != nil {
+			msg += fmt.Sprintf("TearDownMySQL() err = %s\n", err)
+		}
+		return errors.Wrap(errors.New(msg), "Error inserting data")
 	}
 
-	// Need a little delay to ensure the database is ready
-	for i := 0; i < 5; i++ {
-		time.Sleep(1 * time.Duration(time.Second))
-	}
-
+	// Little bit of hang time for database to do its thing
+	time.Sleep(5 * time.Second)
 	return nil
 }
 

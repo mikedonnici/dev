@@ -1,7 +1,7 @@
 # Testing
 
 The `testdata` dir contains function that will create a *real* datastore
-against which the datastore tests can run.
+against which the `datastore` tests can run.
 
 These are kept here because the `datastore` pkg is use to access databases
 that already exist. The creation and destruction of databases is to set

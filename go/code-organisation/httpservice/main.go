@@ -1,30 +1,19 @@
 package main
 
 import (
-	"log"
-	"os"
 	"flag"
 	"fmt"
+	"log"
+	"os"
 
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/server"
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore"
 	"github.com/34South/envr"
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mysql"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore"
 	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mongo"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mysql"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/server"
 )
 
 const defaultPort = "8080"
-
-//func init() {
-//	envr.New("appEnv", []string{
-//		"MYSQL_DSN",
-//		"MYSQL_DBNAME",
-//		"MYSQL_DESC",
-//		"MONGO_DSN",
-//		"MONGO_DBNAME",
-//		"MONGO_DESC",
-//	}).Auto()
-//}
 
 func main() {
 
@@ -43,7 +32,6 @@ func main() {
 	d.MySQL, err = mysql.NewConnection(
 		os.Getenv("MYSQL_DSN"),
 		os.Getenv("MYSQL_DBNAME"),
-		os.Getenv("MYSQL_DESC"),
 	)
 	if err != nil {
 		log.Fatalf("Datastore could not connect to MySQL")
@@ -52,7 +40,6 @@ func main() {
 	d.Mongo, err = mongo.NewConnection(
 		os.Getenv("MONGO_DSN"),
 		os.Getenv("MONGO_DBNAME"),
-		os.Getenv("MONGO_DESC"),
 	)
 	if err != nil {
 		log.Fatalf("Datastore could not connect to MongoDB")
@@ -69,22 +56,22 @@ func setPort(port string) string {
 	if os.Getenv("PORT") != "" {
 		return os.Getenv("PORT")
 	}
+
 	if port != "" {
 		return port
 	}
+
 	return defaultPort
 }
 
 func setEnv(cfg string) {
 
-	// declare required env vars
+	// required env vars
 	e := envr.New("appEnv", []string{
 		"MYSQL_DSN",
 		"MYSQL_DBNAME",
-		"MYSQL_DESC",
 		"MONGO_DSN",
 		"MONGO_DBNAME",
-		"MONGO_DESC",
 	})
 
 	// use cfg file if present
@@ -93,6 +80,4 @@ func setEnv(cfg string) {
 		e.Files = []string{cfg}
 	}
 	e.Auto()
-
-	fmt.Println(e.V)
 }
