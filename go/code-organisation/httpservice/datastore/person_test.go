@@ -4,7 +4,6 @@ import (
 	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/datastoretest"
 	"testing"
 
-	"github.com/matryer/is"
 	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore"
 )
 
@@ -25,7 +24,6 @@ func TestPerson(t *testing.T) {
 }
 
 func testPersonByID(t *testing.T) {
-	is := is.New(t)
 
 	cases := []struct {
 		id        string
@@ -36,15 +34,21 @@ func testPersonByID(t *testing.T) {
 	}
 
 	for _, c := range cases {
+		arg := c.id
+		want := c.firstName
 		p, err := personStore.PersonByID(c.id)
-		is.NoErr(err)                      // error fetching person by id
-		is.Equal(p.FirstName, c.firstName) // incorrect first name
+		if err != nil {
+			t.Errorf("PersonByID(%s) err = %s", arg, err)
+			continue
+		}
+		got := p.FirstName
+		if got != want {
+			t.Errorf("PersonByID(%s).FirstName = %q, want %q", arg, got, want)
+		}
 	}
 }
 
-// Test fetch person from MongoDb by OID
 func testPersonByOID(t *testing.T) {
-	is := is.New(t)
 
 	cases := []struct {
 		oid       string
@@ -55,16 +59,29 @@ func testPersonByOID(t *testing.T) {
 	}
 
 	for _, c := range cases {
+		arg := c.oid
+		want := c.firstName
 		p, err := personStore.PersonByOID(c.oid)
-		is.NoErr(err)                      // error fetching person by object id
-		is.Equal(p.FirstName, c.firstName) // incorrect first name
+		if err != nil {
+			t.Errorf("PersonByOID(%q) err = %s", arg, err)
+			continue
+		}
+		got := p.FirstName
+		if got != want {
+			t.Errorf("PersonByIOD(%q) = %q, want %q", arg, got, want)
+		}
 	}
 }
 
-// Test fetch people
 func testPeople(t *testing.T) {
-	is := is.New(t)
 	xp, err := personStore.People()
-	is.NoErr(err)        // error fetching people
-	is.Equal(len(xp), 5) // expected 5 people records
+	if err != nil {
+		t.Fatalf("People() err = %s", err)
+	}
+	// check count
+	want := 5
+	got := len(xp)
+	if got != want {
+		t.Errorf("People() count = %d, want %d", got, want)
+	}
 }
