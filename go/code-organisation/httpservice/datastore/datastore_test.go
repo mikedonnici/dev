@@ -4,7 +4,7 @@ import (
 	"testing"
 
 	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore"
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/datastoretest"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/testdata"
 )
 
 var store *datastore.Datastore
@@ -12,7 +12,7 @@ var store *datastore.Datastore
 func TestDatastore(t *testing.T) {
 
 	var teardown func()
-	store, teardown = datastoretest.Setup(t)
+	store, teardown = testdata.Setup(t)
 	defer teardown()
 
 	t.Run("datastore", func(t *testing.T) {

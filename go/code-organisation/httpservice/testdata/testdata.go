@@ -4,9 +4,14 @@ import (
 	"database/sql"
 	"encoding/json"
 	"fmt"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mongo"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/mysql"
+	"log"
+	"testing"
 	"time"
 
 	"github.com/hashicorp/go-uuid"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore"
 	"github.com/pkg/errors"
 	"gopkg.in/mgo.v2"
 	"gopkg.in/mgo.v2/bson"
@@ -27,13 +32,58 @@ type TestStore struct {
 	DBName string
 }
 
-// New returns a pointer to a TestStore with a name for the test databases.
+// New returns a pointer to a TestStore
 func New() *TestStore {
-	s, _ := uuid.GenerateUUID()
-	n := fmt.Sprintf("%v_test", s[0:7])
 	return &TestStore{
-		DBName: n,
+		DBName: randName(),
 	}
+}
+
+// Setup creates and returns a new datastore and teardown function
+func Setup(t *testing.T) (*datastore.Datastore, func()) {
+	t.Helper()
+
+	// The job of testStore is only to create the new test databases
+	testStore := New()
+	err := testStore.SetupMySQL()
+	if err != nil {
+		log.Fatalf("TestStore.SetupMySQL() err = %s", err)
+	}
+	err = testStore.SetupMongoDB()
+	if err != nil {
+		log.Fatalf("TestStore.SetupMongoDB() err = %s", err)
+	}
+
+	// Create a datastore and connect it to the newly created test databases
+	ds := datastore.New()
+	ds.MySQL, err = mysql.NewConnection(MySQLDSN, testStore.DBName)
+	if err != nil {
+		log.Fatalf("mysql.NewConnection(%s, %s) err = %s", MySQLDSN, testStore.DBName, err)
+	}
+	ds.Mongo, err = mongo.NewConnection(MongoDSN, testStore.DBName)
+	if err != nil {
+		log.Fatalf("mongo.NewConnection(%s, %s) err = %s", MongoDSN, testStore.DBName, err)
+	}
+
+
+	teardown := func() {
+		err := testStore.TearDownMySQL()
+		if err != nil {
+			t.Errorf("TearDownMySQL() err = %s", err)
+		}
+		err = testStore.TearDownMongoDB()
+		if err != nil {
+			t.Errorf("tearDownMongoDB() err = %s", err)
+		}
+	}
+
+	return ds, teardown
+}
+
+// randName generates a name for the test databases
+func randName() string {
+	s, _ := uuid.GenerateUUID()
+	return fmt.Sprintf("%v_test", s[0:7])
 }
 
 // SetupMySQL creates and populates the test MySQL database

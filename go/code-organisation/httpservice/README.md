@@ -1,14 +1,22 @@
-# httpservice app
+# http service example
 
 ## Overview
 
-This is a demo http service inspired by this [Matt Ryer article](https://medium.com/statuscode/how-i-write-go-http-services-after-seven-years-37c208122831).
+This is a demo http service inspired by this 
+[Matt Ryer article](https://medium.com/statuscode/how-i-write-go-http-services-after-seven-years-37c208122831).
 
-It builds on the datastore idea from the MappCPD project - a datastore being a simple struct that holds connections to one or more data sources.
+It builds on the datastore idea from the MappCPD project - a datastore 
+being a simple struct that holds connections to one or more data sources.
 
-In this case, however, the functions that fetch and format data are methods on the `datastore`. This makes testing easier and means that the `datastore` is responsible for all aspects of data storage and retrieval for the `httpservice`.
+In this case, however, the functions that fetch and format data are 
+methods on the `datastore`. This makes testing easier and means that 
+the `datastore` is responsible for all aspects of data storage and 
+retrieval for the `httpservice`.
 
-Integration tests are run against _real_ databases which are set up from the `testdata` dir.
+Integration tests are run against _real_ databases which are set up 
+from the `testdata` dir.
+
+In this example the datastore has a MySQL and a MongoDB database attached.
 
 ## Configuration
 
@@ -23,7 +31,7 @@ MONGO_DBNAME="test"
 MONGO_DESC="local mongo db"
 ```
 
-These can be set in three ways, in order of precendence:
+These can be set in three ways, in order of precedence:
 
 Firstly, by specifying a config file with the `-c` flag, eg:
 
@@ -31,19 +39,33 @@ Firstly, by specifying a config file with the `-c` flag, eg:
 go run main -c "./env_example.txt"
 ```
 
-Secondly, in the absence of a specified config file it will look for the default `.env` file.
+Secondly, in the absence of a specified config file it will look for 
+the default `.env` file.
 
-Finally, if the deployment environment allows for env vars to be set via a control panel or similar (eg Heroku)then no configuration file needs to be specified.
+Finally, if the deployment environment allows for env vars to be set 
+via a control panel or similar (eg Heroku) then the env var values will 
+be read from the environment and no configuration file is necessary.
 
 **Port Number**
 
-If a `PORT` env var is present in the deployment environment then the server will listen on that port. This is the case for Heroku and similar.
+If a `PORT` env var is present in the deployment environment then the 
+server will listen on that port. This is the case for Heroku and similar.
 
-Otherwise, port number can be specified with an optional `-p` flag, or left to the default of 8080.
+Otherwise, port number can be specified with an optional `-p` flag, or 
+left to the default of 8080.
 
 ## Testing
 
-Most of the integration tests are run against real databases with a small set of data.
+Integration tests are run against real databases with a small set of data.
+
+These database are setup (and torn down) using functions provided in the 
+`testdata` package which is ignored by the compiler.  
+
+This means that on a local dev machine both MySQL and MongoDB should be 
+running. Note that the database credentials for test are hard-coded in 
+the `testdata` folder.
+
+** add notes here on Travis CI setup for MySQL and MongoDB**
 
 To run all tests from root dir:
 
@@ -51,7 +73,9 @@ To run all tests from root dir:
 # go test ./...
 ```
 
-Test files can be run individually as each `*_test.go` file sets up its own test database and then runs a group of test in parallel (see `datastore/person_test.go`).
+Test files can be run individually as each `*_test.go` file sets up its 
+own test database and then runs a group of test in parallel (see 
+`datastore/person_test.go`).
 
 To run an individual set of tests:
 
@@ -59,4 +83,6 @@ To run an individual set of tests:
 # go test -v person_test.go
 ```
 
-Ref: <https://blog.golang.org/subtests>
+## References 
+<https://medium.com/@povilasve/go-advanced-tips-tricks-a872503ac859>
+<https://blog.golang.org/subtests>

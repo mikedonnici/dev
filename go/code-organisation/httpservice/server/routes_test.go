@@ -1,13 +1,13 @@
 package server_test
 
 import (
-	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore/datastoretest"
 	"net/http/httptest"
 	"strings"
 	"testing"
 
 	"github.com/mikedonnici/dev/go/code-organisation/httpservice/datastore"
 	"github.com/mikedonnici/dev/go/code-organisation/httpservice/server"
+	"github.com/mikedonnici/dev/go/code-organisation/httpservice/testdata"
 )
 
 var ds *datastore.Datastore
@@ -17,7 +17,7 @@ var ds *datastore.Datastore
 func TestRoutes(t *testing.T) {
 
 	var teardown func()
-	ds, teardown = datastoretest.Setup(t)
+	ds, teardown = testdata.Setup(t)
 	defer teardown()
 
 	t.Run("routes", func(t *testing.T) {

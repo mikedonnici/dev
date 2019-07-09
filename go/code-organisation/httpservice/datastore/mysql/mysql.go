@@ -29,11 +29,6 @@ func NewConnection(dsn, dbName string) (*Connection, error) {
 	return m, err
 }
 
-// Close terminates the Session - don't really need?
-//func (m *Connection) Close() {
-//	m.Session.Close()
-//}
-
 func (m *Connection) checkFields() error {
 	if m.DSN == "" {
 		return errors.New("MySQL DSN (store source name / connection string) not set")
