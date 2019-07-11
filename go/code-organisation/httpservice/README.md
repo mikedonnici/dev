@@ -83,6 +83,49 @@ To run an individual set of tests:
 # go test -v person_test.go
 ```
 
+### Thoughts on structure
+
+These are a few thoughts to be sanitised later on.
+
+- A single 'service' (in the _microservice_ sense) represents a group of related
+  _tasks_ pertaining to one or more related data entities.
+- Each service has it's own `datastore` because the source(s) of data may be different for each service.
+
+Possible structure for a UserService:
+
+```dir
+userService/
+├── datastore/
+│   ├── mysql/
+│   │   └── mysql.go
+│   ├── mongo/
+│   │   └── mongo.go
+│   ├── datastore.go
+|   ├── person.go
+│   ├── address.go  
+├── server/
+│   ├── routes.go
+│   └── server.go
+```
+
+Or a flat structure:
+
+```dir
+userService/
+├── address.go  
+├── datastore.go
+├── mongo.go
+├── mysql.go
+├── person.go
+├── routes.go
+└── server.go
+```
+
+
+
+
+
+
 ## References 
 <https://medium.com/@povilasve/go-advanced-tips-tricks-a872503ac859>
 <https://blog.golang.org/subtests>
