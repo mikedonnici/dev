@@ -1,3 +1,5 @@
+# CMRS Videos
+
 ## CMRS Masterclass
 
 CMRS has organised many educational meetings over the past decade to showcase Cardiac MRI technologies as it applies to clinicians. The following lecture series represents the scope of educational material covered in the MRI Masterclass between 2011-2016.
