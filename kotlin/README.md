@@ -236,3 +236,71 @@ fun main() {
     identify(staff2)
 }
 ```
+
+### Preventing subclass `override` using `final`
+
+Successive subclasses can override an inherited method:
+
+```kotlin
+abstract class Teller {
+    abstract fun tellStory()
+}
+
+open class Parent : Teller() {
+    override fun tellStory() {
+        println("Parent tells story")
+    }
+}
+
+open class Child : Parent() {
+    override fun tellStory() {
+        println("Child tells story")
+    }
+}
+
+class Toy : Child() {
+    override fun tellStory() {
+        println("Toy tells story")
+    }
+}
+
+fun main() {
+    val storyTeller = Toy()
+    storyTeller.tellStory()
+}
+
+// Toy tells story
+```
+
+Use the `final` keyword to specify a limit to subclass override:
+
+```kotlin
+abstract class Teller {
+    abstract fun tellStory()
+}
+
+open class Parent : Teller() {
+    override fun tellStory() {
+        println("Parent tells story")
+    }
+}
+
+open class Child : Parent() {
+    final override fun tellStory() { // * final *
+        println("Child tells story")
+    }
+}
+
+class Toy : Child() {
+    override fun tellStory() { // * error *
+        println("Toy tells story")
+    }
+}
+
+fun main() {
+    val storyTeller = Toy()
+    storyTeller.tellStory()
+}
+
+// Error: 'tellStory' in 'Child' is final and cannot be overridden
+```
