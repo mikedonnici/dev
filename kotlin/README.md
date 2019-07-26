@@ -237,7 +237,7 @@ fun main() {
 }
 ```
 
-### Preventing subclass `override` using `final`
+### Preventing `override` using `final`
 
 Successive subclasses can override an inherited method:
 
@@ -304,3 +304,183 @@ fun main() {
 
 // Error: 'tellStory' in 'Child' is final and cannot be overridden
 ```
+
+Note that `final` is implicit when declaring a property or method _unless_ it is `open` or `abstract`.
+
+However, when using `override` the `final` keyword must be used explicitely for the desired effect. Otherwise, the property/method can be _overridden_ in child classes.
+
+In summary: _*overridden*_ properties/methods are `open` by default, and this can be stopped by using the `final` keyword.
+
+### Inheriting multiple properties/methods with the same name
+
+When a class inherits multiple implementations of a method it _must_
+override that method to resolve the ambiguity:
+
+```kotlin
+interface Teller {
+    // In this example the interface has an implementation for tellStory()
+    fun tellStory() {
+        println("Anyone can tell a story!")
+    }
+}
+
+abstract class StoryTeller {
+    open fun tellStory() {
+        println("StoryTeller tells the story")
+    }
+}
+
+open class Parent : StoryTeller(), Teller {
+    // No tellStory() here!
+}
+
+fun main() {
+    val st = Parent()
+    st.tellStory()
+}
+
+// Error:(14, 6) Kotlin: Class 'Parent' must override public open fun tellStory():
+// Unit defined in StoryTeller because it inherits many implementations of it
+```
+
+The inheriting class _must_ impement the `tellStory()` method to resolve the ambiguity. However, one of the parent implemetations can be specified:
+
+```kotlin
+interface Teller {
+    fun tellStory() {
+        println("Anyone can tell a story!")
+    }
+}
+
+abstract class StoryTeller {
+    open fun tellStory() {
+        println("StoryTeller tells the story")
+    }
+}
+
+open class Parent : StoryTeller(), Teller {
+    // Resolves the ambiguity
+    override fun tellStory() {         // must be implemented
+        // super.tellStory()           // still ambiguous
+        // super<Teller>.tellStory()   // works
+        super<StoryTeller>.tellStory() // works
+    }
+}
+
+fun main() {
+    val st = Parent()
+    st.tellStory()
+}
+
+// StoryTeller tells the story
+```
+
+### Data classes
+
+A classe that is created to hold data (properties) can be declared as a `data class`:
+
+```kotlin
+data class Thing(val a: String, val b: String, val c: String)
+
+fun main() {
+        val t1 = Thing("AAA", "BBB", "CCC")
+        println(t1)
+}
+
+// Thing(a=AAA, b=BBB, c=CCC)
+```
+
+By default, a `data class` has a nicer `toString()` method than a standard class.
+
+Data classes are easier to test for equality:
+
+```kotlin
+class NormalThing(val a: String, val b: String, val c: String)
+
+data class DataThing(val a: String, val b: String, val c: String)
+
+fun main() {
+    val nt1 = NormalThing("AAA", "BBB", "CCC")
+    val nt2 = NormalThing("AAA", "BBB", "CCC")
+    println(nt1.equals(nt2)) // false
+
+    val dt1 = DataThing("AAA", "BBB", "CCC")
+    val dt2 = DataThing("AAA", "BBB", "CCC")
+    println(dt1.equals(dt2)) // true
+}
+```
+
+Data classes can also be copied easily:
+
+```kotlin
+data class Thing(val a: String, val b: String, val c: String)
+
+fun main() {
+    val t1 = Thing("AAA", "BBB", "CCC")
+    val t2 = t1.copy()
+    println(t1)
+    println(t2)
+    println(t1.equals(t2)) // true
+}
+```
+
+Properties on a copy are easy to modify:
+
+```kotlin
+data class Thing(val a: String, val b: String, val c: String)
+
+fun main() {
+    val t1 = Thing("AAA", "BBB", "CCC")
+    val t2 = t1.copy(a = "A*A")
+    println(t2)
+}
+
+// Thing(a=A*A, b=BBB, c=CCC)
+```
+
+Data classes can be easily decomposed into values:
+
+```kotlin
+data class Thing(val a: String, val b: String, val c: String)
+
+fun main() {
+    val t1 = Thing("AAA", "BBB", "CCC")
+    val (a, b, c) = t1
+    println(a)
+    println(b)
+    println(c)
+}
+
+// AAA
+// BBB
+// CCC
+```
+
+Data classes are also useful for creating _hash sets_. These sets cannot contain duplicate values so using `hashSetOf()` with instances of data classes will ensure there are no duplicates. In the example below, the `hashSetOf()` excludes the duplicate `data class Fauna` object but not the duplicate for `class Flora`.
+
+```kotlin
+data class Fauna(val a: String, val b: String, val c: String)
+
+class Flora(val a: String, val b: String, val c: String)
+
+fun main() {
+
+    val a1 = Fauna("Cat", "Dog", "Bird")
+    val a2 = Fauna("Cat", "Dog", "Bird") // same as t1
+    val a3 = Fauna("Quoll", "Snake", "Wombat")
+    val set1 = hashSetOf(a1, a2, a3)
+
+    val p1 = Flora("Rose", "Jasmine", "Bamboo")
+    val p2 = Flora("Rose", "Jasmine", "Bamboo") // same as p1
+    val p3 = Flora("Dionaea", "Drosera", "Nepenthes")
+    val set2 = hashSetOf(p1, p2, p3)
+
+    println(set1)
+    println(set2)
+}
+
+// [Fauna(a=Cat, b=Dog, c=Bird), Fauna(a=Quoll, b=Snake, c=Wombat)]
+// [Flora@eed1f14, Flora@65ab7765, Flora@1b28cdfa]
+```
+
+Data classes are not restricted to properties only - they can contain methods. However, they cannot be abstract so are generally more useful for concrete classes that contain a lot of data.
