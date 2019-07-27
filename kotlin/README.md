@@ -377,7 +377,7 @@ fun main() {
 
 ### Data classes
 
-A classe that is created to hold data (properties) can be declared as a `data class`:
+A `data class` provides convenience methods for when a classes primary purpose is as a data structure. They are not restricted to properties only and can be given additional methods. However, they cannot be _abstract_ and are therefore more useful for concrete classes that contain a lot of data.
 
 ```kotlin
 data class Thing(val a: String, val b: String, val c: String)
@@ -483,4 +483,56 @@ fun main() {
 // [Flora@eed1f14, Flora@65ab7765, Flora@1b28cdfa]
 ```
 
-Data classes are not restricted to properties only - they can contain methods. However, they cannot be abstract so are generally more useful for concrete classes that contain a lot of data.
+### Objects / Singletons
+
+A singleton is a design pattern where an object of a particular class is only instatiated once.
+
+Some argue it is an anti-pattern as it effectively creates global data and also makes testing difficult.
+
+Either way, in Kotlin this is done using an _object declaration_:
+
+```kotlin
+object DatabaseConnection {
+
+    val dsn = "mysql@localhost"
+
+    fun execute(sql: String) {
+        println("Execute query: $sql")
+    }
+
+}
+
+fun main() {
+
+    val db = DatabaseConnection
+    db.execute("SELECT * FROM row WHERE 1")
+}
+```
+
+### Enum classes
+
+Enum classes are used for storing a set of _possible_ values and help to ensure type safety:
+
+```kotlin
+enum class Colour {
+    RED, GREEN, BLUE
+}
+
+class Paint(val clr: Colour) {
+
+    fun brush() {
+        when (clr) {
+            Colour.RED -> println("Painting red")
+            Colour.GREEN -> println("Painting green")
+            Colour.BLUE -> println("Painting blue")
+        }
+    }
+}
+
+fun main() {
+    val pRed = Paint(Colour.RED)
+    pRed.brush()
+}
+
+// Painting red
+```
