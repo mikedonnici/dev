@@ -532,7 +532,106 @@ class Paint(val clr: Colour) {
 fun main() {
     val pRed = Paint(Colour.RED)
     pRed.brush()
+    println(Colour.RED) // prints meaningful value
 }
 
 // Painting red
+// RED
+```
+
+## Packages
+
+Applications are organised into packages and packages can be nested by creating subfolders in a top-level package directory.
+
+Kotlin can also use Java packages, and vice-versa.
+
+```kotlin
+import java.util.Date
+
+fun main() {
+    println(today())
+}
+
+fun today(): Date {
+    return Date()
+}
+```
+
+Can also used _qualified package name_:
+
+```kotlin
+fun main() {
+    println(today())
+}
+
+fun today(): java.util.Date {
+    return java.util.Date()
+}
+```
+
+Importing packages, or parts thereof, can be done ina few ways:
+
+Import all classes from a package:
+
+```kotlin
+import java.util.*
+import com.mikedonnici.somepkg.*
+```
+
+Import a specific class:
+
+```kotlin
+import java.util.Date
+import com.mikedonnici.somepkg.Thingo
+```
+
+Import a specific top-level function:
+
+```kotlin
+import com.mikedonnici.somepkg.Thingo.foo
+
+fun main() {
+    foo()
+}
+```
+
+Import a method from an _object_, ie a _singleton_, not a class:
+
+```kotlin
+// foo/Foo.kt
+package foo
+
+object FooFactory {
+    fun bar() {
+        println("Here's the bar!")
+    }
+}
+```
+
+...can be imported, thus:
+
+```kotlin
+import foo.FooFactory.bar
+
+fun main() {
+    bar()
+}
+
+// Here's the bar!
+```
+
+Can also import enum constants:
+
+```kotlin
+import pkg.Colours.BLUE
+
+fun main() {
+    val blue = BLUE
+}
+```
+
+Packages that are publically available are conventionally named with a reverse domain name prefix:
+
+```kotlin
+import com.mikedonnici.proj.pkg.subpkg
 ```
