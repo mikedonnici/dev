@@ -82,6 +82,50 @@ class Person(val name: String = "John Doe") {
 }
 ```
 
+It is important to note that in Kotlin declaring a class _property_ differs from declaring a field in Java, and some other languages.
+
+When a _property_ is created a _backing_ field is also created but access to the value is provided via automatically generated _getter_ and _setter_ methods.
+
+A `var` will have a _getter_ and a _setter_, a `val` will only have a _getter_.
+
+```kotlin
+class Animal {
+    var age: Int = 0
+}
+
+fun main() {
+    val a1 = Animal()
+    a1.age = 3          // calls setter
+    println(a1.age)     // calls getter
+}
+
+// 3
+```
+
+Accessing `a1.age` looks like direct field access but internally it is using the _getter_ or _setter_ method.
+
+The `get()` and `set()` methods can be overriden on a class:
+
+```kotlin
+class Animal {
+    var age: Int = 0
+        get() = field + 1
+        set(value) {
+            if (value > 0) {
+                field = value
+            }
+        }
+}
+
+fun main() {
+    val a1 = Animal()
+    a1.age = -3
+    println(a1.age)
+}
+
+// 1
+```
+
 ### Open classes
 
 Open classes are the first level of class that allows inheritence.
@@ -538,6 +582,71 @@ fun main() {
 // Painting red
 // RED
 ```
+
+### Information hiding
+
+It is best practice to control access to the properties and methods of a class by implementing the highest level of information hiding possible while still providing the required functionality via a well-defined public interface.
+
+The highest level of infomration hiding is `private`. A property declared as `private` is only visible within the class:
+
+```kotlin
+class Animal {
+    private var age: Int = 0
+}
+
+fun main() {
+    val a1 = Animal()
+    a1.age = 1
+    println(a1.age)
+}
+
+// Error: Cannot access 'age': it is private in 'Animal'
+```
+
+The next level of information hiding is `protected`. A `protected` property is accessible within the class and sub classes:
+
+```kotlin
+open class Animal {
+
+    protected var name: String = "Animal"
+}
+
+class Dog : Animal() {
+
+    fun call() {
+        println("Hey $name")
+    }
+}
+
+fun main() {
+
+    val f = Dog()
+    f.call()
+}
+
+// "Hey Animal"
+```
+
+The next level of modifier is `internal` which limits visibility to the same _module_ - ie set of related packages.
+
+```kotlin
+class Animal {
+    internal genus: String = ""
+}
+```
+
+The final (and default) visibility modifier is `public` which allows access to a property or method from anywhere. Generally `public` methods are used to create a well-defined public interface for a class:
+
+```kotlin
+class Animal {
+
+    public fun identify() {
+        // ...
+    }
+}
+```
+
+Note that the _getters_ and _setters_ will have the same visibility as the properties.
 
 ## Packages
 
