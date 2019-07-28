@@ -744,3 +744,91 @@ Packages that are publically available are conventionally named with a reverse d
 ```kotlin
 import com.mikedonnici.proj.pkg.subpkg
 ```
+
+## Generics
+
+When a classes or functions needs to accomodate more than one data type, _generic_ parameters can be used.
+
+Generic parameters are specifed with angled brackets `<>` and a parameter name that is often a single, upper-case letter, eg. `<E>`, `<T>`.
+
+Generics with classes:
+
+```kotlin
+class Stack<E>(vararg val items: E) {
+
+    var elements = items.toMutableList()
+
+    fun push(item: E) {
+        elements.add(item)
+    }
+
+    fun pop(): E? {
+        if (elements.isEmpty()) {
+            return null
+        }
+        return elements.removeAt(elements.size - 1)
+    }
+}
+
+class Person(val name: String)
+
+fun main() {
+
+    val p1 = Person("Mike")
+    val p2 = Person("Chris")
+    val p3 = Person("Maia")
+    val p4 = Person("Leo")
+
+    val st = Stack(p1)
+    st.push(p2)
+    st.push(p3)
+    st.push(p4)
+
+    // ? is 'safe' call as can return null
+    // see: https://kotlinlang.org/docs/reference/null-safety.html#safe-calls
+    println(st.pop()?.name)
+    println(st.pop()?.name)
+    println(st.pop()?.name)
+    println(st.pop()?.name)
+    println(st.pop()?.name)
+}
+
+```
+
+Note: **vararg** params are like _variadic_(?) params in Go - a comma-seperated list of args of a particular type.
+
+Generics with functions:
+
+```kotlin
+class Stack<E>(vararg val items: E) {
+
+    var elements = items.toMutableList()
+
+    fun push(item: E) {
+        elements.add(item)
+    }
+
+    fun pop(): E? {
+        if (elements.isEmpty()) {
+            return null
+        }
+        return elements.removeAt(elements.size - 1)
+    }
+}
+
+fun <T> stackOf(vararg items: T): Stack<T> {
+
+    // * is spread operator which 'spreads' the array of items
+    // back out into a vararg for the Stack() constructor
+    return Stack(*items)
+}
+
+fun main() {
+
+    val s1 = stackOf("a", "b", "c")
+    for (i in 0..2) {
+        println(s1.pop())
+    }
+}
+
+```
