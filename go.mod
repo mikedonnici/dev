@@ -4,6 +4,7 @@ go 1.12
 
 require (
 	github.com/34South/envr v0.0.0-20170706023707-e57a7716f427
+	github.com/go-chi/chi v4.0.2+incompatible
 	github.com/go-sql-driver/mysql v1.4.1
 	github.com/gorilla/mux v1.7.3
 	github.com/hashicorp/go-uuid v1.0.1
