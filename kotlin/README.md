@@ -1,5 +1,50 @@
 # kotlin notes
 
+## Collections
+
+### Maps
+
+Maps can be created thus:
+
+```kotlin
+fun main() {
+
+    val nameToAge = mapOf(Pair("Mike", 48), Pair("Christie", 44))
+    val nameToAge2 = mapOf(
+        "Mike" to 48,
+        "Christie" to 44
+    )
+
+    println(nameToAge == nameToAge2)
+    println(nameToAge.keys)
+    println(nameToAge.values)
+    println(nameToAge.entries)
+
+    val countryToPopulation = mutableMapOf(
+        "Germany" to 80_000_000,
+        "USA" to 300_000_000
+    )
+    countryToPopulation.put("Australia", 23_000_000)
+    countryToPopulation.putIfAbsent("USA", 320_000_000)
+
+    println(countryToPopulation)
+    println(countryToPopulation.contains("Australia"))
+    println(countryToPopulation.containsKey("France")) // same as above
+    println(countryToPopulation.containsValue(23_000_000))
+    println(countryToPopulation.get("Germany"))
+    println(countryToPopulation.getOrDefault("France", 0))
+
+    nameToAge.entries.forEach {
+        val (name, age) = it
+        println("$name is $age years old")
+    }
+
+}
+```
+
+Note that `to` is an _infix_ function, ie `"Mike" to 48` is the same as `"Mike".to(48)`.
+
+
 ## Named loops
 
 This works for `break` and `continue`.
