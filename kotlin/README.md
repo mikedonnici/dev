@@ -1,4 +1,27 @@
-# kotlin notes
+# Kotlin
+
+## Fundamentals
+
+Functions can be defined at the top (package) level, unlike Java.
+
+`if` is an expression:
+
+```kotlin
+fun main(args: Array<String>) {
+    val name = if (args.isNotEmpty()) args[0] else "you"
+    println("Hello, $name")
+}
+```
+
+String templates allow expressions to be used inside string literals: 
+
+```kotlin
+main
+```
+
+
+
+
 
 ## Collections
 

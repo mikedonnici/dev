@@ -1,0 +1,15 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<testsuite name="IsogramTest" tests="9" skipped="0" failures="0" errors="0" timestamp="2019-08-07T05:47:26" hostname="nuc" time="0.016">
+  <properties/>
+  <testcase name="test[0: isogram()=true]" classname="IsogramTest" time="0.013"/>
+  <testcase name="test[1: isogram(@isogram@)=false]" classname="IsogramTest" time="0.001"/>
+  <testcase name="test[2: isogram(eleven)=false]" classname="IsogramTest" time="0.0"/>
+  <testcase name="test[3: isogram(subdermatoglyphic)=true]" classname="IsogramTest" time="0.0"/>
+  <testcase name="test[4: isogram(Alphabet)=false]" classname="IsogramTest" time="0.0"/>
+  <testcase name="test[5: isogram(thumbscrew-japingly)=true]" classname="IsogramTest" time="0.0"/>
+  <testcase name="test[6: isogram(six-year-old)=true]" classname="IsogramTest" time="0.0"/>
+  <testcase name="test[7: isogram(Emily Jung Schwartzkopf)=true]" classname="IsogramTest" time="0.0"/>
+  <testcase name="test[8: isogram(accentor)=false]" classname="IsogramTest" time="0.0"/>
+  <system-out><![CDATA[]]></system-out>
+  <system-err><![CDATA[]]></system-err>
+</testsuite>
