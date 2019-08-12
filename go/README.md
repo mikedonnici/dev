@@ -13,7 +13,7 @@
 - [Effective Go](https://golang.org/doc/effective_go.html)
 - [CodeReviewComments](https://github.com/golang/go/wiki/CodeReviewComments)
 - [Clean Go Code](https://github.com/Pungyeon/clean-go-article)
- 
+
 ## Learning Resources
 
 **[API Development](https://leanpub.com/b/golang-app-bundle)**
@@ -28,6 +28,8 @@
 
 **[Arden Labs GitHub](https://github.com/ardanlabs/gotraining)** - Training material, lots of good links.
 
+**[Alex Edwards](https://www.alexedwards.net/)** - Book and Blog
+
 ## Articles / Videos
 
 **Go for Industrial Programming** - Peter Bourgon - [article](http://peter.bourgon.org/go-for-industrial-programming/) / [video](https://www.youtube.com/watch?v=PTE4VJIdHPg)
@@ -41,4 +43,3 @@
 [**Using Go Modules**](https://blog.golang.org/using-go-modules)
 
 [**Idiomatic Go Resources**](https://medium.com/@dgryski/idiomatic-go-resources-966535376dba)
-

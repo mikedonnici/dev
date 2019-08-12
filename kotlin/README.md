@@ -4,6 +4,14 @@
 
 Functions can be defined at the top (package) level, unlike Java.
 
+```kotlin
+package foo
+
+fun bar() {
+    println("foo.bar()")
+}
+```
+
 `if` is an expression:
 
 ```kotlin
@@ -13,17 +21,155 @@ fun main(args: Array<String>) {
 }
 ```
 
-String templates allow expressions to be used inside string literals: 
+String templates allow expressions to be used inside string literals. A
+simple val/var can use `$`, a more complex expression `${}`:
 
 ```kotlin
-main
+fun main() {
+    val iSay = "yum"
+    print("I say $iSay, you say ${youSay()}")
+}
+
+fun youSay(): String {
+    return "pie"
+}
 ```
 
+Variables declares using one of two keywords:
 
+- `val` (value) - _immutable_ (readonly/assign once)
+- `var` (variable) - _mutable_
 
+> Use `val` wherever possible - makes code closer to _functional_ style.
 
+Kotlin is statically typed and types can be declared explicity, or inferred by assignment:
+
+```kotlin
+val dad: String = "Mike"
+val mum = "Christie"
+```
+
+> Should only omit type specification if the type is clear from the context. Otherwise, specify the type so the code is easier to read and reason about.
+
+Note that an object that is pointed to by a `val` can still be modifed via the methods on the object. The `val` simply holds an immutable _reference_ to the object.
+
+```kotlin
+val name = "Mike"                   // cannot be re-assigned
+val people = mutableListOf(name)    // people cannot be re-assigned...
+people.add("Christie")              // ...but can modify the list object
+```
+
+Note that there are also _read-only_ list types which cannot be modified - see below.
+
+## Functions
+
+### `Unit` return type
+
+A function that has no explicit return type returns `Unit`:
+
+```kotlin
+fun foo(): Unit {
+    println("side effect")
+}
+```
+
+Same as:
+
+```kotlin
+fun foo() {
+    println("side effect")
+}
+```
+
+### Expression body syntax
+
+If a function returns a single expression, eg:
+
+```kotlin
+fun max(a: Int, b: Int): Int {
+    return if (a > b) a else b
+}
+```
+
+...can use _expression body_ syntax:
+
+```kotlin
+fun max(a: Int, b: Int) = if (a > b) a else b
+```
+
+### Context
+
+Functions can be top-level, members of a class, or nested (local):
+
+```kotlin
+fun top() = 1
+
+class A {
+    fun member() = 2
+}
+
+fun outer() {
+    // this is called a local function
+    fun local() = 3
+}
+```
+
+Note that top-level functions can be called from Java as a static function named after the file containing the function. For example, to call `foo()` from file `MyClass.kt` would be `MyClassKt.foo()`.
+
+### Named arguments
+
+Make code easier to reason about:
+
+```kotlin
+fun main() {
+    println(listOf("a", "b", "c").joinToString(separator="", prefix="(", postfix=")"))
+}
+// (abc)
+```
+
+### Default arguments
+
+Defaults values can be provided for function parameters:
+
+```kotlin
+fun main() {
+    println(listOf("a", "b", "c").joinToString(postfix="."))
+}
+
+// a, b, c.
+// default separator is ", ", default prefix is empty
+```
+
+To specify default values can use positional or named arguments:
+
+```kotlin
+fun main() {
+    // can call in various ways:
+    printDivider() 		// accept defaults
+    printDivider('-') 	// override first arg (positional)
+    printDivider('-', 20) 	// override both defaults (positional)
+    printDivider(num = 30, char = '+') // override both by name (any order)
+}
+
+fun printDivider(char: Char = '*', num: Int = 10) {
+    repeat(num) {
+        print(char)
+    }
+    println()
+}
+```
 
 ## Collections
+
+In Kotlin there is a distinction between _read-only_ and _mutable_ collections:
+
+```kotlin
+val mutableList = mutableListOf("Go", "Python")
+mutableList.add("Kotlin")
+
+val readOnlyList = listOf("Go", "Python")
+mutableList.add("Kotlin") // computer says 'no'
+```
 
 ### Maps
 
@@ -66,7 +212,6 @@ fun main() {
 ```
 
 Note that `to` is an _infix_ function, ie `"Mike" to 48` is the same as `"Mike".to(48)`.
-
 
 ## Named loops
 
