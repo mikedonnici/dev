@@ -159,17 +159,294 @@ fun printDivider(char: Char = '*', num: Int = 10) {
 }
 ```
 
+## Conditionals- `if` and `when`
+
+`if` is an expression in Kotlin so there is no ternary operator.
+
+```kotlin
+val max = if (a > b) a else b
+```
+
+`when` is similar to a switch:
+
+```kotlin
+fun main() {
+    val a = 1
+    when (a) {
+        1 -> println("a is 1")
+        2 -> println("a is 2")
+        else -> println("a is neither 1 nor 2")
+    }
+}
+```
+
+Can also check multiple values:
+
+```kotlin
+fun main() {
+    val a = 2
+    when (a) {
+        1, 2 -> println("a is 1 or 2")
+        else -> println("a is neither 1 nor 2")
+    }
+}
+```
+
+The argument to `when` is checked for equality with the branch conditions, so any expression can be used:
+
+```kotlin
+fun main() {
+    when (setOf(1,2,3)) {
+        setOf(1,2,3) -> println("Set contains 1, 2 and 3")
+        else -> throw Exception("Set incomplete")
+    }
+}
+```
+
+`when` can be used for checking type:
+
+```kotlin
+// Note the type : Any is required for x, otherwise will get
+// an Incompatible Type error in the branches
+fun main() {
+    val x: Any = "abc"
+    when (x) {
+    	is Int -> println("x is an int value $x")
+    	is String -> print("x is a string with length ${x.length}")
+	}
+}
+```
+
+In the example below, `pet` will be _smart cast_ to the correct type in the matching branch. So if `pet` is a `Dog`, then`pet` is cast to `Dog` and the `pet.woof()` method is available:
+
+```kotlin
+open class Pet
+
+class Dog: Pet() {
+    fun woof() {
+        println("woof, woof")
+    }
+}
+
+class Cat: Pet() {
+    fun meow() {
+        println("meeeoooowww")
+    }
+}
+
+fun main() {
+    val pet: Pet = Dog() // again, type must be specified here
+    when (pet) {
+        is Dog -> pet.woof()
+        is Cat -> pet.meow()
+    }
+}
+```
+
+A new variable can be introduced inside the `when` parenthesis (since Kotlin 1.3):
+
+```kotlin
+// ...classes omitted...
+
+fun main() {
+    when (val pet = myPet()) {
+        is Dog -> pet.woof()
+        is Cat -> pet.meow()
+    }
+}
+
+fun myPet(): Pet {
+    return Dog()
+}
+```
+
+This also makes it possible to use `when` in a function expression body. So refactoring the example above:
+
+```kotlin
+open class Pet
+
+class Dog: Pet() {
+    fun woof() =  "woof, woof"
+}
+
+class Cat: Pet() {
+    fun meow() = "meeeoooowww"
+}
+
+fun main() {
+    println(petNoise())
+}
+
+fun petNoise(): String =
+    when (val pet = myPet()) {
+        is Dog -> pet.woof()
+        is Cat -> pet.meow()
+        else -> throw Exception("Unknow pet")
+    }
+
+fun myPet(): Pet {
+    return Dog()
+}
+```
+
+`when` can be used without an argument, using any boolean expression on the left of each branch:
+
+```kotlin
+fun main() {
+    when {
+       1 + 1 == 2 -> println("1 and 1 is 2")
+       1 + 1 == 3 -> println("not going to happen")
+    }
+}
+```
+
+## Loops - `for`, `while`, `do-while`
+
+`while` and `do-while` are pretty standard:
+
+```kotlin
+while (condition) {
+    /*...*/
+}
+
+do {
+    /*...*/
+} while (condition)
+```
+
+`for` loop iteration using the `in` keyword:
+
+```kotlin
+fun main() {
+    val list = listOf("a", "b", "c")
+    for (l in list) {
+        println(l)
+    }
+    // generally, the element type is omitted, but can be explicit
+    for (l: String in list) {
+        println(l)
+    }
+}
+```
+
+Iterate over a list with indexes, storing values in a `Pair` (like a tuple):
+
+```kotlin
+fun main() {
+    val list = listOf("a", "b", "c")
+    for ((i, v) in list.withIndex()) {
+        println("list[$i] = $v")
+    }
+}
+```
+
+Iterate over a map:
+
+```kotlin
+fun main() {
+    val map = mapOf("a" to "A",
+                    "b" to "B",
+                    "c" to "C")
+    for ((k, v) in map) {
+        println("$k: $v")
+    }
+}
+```
+
+Iterate over a ranges:
+
+```kotlin
+fun main() {
+
+    // includes upper bound, ie 0 to 9 inclusive
+    for (i in 0..6) {
+        println(i)
+    }
+    // 0123456
+
+    // excludes upper bound
+    for (i in 0 until 6) {
+        println(i)
+    }
+    // 012345
+
+    // more comlplex ranges
+    for (i in 9 downTo 1 step 2) {
+        print(i)
+    }
+    // 97531
+
+    // strings - c will be Char type
+    for (c in "abc") {
+        print(c + 1)
+    }
+    // bcd
+
+}
+```
+
+## `in` checks and ranges
+
+`in` has two use cases in Kotlin - iterating over a range, and checking
+if a value _occurs_ in a range.
+
+```kotlin
+// iteration
+for (ch in 'a'..'z') {
+    print(ch)
+}
+
+// within a range
+if ('c' in 'a'..'z') {
+    print(true)
+}
+```
+
+`in` ranges can be used in when conditions:
+
+```kotlin
+fun main() {
+    printIsAlphaNum('5')
+}
+
+fun printIsAlphaNum(ch: Char) {
+    when (ch) {
+        in 'a'..'z', in 'A'..'Z' -> println("Char is a letter")
+        in '0'..'9' -> println("Char is a number")
+        else -> println("Char is non-alphanumeric")
+    }
+}
+// Char is a number
+```
+
+Ranges can be created from any comparible(?) type and can also be stored in a variable.
+
+Ranges of strings are compared _lexographically_, so:
+
+`"ball" in "a".."k" // true`
+
+`"zoo" in "a".."k" // false`
+
+`in` a collection
+
+```kotlin
+if (item in list) { ... }
+
+// same as
+if (list.contains(item)) { ... }
+```
+
 ## Collections
 
 In Kotlin there is a distinction between _read-only_ and _mutable_ collections:
 
-```kotlin
 val mutableList = mutableListOf("Go", "Python")
 mutableList.add("Kotlin")
 
 val readOnlyList = listOf("Go", "Python")
 mutableList.add("Kotlin") // computer says 'no'
-```
+
+````
 
 ### Maps
 
@@ -209,7 +486,7 @@ fun main() {
     }
 
 }
-```
+````
 
 Note that `to` is an _infix_ function, ie `"Mike" to 48` is the same as `"Mike".to(48)`.
 
@@ -794,6 +1071,34 @@ fun main() {
 
 // Painting red
 // RED
+```
+
+Importing the enum class removes the need to preface the constants with the enum class name:
+
+```kotlin
+package enumdemo
+
+import enumdemo.Colour.*
+
+enum class Colour {
+    RED, GREEN, BLUE
+}
+
+class Paint(val clr: Colour) {
+
+    fun brush() {
+        when (clr) {
+            RED -> println("Painting red")
+            GREEN -> println("Painting green")
+            BLUE -> println("Painting blue")
+        }
+    }
+}
+
+fun main() {
+    val pRed = Paint(RED)
+    pRed.brush()
+}
 ```
 
 ### Information hiding

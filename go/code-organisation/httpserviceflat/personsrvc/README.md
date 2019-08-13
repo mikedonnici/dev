@@ -8,21 +8,19 @@ without good reason.
 This package would provide a specific _service_ and could, therefore, be
 utilised by other services.
 
-I am trying this after looking at gokit - which looks awesome but I found hard
-to wrap my head around at this stage.
+I am trying this after looking at [gokit](https://github.com/go-kit/kit) - which looks awesome but I found hard to wrap my head around.
 
 There are others, goa, micro, gizmo.
 
 Here are the endpoints:
 
 - `/` -
-- `/arg` - 
-- `/person/{id}` 
+- `/arg` -
+- `/person/{id}`
 - `/person/oid/{oid}`
 - `/people`
 - `/mwtrue` - runs middleware
 - `/mwfalse` - skips middleware
-
 
 Set up MySQL:
 
@@ -36,7 +34,7 @@ CREATE TABLE peoplesrvc.people (
   PRIMARY KEY (id)
 ) ENGINE=InnoDB DEFAULT CHARSET=utf8;
 
-INSERT INTO peoplesrvc.people VALUES 
+INSERT INTO peoplesrvc.people VALUES
   ('1','Broderick','Reynolds','68'),
   ('2','Osborne','Jast','77'),
   ('3','Dawn','Hayes','61'),
@@ -65,8 +63,6 @@ MONGO_DBNAME="peoplesrvc"
 ```
 
 go run main.go
-
-
 
 Todo:
 
