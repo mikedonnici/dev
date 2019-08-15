@@ -16,6 +16,8 @@
 
 ## Learning Resources
 
+**[Hoanh An Ultimate Go](https://github.com/hoanhan101/ultimate-go)** Awesome set of notes, including Ultimate Go
+
 **[API Development](https://leanpub.com/b/golang-app-bundle)**
 
 **[Golang Bot](https://golangbot.com/learn-golang-series)** - Nice tutorial series on Go fundamentals
