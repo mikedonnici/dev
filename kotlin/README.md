@@ -436,6 +436,40 @@ if (item in list) { ... }
 if (list.contains(item)) { ... }
 ```
 
+## Exceptions
+
+In Kotlin, `throw` is an expression:
+
+```kotlin
+val percentage = 
+    if (number in 0..100)
+        number
+    else 
+        throw IllegalArgumentException(
+            "A percentage must be between 0 and 100: $number")    
+```
+
+`try` is also an expression:
+
+```kotlin
+fun main() { 
+   println(strToNum("abc")) // null
+   println(strToNum("123")) // 123
+}
+
+fun strToNum(str: String) = try {
+    	Integer.parseInt(str)
+	} catch (e: NumberFormatException) {
+	    null
+	}
+```
+
+
+ 
+
+
+
+
 ## Collections
 
 In Kotlin there is a distinction between _read-only_ and _mutable_ collections:

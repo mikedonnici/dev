@@ -16,6 +16,8 @@
 
 ## Learning Resources
 
+**[Hoanh An Ultimate Go](https://github.com/hoanhan101/ultimate-go)** Awesome set of notes, including Ultimate Go
+
 **[API Development](https://leanpub.com/b/golang-app-bundle)**
 
 **[Golang Bot](https://golangbot.com/learn-golang-series)** - Nice tutorial series on Go fundamentals
@@ -27,6 +29,8 @@
 **[Arden Labs Blog](https://www.ardanlabs.com/blog/)** - Bill Kennedy's Go training, good blog.
 
 **[Arden Labs GitHub](https://github.com/ardanlabs/gotraining)** - Training material, lots of good links.
+
+**[Ultimate Go](https://github.com/ardanlabs/gotraining/blob/master/topics/go/README.md)** - Arden Labs Ultimate Go notes
 
 **[Alex Edwards](https://www.alexedwards.net/)** - Book and Blog
 
