@@ -30,6 +30,8 @@
 
 **[Arden Labs GitHub](https://github.com/ardanlabs/gotraining)** - Training material, lots of good links.
 
+**[Ultimate Go](https://github.com/ardanlabs/gotraining/blob/master/topics/go/README.md)** - Arden Labs Ultimate Go notes
+
 **[Alex Edwards](https://www.alexedwards.net/)** - Book and Blog
 
 ## Articles / Videos
