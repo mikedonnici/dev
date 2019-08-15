@@ -1,11 +1,5 @@
 # Kotlin
 
-<code>
-fun main() {
-    println("hi")
-}
-</code>
-
 ## Fundamentals
 
 Functions can be defined at the top (package) level, unlike Java.
