@@ -441,18 +441,18 @@ if (list.contains(item)) { ... }
 In Kotlin, `throw` is an expression:
 
 ```kotlin
-val percentage = 
+val percentage =
     if (number in 0..100)
         number
-    else 
+    else
         throw IllegalArgumentException(
-            "A percentage must be between 0 and 100: $number")    
+            "A percentage must be between 0 and 100: $number")
 ```
 
 `try` is also an expression:
 
 ```kotlin
-fun main() { 
+fun main() {
    println(strToNum("abc")) // null
    println(strToNum("123")) // 123
 }
@@ -463,12 +463,6 @@ fun strToNum(str: String) = try {
 	    null
 	}
 ```
-
-
- 
-
-
-
 
 ## Collections
 
@@ -520,7 +514,7 @@ fun main() {
     }
 
 }
-````
+```
 
 Note that `to` is an _infix_ function, ie `"Mike" to 48` is the same as `"Mike".to(48)`.
 
@@ -1389,6 +1383,75 @@ fun main() {
 
 ### Lambdas
 
+A _lambda_ is an anonymous function that can be used as an expression.
+
+They provided a concise syntax and allow for working with collections in a functional style.
+
+Lambdas are always specified in curly braces. In this example, `x` and `y` are parameters and `x + y` is the function body:
+
+```kotlin
+{ x: Int, y: Int -> x + y }
+```
+
+A lambda can be passed as an argument to a function:
+
+```kotlin
+list.any({ i: Int -> i > 10 })
+```
+
+If the lambda is the last argument in can be placed outside the parenthesis:
+
+```kotlin
+list.any() { i: Int -> i > 10 }
+```
+
+If it is the only argument the parenthesis can be omitted:
+
+```kotlin
+list.any { i: Int -> i > 10 }
+```
+
+_Note: This is an idea that came from Ruby._
+
+If the the argument type can be inferred, it can also be omitted:
+
+```kotlin
+list.any { i -> i > 10 }
+```
+
+If there is only one argument can use the automatically created arg name, `it`:
+
+```kotlin
+list.any { it > 10 }
+```
+
+A multi-line lambda is ok - the last expression is the result:
+
+```kotlin
+list.any {
+    println("In the lambda!")
+    it > 10
+}
+```
+
+Lambda arguments (map entry or a pair) can be destructured, so instead of this:
+
+```kotlin
+map.mapValues { entry -> "${entry.key}: ${entry.value}"}
+```
+
+...can do this:
+
+```kotlin
+map.mapValues { (key, value) -> "$key: $value" }
+```
+
+Unused parameters can be discarded with an underscore:
+
+```kotlin
+map.mapValues { (_, value) -> "$value" }
+```
+
 ### Collections - common operations
 
 ### Function Types
@@ -1396,3 +1459,11 @@ fun main() {
 ### Member References
 
 ###
+
+```
+
+```
+
+```
+
+```
