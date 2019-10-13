@@ -181,3 +181,103 @@ A bucket policy is the easiest way to allow public access to the static web site
   ]
 }
 ```
+
+Static S3 sites will scale automatically.
+
+## Cloudfront
+
+CDN with many edge locations that delivers content closest to the client in order to reduce transfer time.
+
+- **Edge Location**, as distinct from availability zones or regions, are places from where the content can be servedre seperate
+- **Origin** is the source of the content, S3 bucket, EC2 instance, Elastic Load Balancer or Route53
+- **Distribution** is a name given to the CDN which consists of a collection of Edge Locations.
+
+Types of distributions:
+
+- **Web Distribution** is most common
+- **RMTP** used for streaming adobe media content
+
+Note: Edge Locations are _not_ read-only - can PUT an object to them and can use S3 transfer acceleration.
+
+Objects are cached for a TTL which is specified in seconds.
+
+Can clear cache but charges will apply.
+
+## EC2
+
+Elastic Compute Cloud
+
+Pricing models:
+
+- On-Demand charged per second
+- Reserved are contracted for a term (1 or 3 years) at a reduced cost
+  - Standard - lowest cost butinstance type is fixed
+  - Convertible - can change type if same or greater value
+  - Scheduled - can launch within specified time
+- Spot enables bidding for instances at a set price
+- Dedicated hosts (physical servers), eg for some server-bound licensing or regulatory requirements
+
+Note: For Spot pricing if the price rises above your set price you are not charged for the remaining part of the hour. However, if you terminate the instance yourself the balance of the hour will be charged.
+
+### EBS
+
+Elastic Block Storage is a virtual disk that can be attached to an EC2 instance.
+
+Placed in same AZ as the instance and are automatically replicated to protect from single-component failure.
+
+EBS comes in a few types types:
+
+- SSD (SOlid-State Disk)
+  - General Purpose SSD (GP2) - general use
+  - Provisioned IOPS SSD(IO1) - high performance
+- Magnetic
+  - Throughput Optimized HDD (ST1) - low cost, frequent access
+  - Cold HDD (SC1) - lowest cos, less frequent access eg file servers
+  - Magentic - Previous generation
+
+## CLI Basics
+
+Hint: aws cli is installed on Amazon Linux by default so can access aws cli via an EC2 instance.
+
+To configure access with access key id and secret access key:
+
+```bash
+$ aws configure
+```
+
+Credentials are stored in `~/.aws` folder - not all that secure.
+
+Example
+
+```bash
+# make a bucket
+$ aws s3 mb s3://mikedonnicibucket
+# list buckets
+$ aws s3 ls
+# copy a file
+$ aws s3 cp somefile.txt s3://mikedonnicibucket
+# list contents of bucket
+$ aws s3 ls s3://mikedonnictest
+```
+
+A more secure way to use the cli is with roles.
+
+## IAM Roles
+
+- IAM -> Roles -> Create Role
+- Select service that uses the role, eg EC2.
+- Attach permission policy, eg AmazonS3FullAccess.
+
+The role now exists but has not been assigned to any service instance.
+
+Locate the instance and then:
+
+- Actions -> Instance Settings -> Attach/Replace IAM Role
+
+Now if you log into the EC2 instance access to S3 is provided via the role that has been assigned to this EC2 instance.
+
+Roles are:
+
+- More secure that key id / secret key
+- Easier to manage and configure policies
+- Roles are universal like users
