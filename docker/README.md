@@ -1,18 +1,18 @@
 # Docker
 
-## Editions
+## Installation
 
 There are various editions of Docker for different OS and for cloud.
 
-On mac it is not supported natively so runs in a VM.
+On Mac it is not supported natively so runs in a VM.
 
-## Linux Installation
+### Linux
 
 *Don't use package manager*
 
 Installation script here: https://get.docker.com/
 
-Install instruction at the top of the comments:above script:
+Install instruction at the top of the comments, above script:
 
 ```bash
 $ curl -fsSL get.docker.com -o get-docker.sh

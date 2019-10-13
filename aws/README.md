@@ -67,7 +67,7 @@ These steps will result in all green ticks status fro security status:
 
 ## S3
 
-**S3 - Simple Storage Service**
+**Simple Storage Service**
 
 Overview:
 
@@ -181,3 +181,43 @@ A bucket policy is the easiest way to allow public access to the static web site
   ]
 }
 ```
+
+## EC2
+
+**Elastic Compute Cloud**
+
+
+### Load Balancers
+
+Can distribute requests to EC2 instances in different availability zones.
+
+Three types:
+
+- Application load balancer - layer 7 aware
+- Network load balancer - high performance or static IPs
+- Classic load balancer - test, dev, low cost
+
+
+## RDS
+
+**Relational Database Service**
+
+Options at AWS include:
+
+- SQL Server
+- Oracle
+- MySQL
+- MariaDB
+- PostGres
+- Aurora
+
+Two key features:
+
+- Multi-AZ for disaster recovery
+- Read replicas for perfomance
+
+
+
+
+
+

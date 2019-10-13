@@ -474,13 +474,13 @@ fun strToNum(str: String) = try {
 
 In Kotlin there is a distinction between _read-only_ and _mutable_ collections:
 
+```kotlin
 val mutableList = mutableListOf("Go", "Python")
 mutableList.add("Kotlin")
 
 val readOnlyList = listOf("Go", "Python")
 mutableList.add("Kotlin") // computer says 'no'
-
-````
+```
 
 ### Maps
 
@@ -1384,3 +1384,15 @@ fun main() {
 }
 
 ```
+
+## Functional Programming
+
+### Lambdas
+
+### Collections - common operations
+
+### Function Types
+
+### Member References
+
+###
