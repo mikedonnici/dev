@@ -1454,6 +1454,89 @@ map.mapValues { (_, value) -> "$value" }
 
 ### Collections - common operations
 
+Kotlin contains a lot of extension functions for collections. Many of these use lambdas are can be used in a _functional_ style.
+
+`.filter()` filters the elements of a list and keeps only those elements that satisfy the given predicate:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.filter { it > 5 })
+// [6, 7, 8, 9]
+```
+
+`.map()` transforms each element in a collection and stores the resulting elements in a new list with the same number of elements as the original:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.map { it * it })
+// [1, 4, 9, 16, 25, 36, 49, 64, 81]
+```
+
+`.any()`, `.all()`, `.none()` return a boolean result if _any_, _all_ or _none_ satisfy the given predicate:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.any { it > 9 })  // false
+println(list.all { it < 10 }) // true
+println(list.none { it > 9 }) // true
+```
+
+`.find()` returns the _first_ result that satisfies the predicate, or null:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.find { it > 6 }) // 7
+println(list.find { it < 1 }) // null
+```
+
+`.first()`, `.firstOrNull()` find the _first_ element that satisfies the predicate. `first()` ill raise an exception if not found, `firstOrNull()` will return null:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.first { it > 6 })       // 7
+println(list.firstOrNull { it < 1 }) // null, same as .find()
+println(list.first { it < 1 })       // exception
+```
+
+`.count()` returns the number of elements that satisfy the predicate:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.count { it % 2 == 0 })
+// 4
+```
+
+`.partition()` divides a collection into two collections, one which contains elements that satisfy the predicate, and a second containing the other elements:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.partition { it % 2 == 0 })
+// ([2, 4, 6, 8], [1, 3, 5, 7, 9])
+```
+
+`.groupBy()` can divide a collection into groups dictated by the predciate. The result is a _map_ where the _key_ represents the value of the predciate for that group, and the _value_ is a list of the elements that match the predicate:
+
+```kotlin
+class Person(val name: String, val age: Int)
+
+fun main() {
+    val people = listOf(
+        Person("Mike", 48),
+        Person("Greg", 48),
+        Person("Grant", 47),
+        Person("Declan", 47),
+        Person("Christie", 44)
+    )
+    val ageGroups = people.groupBy { it.age }
+    for ((age, list) in ageGroups) {
+        println("People who are $age years:")
+        for (p in list) {
+            println(" - ${p.name}")
+        }
+    }
+}
+```
+
 ### Function Types
 
 ### Member References
