@@ -21,8 +21,7 @@ fun main(args: Array<String>) {
 }
 ```
 
-String templates allow expressions to be used inside string literals. A
-simple val/var can use `$`, a more complex expression `${}`:
+String templates allow expressions to be used inside string literals. A simple val/var can use `$`, a more complex expression `${}`:
 
 ```kotlin
 fun main() {
@@ -145,9 +144,9 @@ To specify default values can use positional or named arguments:
 ```kotlin
 fun main() {
     // can call in various ways:
-    printDivider() 		// accept defaults
-    printDivider('-') 	// override first arg (positional)
-    printDivider('-', 20) 	// override both defaults (positional)
+    printDivider()         // accept defaults
+    printDivider('-')     // override first arg (positional)
+    printDivider('-', 20)     // override both defaults (positional)
     printDivider(num = 30, char = '+') // override both by name (any order)
 }
 
@@ -211,9 +210,9 @@ fun main() {
 fun main() {
     val x: Any = "abc"
     when (x) {
-    	is Int -> println("x is an int value $x")
-    	is String -> print("x is a string with length ${x.length}")
-	}
+        is Int -> println("x is an int value $x")
+        is String -> print("x is a string with length ${x.length}")
+    }
 }
 ```
 
@@ -385,10 +384,9 @@ fun main() {
 }
 ```
 
-## `in` checks and ranges
+## Using `in` for checks and ranges
 
-`in` has two use cases in Kotlin - iterating over a range, and checking
-if a value _occurs_ in a range.
+`in` has two use cases in Kotlin - iterating over a range, and checking if a value _occurs_ in a range.
 
 ```kotlin
 // iteration
@@ -436,6 +434,60 @@ if (item in list) { ... }
 if (list.contains(item)) { ... }
 ```
 
+## Safe Casts
+
+In the case where you want to call a method on a certain _type_ need to first check that a value is of that type.
+
+For example:
+
+```kotlin
+fun main() {
+    val a: Any = "string"
+    if (a is String) {
+        val b = a as String         // from abstract to specific type, note `as String` not required
+        println(b.toUpperCase())    // call method on type
+    } 
+}
+```
+
+In the above example `toUpperCase()` method is not available on the `Any` type so we need to cast `a` to a `String` type first. This is only possible, of course, if the value of `a` is actually a String.
+
+Kotlin has smart casting, so the example above can be achieved thus:
+
+```kotlin
+fun main() {
+    val a: Any = "string"
+    if (a is String) { // a is smart case to a string here
+        println(a.toUpperCase())
+    }
+}
+```
+
+Note that `a` is an abstract type `Any` and an exception is thrown if the cast
+is not possible. For example, if `a` was an `Int`:
+
+```kotlin
+fun main() {
+    val a: Int = 10
+    if (a is String) { // Incompatible types: String and Int
+        println(a.toUpperCase())
+    }
+}
+```
+
+Instead, _safe cast_ `as?` can be used:
+
+fun main() {
+    val a = "string"
+    println((a as? String)?.toUpperCase()) // "STRING"
+
+    val b = 10
+    println((b as? String)?.toUpperCase()) // null
+}
+
+Safe cast returns either the smart-cast value, is the value can be cast, or
+`null` if not.
+
 ## Exceptions
 
 In Kotlin, `throw` is an expression:
@@ -446,7 +498,7 @@ val percentage =
         number
     else 
         throw IllegalArgumentException(
-            "A percentage must be between 0 and 100: $number")    
+            "A percentage must be between 0 and 100: $number")
 ```
 
 `try` is also an expression:
@@ -458,30 +510,21 @@ fun main() {
 }
 
 fun strToNum(str: String) = try {
-    	Integer.parseInt(str)
-	} catch (e: NumberFormatException) {
-	    null
-	}
+        Integer.parseInt(str)
+    } catch (e: NumberFormatException) {
+        null
+    }
 ```
-
-
- 
-
-
-
 
 ## Collections
 
 In Kotlin there is a distinction between _read-only_ and _mutable_ collections:
 
-val mutableList = mutableListOf("Go", "Python")
-mutableList.add("Kotlin")
+val mutableList = mutableListOf("Go", "Python") mutableList.add("Kotlin")
 
-val readOnlyList = listOf("Go", "Python")
-mutableList.add("Kotlin") // computer says 'no'
+val readOnlyList = listOf("Go", "Python") mutableList.add("Kotlin") // computer says 'no'
 
 ````
-
 ### Maps
 
 Maps can be created thus:
@@ -654,8 +697,7 @@ fun main() {
 
 Open classes are the first level of class that allows inheritence.
 
-An `open` class can be instantiated as an object directly, or have its
-properties and methods overriden by child classes.
+An `open` class can be instantiated as an object directly, or have its properties and methods overriden by child classes.
 
 ```kotlin
 open class Person(open val name: String) {
@@ -679,16 +721,13 @@ fun main() {
     val dr = Doctor(name = "Mike")
     dr.speak()
 }
-
 ```
 
 ### Abstract classes
 
-Abstract classes are classes that enable inheritence but cannot be directly
-instantiated.
+Abstract classes are classes that enable inheritence but cannot be directly instantiated.
 
-An `abstract` class must be overriden by a concrete child class and it is
-implicitly an `open` class.
+An `abstract` class must be overriden by a concrete child class and it is implicitly an `open` class.
 
 Methods in an `abstract` class may also be `open` or `abstract`,
 
@@ -735,9 +774,7 @@ fun main() {
 
 ### Interfaces
 
-An `interface` is the highest level of abstraction for classes and describes a
-contract for a set of properties/methods that must be present for a class to
-satisfy the `interface`.
+An `interface` is the highest level of abstraction for classes and describes a contract for a set of properties/methods that must be present for a class to satisfy the `interface`.
 
 Properties and methods defined in an interface are implicitly `abstract`.
 
@@ -877,12 +914,11 @@ Note that `final` is implicit when declaring a property or method _unless_ it is
 
 However, when using `override` the `final` keyword must be used explicitely for the desired effect. Otherwise, the property/method can be _overridden_ in child classes.
 
-In summary: _*overridden*_ properties/methods are `open` by default, and this can be stopped by using the `final` keyword.
+In summary: **overridden** properties/methods are `open` by default, and this can be stopped by using the `final` keyword.
 
 ### Inheriting multiple properties/methods with the same name
 
-When a class inherits multiple implementations of a method it _must_
-override that method to resolve the ambiguity:
+When a class inherits multiple implementations of a method it _must_ override that method to resolve the ambiguity:
 
 ```kotlin
 interface Teller {
@@ -1299,7 +1335,7 @@ import com.mikedonnici.proj.pkg.subpkg
 
 ## Generics
 
-When a classes or functions needs to accomodate more than one data type, _generic_ parameters can be used.
+When a classes or functions needs to accommodate more than one data type, _generic_ parameters can be used.
 
 Generic parameters are specifed with angled brackets `<>` and a parameter name that is often a single, upper-case letter, eg. `<E>`, `<T>`.
 
@@ -1344,7 +1380,6 @@ fun main() {
     println(st.pop()?.name)
     println(st.pop()?.name)
 }
-
 ```
 
 Note: **vararg** params are like _variadic_(?) params in Go - a comma-seperated list of args of a particular type.
@@ -1382,5 +1417,327 @@ fun main() {
         println(s1.pop())
     }
 }
+```
 
+## Extension Functions
+
+Extension functions extend the class. They are defined outside of the class but can be called as a regular member to the class.
+
+The _type_ that the function extends is called a **receiver**.
+
+In the example below, `String` is the receiver and can be referenced in the body of the function using the `this` keyword:
+
+```kotlin
+fun String.lastChar() = this.get(this.length - 1)
+```
+
+The `this` keyword can be omitted:
+
+```kotlin
+fun String.lastChar() = get(length-1)
+```
+
+An extension defined outside of a package must be imported:
+
+```kotlin
+import com.example.extensions.lastChar
+val c: Char = "abc".lastChar()
+```
+
+...or:
+
+```kotlin
+import com.example.extensions.*
+val c: Char = "abc".lastChar()
+```
+
+Extensions are an important part of Kotlin and the Kotlin Standard Library is the **Java Standard Library + extentions**.
+
+Under the hood, extensions are _static_ functions. In this example `obj` is of type `Parent` so the _static_ function `Parent.foo()` is called rather than `Child.foo()`:
+
+```kotlin
+open class Parent
+class Child: Parent()
+
+fun Parent.foo() = "parent"
+fun Child.foo() = "child"
+
+fun main() { 
+  val obj: Parent = Child() // type is Parent, so...
+  println(obj.foo())         // ...static fun Parent.foo() called
+}
+// parent
+```
+
+### Extension vs Member
+
+A member function always wins out over an extension with the same name:
+
+```kotlin
+fun main() {
+    println("abc".get(1))
+}
+
+fun String.get(index: Int) = "*"
+// b
+```
+
+Compiler will issue a warning: `Extension is shadowed by a member:...`
+
+However, extensions can _overload_ members if the signature is different:
+
+```kotlin
+fun main() {
+    println("abc".get(1)) // calls member
+    println("abc".get(1, true)) // calls extension override
+}
+
+fun String.get(index: Int, uppercase: Boolean): Char {
+    if (uppercase) {
+        return get(index).toUpperCase()
+    }
+    return get(index)
+}
+// b
+// B
+```
+
+## Functional Programming
+
+### Lambda syntax
+
+Lambdas are anonymous functions that can be used as an expression.
+
+In Kotlin, lambdas are written in curly braces:
+
+```kotlin
+{ x: Int, y: Int -> x + y }
+```
+
+Arguments on the left: `x: Int, y: Int`, function body on the right: `x + y`.
+
+A lambda can be passed to a function:
+
+```kotlin
+fun main() {
+    val list = listOf(1,2,3,4,5,6,7,8,9)
+	val newList = list.filter({ i: Int -> i > 5 })
+    print(newList)
+}
+// [6, 7, 8, 9]
+```
+
+If the lambda is the last argument, it can be placed outside the function
+parenthesis:
+
+```kotlin
+fun main() {
+    val list = listOf(1,2,3,4,5,6,7,8,9)
+	val newList = list.filter() { i: Int -> i > 5 }
+    print(newList)
+}
+// [6, 7, 8, 9]
+```
+
+If it is the only argument, the function parenthesis can be omitted (an idea
+borrowed rom Ruby):
+
+```kotlin
+fun main() {
+    val list = listOf(1,2,3,4,5,6,7,8,9)
+	val newList = list.filter { i: Int -> i > 5 }
+    print(newList)
+}
+// [6, 7, 8, 9]
+```
+
+Type can also be ommitted if it is clear from the context:
+
+```kotlin
+fun main() {
+    val list = listOf(1,2,3,4,5,6,7,8,9)
+	val newList = list.filter { i -> i > 5 }
+    print(newList)
+}
+// [6, 7, 8, 9]
+```
+
+If there is only one argument you can use the automatically created `it`:
+
+```kotlin
+fun main() {
+    val list = listOf(1,2,3,4,5,6,7,8,9)
+	val newList = list.filter { it > 5 }
+    print(newList)
+}
+// [6, 7, 8, 9]
+```
+
+For a *multi-line* lambda the last expression is the result:
+
+```kotlin
+list.any {
+    println("Processing $it")
+    it > 0 // result expression
+}
+```
+
+Lambda arguments such as Map entries or Pairs can be _destructured_ as well.
+
+So instead of this:
+
+```kotlin
+fun main() {
+    val map = mapOf("one" to 1, "two" to 2)
+	val map2 = map.mapValues { entry -> "${entry.key} -> ${entry.value}" }
+}
+```
+
+...can do:
+
+```kotlin
+fun main() {
+    val map = mapOf("one" to 1, "two" to 2)
+	val map2 = map.mapValues { (key, value) "$key -> $value" }
+    println(map2)
+}
+```
+
+Unused parameters can be discarded with an underscore:
+
+```kotlin
+fun main() {
+    val map = mapOf("one" to 1, "two" to 2)
+	val map2 = map.mapValues { (_, value) "$value" }
+    println(map2)
+}
+```
+
+### Collection extensions
+
+The Kotlin libray contains many extension functions for working with
+collections.
+
+Many of these work are _functional_ and work with lambdas.
+
+#### `filter`
+
+Filters out the content of a list and keeps only the elements that satisfy the
+given predicate:
+
+```kotlin
+fun main() {
+    println(listOf(1,2,3,4,5,6,7,8,9).filter { it > 5 })
+}
+// [6, 7, 8, 9]
+```
+
+#### `map`
+
+Transforms each element in a collection:
+
+```kotlin
+fun main() {
+    println(listOf(1,2,3,4,5,6,7,8,9).map { it * it })
+}
+```
+
+#### `any`, `all`, `none`
+
+Return a boolean based on the predicate being satisfied by the appropriate
+number of elements:
+
+```kotlin
+fun main() {
+    val list = listOf(1,2,3,4,5,6,7,8,9)
+    println(list.any { it > 10 }) // false
+    println(list.all { it < 10})  // true
+    println(list.none { it < 4 }) // false
+}
+```
+
+#### `find`, `first`, `firstOrNull`
+
+Returns first element that satisfies the predicate.
+
+If no element satisfies, `find` and `firstOrNull` return `null`, `first` will throw an exception.
+
+```kotlin
+fun main() {
+    val list = listOf(1,2,3,4,5,6,7,8,9)
+    
+    println(list.find { it > 5 })  // 6
+    println(list.find { it > 10 }) // null
+    
+    
+    println(list.first { it < 10}) 		// 1
+    try {
+    	println(list.first { it > 10})  // Exception    
+    } 
+    catch(e: Exception) {
+        println(e.message) 
+        // Collection contains no element matching the predicate. 
+    }
+    
+    println(list.firstOrNull { it > 10 }) // null
+}
+
+```
+
+#### `count`
+
+Counts the number of elements that satisfy the given predicate:
+
+```kotlin
+fun main() {
+    val list = listOf(1,2,3,4,5,6,7,8,9)
+    println(list.count { it > 7 })
+}
+// 2
+```
+
+#### `partition`
+
+Splits the original list into a pair of lists, where the first list contains
+elements for which the predicate yielded true and the second list, false.
+
+```kotlin
+fun main() {
+    val list = listOf(1,2,3,4,5,6,7,8,9)
+    val lists = list.partition { it % 2 == 0 }
+    println(lists.first)
+    println(lists.second)
+}
+// [2, 4, 6, 8]
+// [1, 3, 5, 7, 9]
+```
+
+#### `groupBy`
+
+Partitions a collection into multiple sub-collections. In this example, the
+collection is split into a map that is keyed by `genus`.
+
+```kotlin
+class Carnivore(val genus: String, val species: String)
+
+fun main() {
+    val plants = listOf(
+    	Carnivore("Drosera", "spathulata"),
+    	Carnivore("Drosera", "pygmaea"),
+        Carnivore("Sarracenia", "flava"),
+        Carnivore("Sarracenia", "leucophylla"),
+    	Carnivore("Drosera", "binata"),
+    	Carnivore("Drosera", "capensis"),
+        Carnivore("Dionaea", "muscipula"),
+        Carnivore("Drosphyllum", "lusitanicum")
+    )
+    val genera = plants.groupBy { it.genus }
+    genera["Drosera"]?.forEach {
+        println("${it.genus} ${it.species}")
+    }
+}
+// Drosera spathulata
+// Drosera binata
+// Drosera pygmaea
+// Drosera capensis
 ```
