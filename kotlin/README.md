@@ -493,10 +493,10 @@ Safe cast returns either the smart-cast value, is the value can be cast, or
 In Kotlin, `throw` is an expression:
 
 ```kotlin
-val percentage = 
+val percentage =
     if (number in 0..100)
         number
-    else 
+    else
         throw IllegalArgumentException(
             "A percentage must be between 0 and 100: $number")
 ```
@@ -504,7 +504,7 @@ val percentage =
 `try` is also an expression:
 
 ```kotlin
-fun main() { 
+fun main() {
    println(strToNum("abc")) // null
    println(strToNum("123")) // 123
 }
@@ -520,11 +520,14 @@ fun strToNum(str: String) = try {
 
 In Kotlin there is a distinction between _read-only_ and _mutable_ collections:
 
-val mutableList = mutableListOf("Go", "Python") mutableList.add("Kotlin")
+```kotlin
+val mutableList = mutableListOf("Go", "Python")
+mutableList.add("Kotlin")
 
-val readOnlyList = listOf("Go", "Python") mutableList.add("Kotlin") // computer says 'no'
+val readOnlyList = listOf("Go", "Python")
+mutableList.add("Kotlin") // computer says 'no'
+```
 
-````
 ### Maps
 
 Maps can be created thus:
@@ -563,7 +566,7 @@ fun main() {
     }
 
 }
-````
+```
 
 Note that `to` is an _infix_ function, ie `"Mike" to 48` is the same as `"Mike".to(48)`.
 
@@ -1740,4 +1743,176 @@ fun main() {
 // Drosera binata
 // Drosera pygmaea
 // Drosera capensis
+```
+
+## Functional Programming
+
+### Lambdas
+
+A _lambda_ is an anonymous function that can be used as an expression.
+
+They provided a concise syntax and allow for working with collections in a functional style.
+
+Lambdas are always specified in curly braces. In this example, `x` and `y` are parameters and `x + y` is the function body:
+
+```kotlin
+{ x: Int, y: Int -> x + y }
+```
+
+A lambda can be passed as an argument to a function:
+
+```kotlin
+list.any({ i: Int -> i > 10 })
+```
+
+If the lambda is the last argument in can be placed outside the parenthesis:
+
+```kotlin
+list.any() { i: Int -> i > 10 }
+```
+
+If it is the only argument the parenthesis can be omitted:
+
+```kotlin
+list.any { i: Int -> i > 10 }
+```
+
+_Note: This is an idea that came from Ruby._
+
+If the the argument type can be inferred, it can also be omitted:
+
+```kotlin
+list.any { i -> i > 10 }
+```
+
+If there is only one argument can use the automatically created arg name, `it`:
+
+```kotlin
+list.any { it > 10 }
+```
+
+A multi-line lambda is ok - the last expression is the result:
+
+```kotlin
+list.any {
+    println("In the lambda!")
+    it > 10
+}
+```
+
+Lambda arguments (map entry or a pair) can be destructured, so instead of this:
+
+```kotlin
+map.mapValues { entry -> "${entry.key}: ${entry.value}"}
+```
+
+...can do this:
+
+```kotlin
+map.mapValues { (key, value) -> "$key: $value" }
+```
+
+Unused parameters can be discarded with an underscore:
+
+```kotlin
+map.mapValues { (_, value) -> "$value" }
+```
+
+### Collections - common operations
+
+Kotlin contains a lot of extension functions for collections. Many of these use lambdas are can be used in a _functional_ style.
+
+`.filter()` filters the elements of a list and keeps only those elements that satisfy the given predicate:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.filter { it > 5 })
+// [6, 7, 8, 9]
+```
+
+`.map()` transforms each element in a collection and stores the resulting elements in a new list with the same number of elements as the original:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.map { it * it })
+// [1, 4, 9, 16, 25, 36, 49, 64, 81]
+```
+
+`.any()`, `.all()`, `.none()` return a boolean result if _any_, _all_ or _none_ satisfy the given predicate:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.any { it > 9 })  // false
+println(list.all { it < 10 }) // true
+println(list.none { it > 9 }) // true
+```
+
+`.find()` returns the _first_ result that satisfies the predicate, or null:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.find { it > 6 }) // 7
+println(list.find { it < 1 }) // null
+```
+
+`.first()`, `.firstOrNull()` find the _first_ element that satisfies the predicate. `first()` ill raise an exception if not found, `firstOrNull()` will return null:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.first { it > 6 })       // 7
+println(list.firstOrNull { it < 1 }) // null, same as .find()
+println(list.first { it < 1 })       // exception
+```
+
+`.count()` returns the number of elements that satisfy the predicate:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.count { it % 2 == 0 })
+// 4
+```
+
+`.partition()` divides a collection into two collections, one which contains elements that satisfy the predicate, and a second containing the other elements:
+
+```kotlin
+val list = listOf(1,2,3,4,5,6,7,8,9)
+println(list.partition { it % 2 == 0 })
+// ([2, 4, 6, 8], [1, 3, 5, 7, 9])
+```
+
+`.groupBy()` can divide a collection into groups dictated by the predciate. The result is a _map_ where the _key_ represents the value of the predciate for that group, and the _value_ is a list of the elements that match the predicate:
+
+```kotlin
+class Person(val name: String, val age: Int)
+
+fun main() {
+    val people = listOf(
+        Person("Mike", 48),
+        Person("Greg", 48),
+        Person("Grant", 47),
+        Person("Declan", 47),
+        Person("Christie", 44)
+    )
+    val ageGroups = people.groupBy { it.age }
+    for ((age, list) in ageGroups) {
+        println("People who are $age years:")
+        for (p in list) {
+            println(" - ${p.name}")
+        }
+    }
+}
+```
+
+### Function Types
+
+### Member References
+
+###
+
+```
+
+```
+
+```
+
 ```
