@@ -1,0 +1,14 @@
+syntax = "proto3";
+
+/*
+Money (example: USD 35.42  (35 = integral, 42 = decimal)):
+Currency Code (string)
+Integral amount (number)
+Decimal amount (number)
+*/
+
+message Money {
+  string currency_code = 1;
+  int32 integral_amount = 2;
+  int32 decimal_amount = 3;
+}
