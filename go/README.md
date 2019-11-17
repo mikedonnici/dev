@@ -2,9 +2,10 @@
 
 - [Code organisation](./code-organisation/) - HTTP service example
 - [Dependencies](./dependencies/)
-- [JWT](./jwt/)
+- [Functional Programming](./functional-programming/)
 - [Interfaces](./interfaces/)
-- [network-programming](./network-programming/)
+- [JWT](./jwt/)
+- [Netwwork Programming](./network-programming/)
 - [testing](./testing/)
 - [tooling](./tooling/)
 
@@ -15,6 +16,8 @@
 - [Clean Go Code](https://github.com/Pungyeon/clean-go-article)
 
 ## Learning Resources
+
+**[Go By Example](https://gobyexample.com/)**
 
 **[Hoanh An Ultimate Go](https://github.com/hoanhan101/ultimate-go)** Awesome set of notes, including Ultimate Go
 
