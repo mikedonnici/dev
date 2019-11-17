@@ -1,0 +1,11 @@
+syntax = "proto3";
+
+import "proto/date.proto";
+
+package person;
+
+message Person {
+  string first_name = 1;
+  string last_named = 2;
+  my.date.Date birthday = 3;
+}

@@ -21,7 +21,7 @@ Human-readable `.proto` files are used to generate boilerplate code in your lang
 
 Protocol buffer exchanges messages, which are defined in a `.proto` files, eg:
 
-```protobuf
+```proto
 syntax = "proto3";
 
 // type name = tag;
@@ -41,7 +41,7 @@ message fooMessage {
 
 Example:
 
-```protobuf
+```proto
 syntax = "proto3";
 
 message Person {
@@ -72,7 +72,7 @@ Implements the concept of _lists_ or _arrays_ comprised of 0 to many elements.
 
 For example:
 
-```protobuf
+```proto
 syntax = "proto3";
 
 message Person {
@@ -107,7 +107,7 @@ Useful for documenting schemas.
 - First valeu is the _default_
 - Must start with tag `0`
 
-```protobuf
+```proto
 syntax = "proto3";
 
 message Person {
@@ -136,7 +136,7 @@ message Person {
 
 A `.proto` file can contain multiple messages:
 
-```protobuf
+```proto
 syntax = "proto3";
 
 message Person {
@@ -172,7 +172,7 @@ message Date {
 
 Message types can alsobe nested:
 
-```protobuf
+```proto
 syntax = "proto3";
 
 message Person {
@@ -220,3 +220,57 @@ message Date {
 ```
 
 ## Importing types
+
+Types can be imported from other `.proto` files, eg:
+
+```proto
+syntax = "proto3";
+
+import "proto/date.proto";
+
+message Person {
+  string first_name = 1;
+  string last_named = 2;
+  Date birthday = 3;
+}
+```
+
+Note that the import path is a bit tricky and needs to be relative to a proto path
+which is specified with `--proto_path`.
+
+## Packages
+
+Package names are used to create an arbitrary namespace, eg:
+
+```proto
+syntax = "proto3";
+
+package my.date;
+
+message Date {
+  int32 year = 1;
+  int32 month = 2;
+  int32 day = 3;
+}
+```
+
+Then, when this is imported:
+
+```proto
+syntax = "proto3";
+
+import "proto/date.proto";
+
+package person;
+
+message Person {
+  string first_name = 1;
+  string last_named = 2;
+  // use fulle qualified package name
+  my.date.Date birthday = 3;
+}
+```
+
+- Use to organise messages and avoid naming conflicts
+- Helps with correct compilation in different languages
+

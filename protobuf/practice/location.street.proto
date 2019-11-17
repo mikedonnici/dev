@@ -1,0 +1,10 @@
+syntax = "proto3";
+
+import "practice/location.city.proto";
+
+package council;
+
+message Street {
+    string name = 1;
+    geo.City city = 2;
+}
