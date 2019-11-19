@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "practice/location.street.proto";
+import "proto/location.street.proto";
 
 package infrastructure;
 

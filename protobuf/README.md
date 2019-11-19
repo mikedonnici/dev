@@ -274,3 +274,36 @@ message Person {
 - Use to organise messages and avoid naming conflicts
 - Helps with correct compilation in different languages
 
+## Generating code with `protoc`
+
+The `protoc` command-line utility can generate boilerplate code for a 
+bunch of languages. Do `protoc` for a list of options.
+
+In short, you specify the path to the proto files (`-I`), the output 
+language and path, and the proto files to parse. 
+
+For example, from within a `project` folder containing a `proto` dir and 
+a `python` dir:
+
+```bash
+$ protoc -I=proto --python_out=python proto/*.proto
+``` 
+
+Note: it can be a bit curly to get paths to work, particularly when 
+there are imports and packages in use.
+
+## Options for generating code
+
+There are `.proto` file options for changing the way the boilerplate 
+code is generated.
+
+For example, the default package names when generating `Go` code tend to 
+be not very _idiomatic_. So, can do:
+
+```proto
+syntax = "proto3";
+
+option go_package = "betternamepb";
+```
+
+

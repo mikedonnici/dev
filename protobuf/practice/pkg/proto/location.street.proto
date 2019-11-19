@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-import "practice/location.city.proto";
+import "proto/location.city.proto";
 
 package council;
 
