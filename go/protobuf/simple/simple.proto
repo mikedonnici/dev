@@ -1,6 +1,6 @@
 syntax = "proto3";
 
-option go_package = "personpb";
+option go_package = "simple";
 
 message Person {
     string name = 1;
