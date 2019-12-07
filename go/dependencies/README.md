@@ -68,3 +68,4 @@ go mod tidy
 ## References
 
 - [The Principles of Versioning in Go](https://research.swtch.com/vgo-principles) - Russ Cox
+- Arden Labs Posts on Modules - [Part 1](https://www.ardanlabs.com/blog/2019/10/modules-01-why-and-what.html), [Part 2](https://www.ardanlabs.com/blog/2019/12/modules-02-projects-dependencies-gopls.html)
