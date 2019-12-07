@@ -7,7 +7,7 @@ Extract from <https://blog.golang.org/using-go-modules>
 - Each dependency requirement is written as a module path and a specific [semantic version](https://semver.org)
 - `go.mod` only appears in the root of the module
 - `go` command resolves imports by using the specific dependency module versions listed in `go.mod`
-- Defaults to _latest_ in order of preference for _latest tagged stable_, _latest tagged pre-release) then _latest untagged_
+- Defaults to _latest_ in order of preference for _latest tagged stable_, _latest tagged pre-release) then \_latest untagged_
 - An untagged release with be listed with a [psuedo version](https://golang.org/cmd/go/#hdr-Pseudo_versions) number
 - `go.sum` file contains hashes of the content of specific module versions
 - Each major version (except v1) must be in module path, for example:
@@ -64,3 +64,7 @@ go mod tidy
 - `go list -m all` prints the current module's dependencies.
 - `go get` changes the required version of a dependency (or adds a new dependency).
 - `go mod tidy` removes unused dependencies.
+
+## References
+
+- [The Principles of Versioning in Go](https://research.swtch.com/vgo-principles) - Russ Cox
