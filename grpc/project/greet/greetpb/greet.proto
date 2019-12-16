@@ -1,0 +1,35 @@
+syntax = "proto3";
+
+package greet;
+option go_package = "greetpb";
+
+message Person {
+    string first_name = 1;
+    string last_name = 2;
+}
+
+message GreetRequest {
+    Person person = 1;
+}
+
+message GreetResponse {
+    string greeting = 1;
+}
+
+service GreetService {
+
+    // Unary
+    rpc Greet(GreetRequest) returns (GreetResponse) {};
+
+    // Server streaming
+    rpc GreetManyTimes(GreetRequest) returns (stream GreetResponse) {};
+
+    // Client streaming
+    rpc GreetAfterManyTimes(stream GreetRequest) returns (GreetResponse) {};
+
+    // Bi-directional
+    rpc GreetAsync(stream GreetRequest) returns (stream GreetResponse) {};
+
+    // Unary with deadline
+    rpc GreetWithDeadline(GreetRequest) returns (GreetResponse) {};
+};

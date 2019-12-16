@@ -1,0 +1,60 @@
+syntax = "proto3";
+
+package calculator;
+option go_package = "calculatorpb";
+
+message AddRequest {
+    int32 num1 = 1;
+    int32 num2 = 2;
+}
+
+message AddResponse {
+    int32 sum = 1;
+}
+
+message PrimeNumberDecompositionRequest {
+    int32 number = 1;
+}
+
+message PrimeNumberDecompositionResponse {
+    int32 number = 1;
+}
+
+message AverageRequest {
+    int32 number = 1;
+}
+
+message AverageResponse {
+    float average = 1;
+}
+
+message BiggestInSetRequest {
+    int32 number = 1;
+}
+
+message BiggestInSetResponse {
+    int32 number = 1;
+}
+
+message SquareRootRequest {
+    int32 number = 1;
+}
+
+message SquareRootResponse {
+    float number = 1;
+}
+
+service CalculatorService{
+
+    rpc Sum(AddRequest) returns (AddResponse) {};
+
+    rpc PrimeNumberDecomposition(PrimeNumberDecompositionRequest) returns (stream PrimeNumberDecompositionResponse) {};
+
+    rpc Average(stream AverageRequest) returns (AverageResponse) {};
+
+    rpc BiggestInSet(stream BiggestInSetRequest) returns (stream BiggestInSetResponse) {};
+
+    // SquareRoot returns the square root of the argument or an
+    // INVALID_ARGUMENT error if the argument is negative
+    rpc SquareRoot(SquareRootRequest) returns (SquareRootResponse) {};
+}

@@ -455,7 +455,7 @@ message Foo {
 }
 ```
 
-### Timestamp [:link:](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#timestamp)
+### Timestamp [⇥](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#timestamp)
 
 A `timestamp` is on of the [well-known types](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf) in protocol buffers. That is, a type that is common across many languages.
 
@@ -473,9 +473,51 @@ message Foo {
 }
 ```
 
-### Duration [:link:](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#duration)
+### Duration [⇥](https://developers.google.com/protocol-buffers/docs/reference/google.protobuf#duration)
 
 A `duration` is also a well-known type and has `seconds` and `nanoseconds` fields.
+
+## Naming conventions
+
+- Message names in `CamelCase`
+- Field name in `snake_case`
+- Enum values in `CAPITAL_SNAKE_CASE`
+
+See the [style guide](https://developers.google.com/protocol-buffers/docs/style) for more.
+
+There is also a good [proto style guide](https://github.com/uber/prototool/blob/dev/etc/style/uber1/uber1.proto) from Uber.
+
+## Services
+
+Protocol buffers can be used to define services, or endpoints, that are used to send and receive messages.
+
+Service code can be generated for various languages - [gRPC](https://grpc.io) is one such implelemtation.
+
+Clients appear to be calling the server functions directly (ie, RPC) and all of the transport is handled by gRPC.
+
+The `.proto` file defines the service, and the messages that are involved:
+
+```proto
+syntax = "proto3";
+
+import "google/protobuf/timestamp.proto";
+import "google/protobuf/duration.proto";
+
+message SearchRequest {
+  timestamp search_time = 1;
+  string search_phrase = 2;
+}
+
+message SearchResponse {
+  string search_id = 1;
+  duration search_duration = 2;
+  repeated string results = 3;
+}
+
+service SearchService {
+  rpc Search(SearchRequest) returns (SearchResonse);
+}
+```
 
 ## Refs
 
