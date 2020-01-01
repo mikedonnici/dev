@@ -3,6 +3,9 @@ package main
 import (
 	"context"
 	"fmt"
+	"go.mongodb.org/mongo-driver/bson"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 	"log"
 	"net"
 	"os"
@@ -26,6 +29,10 @@ const (
 	mongoDSN = "mongodb://localhost:27017"
 )
 
+const (
+	errMissingCollection = "the %s collection does not seem to be attached"
+)
+
 type service struct {
 	collections map[string]*mongo.Collection
 }
@@ -40,15 +47,13 @@ type post struct {
 func main() {
 
 	// adds some addition guff to log lines
-	log.SetFlags(log.LstdFlags | log.Lshortfile)
-
+	// log.SetFlags(log.LstdFlags | log.Lshortfile)
 	// create the service and attach mongo collection(s)
 	srvc := NewService()
 	if err := srvc.AttachMongoCollection(mongoDSN, "blog", "posts"); err != nil {
 		log.Fatalf(".AttachMongoCollection() err = %s", err)
 	}
 	log.Println("Attached mongodb")
-	fmt.Println(srvc.collections)
 
 	lis, err := net.Listen("tcp", "0.0.0.0:50051")
 	if err != nil {
@@ -123,29 +128,108 @@ func (s *service) AttachMongoCollection(mongoDSN string, dbName, collectionName 
 func (s *service) CreatePost(ctx context.Context, req *blogpb.CreatePostRequest) (*blogpb.CreatePostResponse, error) {
 
 	log.Println("Creating post...")
-	log.Println(s.collections)
+
 	c, ok := s.collections["posts"]
 	if !ok {
-		return nil, fmt.Errorf("could not find posts collection")
+		return nil, fmt.Errorf(errMissingCollection, "posts")
 	}
 
-	p := post{
-		AuthorID: req.Post.AuthorId,
-		Title:    req.Post.Title,
-		Content:  req.Post.Content,
+	p := req.GetPost()
+	data := post{
+		AuthorID: p.GetAuthorId(),
+		Title:    p.GetTitle(),
+		Content:  p.GetContent(),
 	}
-	r, err := c.InsertOne(ctx, p)
+	r, err := c.InsertOne(ctx, data)
 	if err != nil {
-		return nil, fmt.Errorf(".InsertOne() err = %w", err)
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("InsertOne() err = %s", err))
 	}
-	id := r.InsertedID.(primitive.ObjectID).String()
+	oid, ok := r.InsertedID.(primitive.ObjectID)
+	if !ok {
+		return nil, status.Errorf(codes.Internal, "could not assert ObjectID")
+	}
 
 	return &blogpb.CreatePostResponse{
 		Post: &blogpb.Post{
-			Id:       id,
+			Id:       oid.Hex(),
+			AuthorId: p.GetAuthorId(),
+			Title:    p.GetTitle(),
+			Content:  p.GetContent(),
+		},
+	}, nil
+}
+
+func (s *service) ReadPost(ctx context.Context, req *blogpb.ReadPostRequest) (*blogpb.ReadPostResponse, error) {
+
+	log.Println("Reading post...")
+
+	c, ok := s.collections["posts"]
+	if !ok {
+		return nil, fmt.Errorf(errMissingCollection, "posts")
+	}
+
+	oid, err := primitive.ObjectIDFromHex(req.GetPostId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf(".ObjectIDFromHex() err = %s", err))
+	}
+
+	// f := post{ID: oid} // tags don't convert this to BSON?
+	f := bson.M{"_id": oid}
+	r := c.FindOne(ctx, f)
+	if r.Err() == mongo.ErrNoDocuments {
+		return nil, status.Errorf(codes.NotFound, fmt.Sprintf("no post found with id %s", oid))
+	}
+	if err != nil {
+		return nil, fmt.Errorf(".FindOne() err = %w", err)
+	}
+
+	p := post{}
+	if err := r.Decode(&p); err != nil {
+		return nil, fmt.Errorf(".Decode() err = %w", err)
+	}
+
+	return &blogpb.ReadPostResponse{
+		Post: &blogpb.Post{
+			Id:       p.ID.Hex(),
 			AuthorId: p.AuthorID,
 			Title:    p.Title,
 			Content:  p.Content,
+		},
+	}, nil
+}
+
+func (s *service) UpdatePost(ctx context.Context, req *blogpb.UpdatePostRequest) (*blogpb.UpdatePostResponse, error) {
+
+	log.Println("Updating post...")
+
+	c, ok := s.collections["posts"]
+	if !ok {
+		return nil, fmt.Errorf(errMissingCollection, "posts")
+	}
+
+	p := req.GetPost()
+	oid, err := primitive.ObjectIDFromHex(p.GetId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf(".ObjectIDFromHex() err = %s", err))
+	}
+	data := post{
+		ID:       oid,
+		AuthorID: p.GetAuthorId(),
+		Title:    p.GetTitle(),
+		Content:  p.GetContent(),
+	}
+
+	_, err = c.UpdateOne(ctx, bson.M{"_id": oid}, data)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("UpdateOne() err = %s", err))
+	}
+
+	return &blogpb.UpdatePostResponse{
+		Post: &blogpb.Post{
+			Id:       oid.Hex(),
+			AuthorId: data.GetAuthorId(),
+			Title:    data.GetTitle(),
+			Content:  p.GetContent(),
 		},
 	}, nil
 }

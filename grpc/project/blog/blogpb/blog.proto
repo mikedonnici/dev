@@ -19,7 +19,25 @@ message CreatePostResponse {
     Post post = 1;
 }
 
+message ReadPostRequest {
+    string post_id = 1;
+}
+
+message ReadPostResponse {
+    Post post = 1;
+}
+
+message UpdatePostRequest {
+    Post post = 1;
+}
+
+message UpdatePostResponse {
+    Post post = 1;
+}
+
 service BlogService {
 
     rpc CreatePost(CreatePostRequest) returns (CreatePostResponse) {};
+    rpc ReadPost(ReadPostRequest) returns (ReadPostResponse) {};
+    rpc UpdatePost(UpdatePostRequest) returns (UpdatePostResponse) {};
 }
