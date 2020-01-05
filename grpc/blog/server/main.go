@@ -3,23 +3,22 @@ package main
 import (
 	"context"
 	"fmt"
-	"go.mongodb.org/mongo-driver/bson"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"log"
 	"net"
 	"os"
 	"os/signal"
 	"time"
 
+	"github.com/mikedonnici/dev/grpc/blog/blogpb"
+	"go.mongodb.org/mongo-driver/bson"
 	"go.mongodb.org/mongo-driver/bson/primitive"
 	"go.mongodb.org/mongo-driver/mongo"
 	"go.mongodb.org/mongo-driver/mongo/options"
 	"go.mongodb.org/mongo-driver/mongo/readpref"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
-
-	"github.com/mkedonnici/grpc/project/blog/blogpb"
+	"google.golang.org/grpc/status"
 )
 
 const (
@@ -148,14 +147,10 @@ func (s *service) CreatePost(ctx context.Context, req *blogpb.CreatePostRequest)
 	if !ok {
 		return nil, status.Errorf(codes.Internal, "could not assert ObjectID")
 	}
+	data.ID = oid
 
 	return &blogpb.CreatePostResponse{
-		Post: &blogpb.Post{
-			Id:       oid.Hex(),
-			AuthorId: p.GetAuthorId(),
-			Title:    p.GetTitle(),
-			Content:  p.GetContent(),
-		},
+		Post: blogpbPost(data),
 	}, nil
 }
 
@@ -173,7 +168,6 @@ func (s *service) ReadPost(ctx context.Context, req *blogpb.ReadPostRequest) (*b
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf(".ObjectIDFromHex() err = %s", err))
 	}
 
-	// f := post{ID: oid} // tags don't convert this to BSON?
 	f := bson.M{"_id": oid}
 	r := c.FindOne(ctx, f)
 	if r.Err() == mongo.ErrNoDocuments {
@@ -183,18 +177,13 @@ func (s *service) ReadPost(ctx context.Context, req *blogpb.ReadPostRequest) (*b
 		return nil, fmt.Errorf(".FindOne() err = %w", err)
 	}
 
-	p := post{}
-	if err := r.Decode(&p); err != nil {
+	data := post{}
+	if err := r.Decode(&data); err != nil {
 		return nil, fmt.Errorf(".Decode() err = %w", err)
 	}
 
 	return &blogpb.ReadPostResponse{
-		Post: &blogpb.Post{
-			Id:       p.ID.Hex(),
-			AuthorId: p.AuthorID,
-			Title:    p.Title,
-			Content:  p.Content,
-		},
+		Post: blogpbPost(data),
 	}, nil
 }
 
@@ -212,6 +201,8 @@ func (s *service) UpdatePost(ctx context.Context, req *blogpb.UpdatePostRequest)
 	if err != nil {
 		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf(".ObjectIDFromHex() err = %s", err))
 	}
+
+	filter := bson.M{"_id": oid}
 	data := post{
 		ID:       oid,
 		AuthorID: p.GetAuthorId(),
@@ -219,17 +210,22 @@ func (s *service) UpdatePost(ctx context.Context, req *blogpb.UpdatePostRequest)
 		Content:  p.GetContent(),
 	}
 
-	_, err = c.UpdateOne(ctx, bson.M{"_id": oid}, data)
+	_, err = c.ReplaceOne(ctx, filter, data)
 	if err != nil {
 		return nil, status.Errorf(codes.Internal, fmt.Sprintf("UpdateOne() err = %s", err))
 	}
 
 	return &blogpb.UpdatePostResponse{
-		Post: &blogpb.Post{
-			Id:       oid.Hex(),
-			AuthorId: data.GetAuthorId(),
-			Title:    data.GetTitle(),
-			Content:  p.GetContent(),
-		},
+		Post: blogpbPost(data),
 	}, nil
+}
+
+// blogpbPost returns a pointer to a blogpb.Post from the provided post value
+func blogpbPost(data post) *blogpb.Post {
+	return &blogpb.Post{
+		Id:       data.ID.Hex(),
+		AuthorId: data.AuthorID,
+		Title:    data.Title,
+		Content:  data.Content,
+	}
 }

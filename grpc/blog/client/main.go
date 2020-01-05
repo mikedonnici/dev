@@ -3,15 +3,15 @@ package main
 import (
 	"context"
 	"fmt"
-	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
 	"log"
 	"net/http"
 	"time"
 
-	"github.com/mkedonnici/grpc/project/blog/blogpb"
+	"github.com/mikedonnici/dev/grpc/blog/blogpb"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
+	"google.golang.org/grpc/status"
 )
 
 const (
@@ -40,8 +40,17 @@ func main() {
 	client := blogpb.NewBlogServiceClient(conn)
 
 	// test runs
-	// create(client)
-	read(client)
+	//create(client)
+	id := "5e1114d999b4f9b9c48dfbae"
+	read(client, id)
+
+	updatedPost := blogpb.Post{
+		Id:       id,
+		AuthorId: "Michael Peter Donnici",
+		Title:    "The new way to handle things... with care and tests!",
+		Content:  "The complexity of arranging code and corresponding tests is a constant battle between...",
+	}
+	update(client, updatedPost)
 }
 
 func create(client blogpb.BlogServiceClient) {
@@ -66,11 +75,12 @@ func create(client blogpb.BlogServiceClient) {
 	fmt.Println(res.Post)
 }
 
-func read(client blogpb.BlogServiceClient) {
+// read handles reading a post ... printing here but would manage the response from here based on
+// status code / error types etc.
+func read(client blogpb.BlogServiceClient, postID string) {
 
-	const id = "5df8a709e7ad6cd6b1bda0a8"
 	req := blogpb.ReadPostRequest{
-		PostId: id,
+		PostId: postID,
 	}
 
 	res, err := readBlogPost(client, req)
@@ -78,11 +88,28 @@ func read(client blogpb.BlogServiceClient) {
 		statusErr, exists := status.FromError(err)
 		if exists {
 			if statusErr.Code() == codes.NotFound {
-				log.Fatalf("Post with id %s not found, err = %s", id, statusErr)
+				log.Fatalf("Post with id %q not found, err = %s", postID, statusErr.Err())
 			}
-			log.Fatalf("statusErr = %s", statusErr)
+			log.Fatalf("readBlogPost() statusErr = %s", statusErr.Err())
 		}
-		log.Fatalf(".readBlogPost() err = %s", err)
+		log.Fatalf("readBlogPost() err = %s", err)
+	}
+	fmt.Println(res)
+}
+
+func update(client blogpb.BlogServiceClient, updatedPost blogpb.Post) {
+
+	req := blogpb.UpdatePostRequest{
+		Post: &updatedPost,
+	}
+
+	res, err := updateBlogPost(client, req)
+	if err != nil {
+		statusErr, exists := status.FromError(err)
+		if exists {
+			log.Fatalf("updateBlogPost() statusErr = %s", statusErr.Err())
+		}
+		log.Fatalf("updateBlogPost() err = %s", err)
 	}
 	fmt.Println(res)
 }
@@ -92,6 +119,10 @@ func createPostHandler(w http.ResponseWriter, r *http.Request) {
 }
 
 func readPostHandler(w http.ResponseWriter, r *http.Request) {
+
+}
+
+func updatePostHandler(w http.ResponseWriter, r *http.Request) {
 
 }
 
@@ -105,4 +136,10 @@ func readBlogPost(client blogpb.BlogServiceClient, req blogpb.ReadPostRequest) (
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
 	defer cancel()
 	return client.ReadPost(ctx, &req)
+}
+
+func updateBlogPost(client blogpb.BlogServiceClient, req blogpb.UpdatePostRequest) (*blogpb.UpdatePostResponse, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
+	defer cancel()
+	return client.UpdatePost(ctx, &req)
 }

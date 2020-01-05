@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/mikedonnici/dev/grpc/calculator/calculatorpb"
 	"google.golang.org/grpc"
 	"math"
 	"net"
@@ -11,8 +12,6 @@ import (
 	"google.golang.org/grpc/status"
 	"io"
 	"log"
-
-	"github.com/mkedonnici/grpc/project/calculator/calculatorpb"
 )
 
 // implement the SumServiceServer interface

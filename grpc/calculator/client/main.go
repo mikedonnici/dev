@@ -3,14 +3,13 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/mikedonnici/dev/grpc/calculator/calculatorpb"
 	"google.golang.org/grpc/status"
 	"io"
 	"log"
 	"time"
 
 	"google.golang.org/grpc"
-
-	"github.com/mkedonnici/grpc/project/calculator/calculatorpb"
 )
 
 func main() {

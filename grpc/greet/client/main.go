@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/mikedonnici/dev/grpc/greet/greetpb"
 	"io"
 	"log"
 	"time"
@@ -11,8 +12,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
-
-	"github.com/mkedonnici/grpc/project/greet/greetpb"
 )
 
 const (

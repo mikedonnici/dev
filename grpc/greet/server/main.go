@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"github.com/mikedonnici/dev/grpc/greet/greetpb"
 	"io"
 	"log"
 	"net"
@@ -12,8 +13,6 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials"
 	"google.golang.org/grpc/status"
-
-	"github.com/mkedonnici/grpc/project/greet/greetpb"
 )
 
 // needs to implement the GreetServer interface
