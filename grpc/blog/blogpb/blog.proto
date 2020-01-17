@@ -14,7 +14,6 @@ message Post {
 message CreatePostRequest {
     Post post = 1;
 }
-
 message CreatePostResponse {
     Post post = 1;
 }
@@ -22,7 +21,6 @@ message CreatePostResponse {
 message ReadPostRequest {
     string post_id = 1;
 }
-
 message ReadPostResponse {
     Post post = 1;
 }
@@ -30,14 +28,34 @@ message ReadPostResponse {
 message UpdatePostRequest {
     Post post = 1;
 }
-
 message UpdatePostResponse {
+    Post post = 1;
+}
+
+message DeletePostRequest {
+    string post_id = 1;
+}
+message DeletePostResponse {
+    string post_id = 1;
+}
+
+// filters could go here
+message ListPostRequest {
+
+}
+message ListPostResponse {
     Post post = 1;
 }
 
 service BlogService {
 
     rpc CreatePost(CreatePostRequest) returns (CreatePostResponse) {};
+
     rpc ReadPost(ReadPostRequest) returns (ReadPostResponse) {};
+
     rpc UpdatePost(UpdatePostRequest) returns (UpdatePostResponse) {};
+
+    rpc DeletePost(DeletePostRequest) returns (DeletePostResponse) {};
+
+    rpc ListPost(ListPostRequest) returns (stream ListPostResponse) {};
 }

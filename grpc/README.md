@@ -78,6 +78,11 @@ ref:
 
 Can use the above to interrogate and interact with a gRPc service.
 
+## gRPC Gateway
+
+Use a a reverse-proxy client for implementing a RESTful API between clients and a gRPC server.
+
+- <https://github.com/grpc-ecosystem/grpc-gateway>
 
 
 Course ref: <https://github.com/simplesteph/grpc-go-course>

@@ -128,9 +128,9 @@ func (s *service) CreatePost(ctx context.Context, req *blogpb.CreatePostRequest)
 
 	log.Println("Creating post...")
 
-	c, ok := s.collections["posts"]
-	if !ok {
-		return nil, fmt.Errorf(errMissingCollection, "posts")
+	c, err := s.collection("posts")
+	if err != nil {
+		return nil, err
 	}
 
 	p := req.GetPost()
@@ -158,9 +158,9 @@ func (s *service) ReadPost(ctx context.Context, req *blogpb.ReadPostRequest) (*b
 
 	log.Println("Reading post...")
 
-	c, ok := s.collections["posts"]
-	if !ok {
-		return nil, fmt.Errorf(errMissingCollection, "posts")
+	c, err := s.collection("posts")
+	if err != nil {
+		return nil, err
 	}
 
 	oid, err := primitive.ObjectIDFromHex(req.GetPostId())
@@ -179,7 +179,7 @@ func (s *service) ReadPost(ctx context.Context, req *blogpb.ReadPostRequest) (*b
 
 	data := post{}
 	if err := r.Decode(&data); err != nil {
-		return nil, fmt.Errorf(".Decode() err = %w", err)
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("Decode() err = %s", err))
 	}
 
 	return &blogpb.ReadPostResponse{
@@ -191,9 +191,9 @@ func (s *service) UpdatePost(ctx context.Context, req *blogpb.UpdatePostRequest)
 
 	log.Println("Updating post...")
 
-	c, ok := s.collections["posts"]
-	if !ok {
-		return nil, fmt.Errorf(errMissingCollection, "posts")
+	c, err := s.collection("posts")
+	if err != nil {
+		return nil, err
 	}
 
 	p := req.GetPost()
@@ -220,7 +220,86 @@ func (s *service) UpdatePost(ctx context.Context, req *blogpb.UpdatePostRequest)
 	}, nil
 }
 
-// blogpbPost returns a pointer to a blogpb.Post from the provided post value
+func (s *service) DeletePost(ctx context.Context, req *blogpb.DeletePostRequest) (*blogpb.DeletePostResponse, error) {
+
+	log.Println("Deleting post...")
+
+	c, err := s.collection("posts")
+	if err != nil {
+		return nil, err
+	}
+
+	oid, err := primitive.ObjectIDFromHex(req.GetPostId())
+	if err != nil {
+		return nil, status.Errorf(codes.InvalidArgument, fmt.Sprintf("could not convert hex to object id, err = %s", err))
+	}
+
+	// ensure exists before deleting
+	_, err = s.ReadPost(ctx, &blogpb.ReadPostRequest{
+		PostId: oid.Hex(),
+	})
+	if err != nil {
+		return nil, status.Errorf(codes.NotFound, fmt.Sprintf("could not find post with id %q to delete", oid.Hex()))
+	}
+
+	filter := bson.M{"_id": oid}
+
+	_, err = c.DeleteOne(ctx, filter)
+	if err != nil {
+		return nil, status.Errorf(codes.Internal, fmt.Sprintf("DeleteOne() err = %s", err))
+	}
+
+	return &blogpb.DeletePostResponse{
+		PostId: oid.Hex(),
+	}, nil
+}
+
+func (s *service) ListPost(req *blogpb.ListPostRequest, stream blogpb.BlogService_ListPostServer) error {
+
+	log.Println("List posts...")
+
+	c, err := s.collection("posts")
+	if err != nil {
+		return err
+	}
+
+	filter := bson.M{} // empty
+	crsr, err := c.Find(context.Background(), filter)
+	if err != nil {
+		return status.Errorf(codes.Internal, fmt.Sprintf("Find() err = %s", err))
+	}
+	defer crsr.Close(context.Background())
+
+	for crsr.Next(context.Background()) {
+
+		data := post{}
+		if err := crsr.Decode(&data); err != nil {
+			return status.Errorf(codes.Internal, fmt.Sprintf("Decode() err = %s", err))
+		}
+
+		stream.Send(&blogpb.ListPostResponse{
+			Post: blogpbPost(data),
+		})
+	}
+
+	// returns last error seen by cursor... ie if it leaps out of the .Next loop for some reason (?)
+	if err := crsr.Err(); err != nil {
+		return status.Errorf(codes.Internal, fmt.Sprintf("cursor.Next() err = %s", err))
+	}
+
+	return nil
+}
+
+// collection returns a pointer to a mongo collection associated with the service, or an an error
+func (s *service) collection(name string) (*mongo.Collection, error) {
+	c, ok := s.collections["posts"]
+	if !ok {
+		return nil, fmt.Errorf(errMissingCollection, "posts")
+	}
+	return c, nil
+}
+
+// blogpbPost is a convenience func that returns a pointer to a blogpb.Post from the provided post value
 func blogpbPost(data post) *blogpb.Post {
 	return &blogpb.Post{
 		Id:       data.ID.Hex(),

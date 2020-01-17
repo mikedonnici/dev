@@ -3,6 +3,7 @@ package main
 import (
 	"context"
 	"fmt"
+	"io"
 	"log"
 	"net/http"
 	"time"
@@ -40,28 +41,55 @@ func main() {
 	client := blogpb.NewBlogServiceClient(conn)
 
 	// test runs
-	//create(client)
-	id := "5e1114d999b4f9b9c48dfbae"
-	read(client, id)
-
-	updatedPost := blogpb.Post{
-		Id:       id,
-		AuthorId: "Michael Peter Donnici",
-		Title:    "The new way to handle things... with care and tests!",
-		Content:  "The complexity of arranging code and corresponding tests is a constant battle between...",
+	newPost1 := blogpb.Post{
+		AuthorId: "Leo Anthony Donnici",
+		Title:    "How to build a transformer with Lego.",
+		Content:  "Lorem ipsum....",
 	}
-	update(client, updatedPost)
+	newPost2 := blogpb.Post{
+		AuthorId: "Maia Grace Donnici",
+		Title:    "On the benefits of Fairies and Spells.",
+		Content:  "Lorem ipsum....",
+	}
+
+	// Create the posts
+	p1 := create(client, &newPost1)
+	log.Printf("Created post with id %s: %q", p1.GetId(), p1.GetTitle())
+	p2 := create(client, &newPost2)
+	log.Printf("Created post with id %s: %q", p2.GetId(), p2.GetTitle())
+
+	// Read a post
+	id := p1.Id
+	p3 := read(client, id)
+	log.Printf("Read post with id %s: %q", id, p3.GetTitle())
+
+	// Update a post
+	updatedPost := p3
+	updatedPost.Title = "Lego transformers - advanced course"
+	updatedPost.Content = "The complexity of arranging code and corresponding tests is a constant battle between..."
+	p4 := update(client, updatedPost)
+	log.Printf("Updated post with id %s", p3.Id)
+	log.Printf("---> from: %v", p3)
+	log.Printf("---> to: %v", p4)
+
+	// Delete a post
+	deletedId := delete(client, p4.Id)
+	log.Printf("Deleted post with id %q", deletedId)
+
+	// List the posts
+	posts := list(client)
+	for _, p := range posts {
+		fmt.Println(p)
+	}
 }
 
-func create(client blogpb.BlogServiceClient) {
-	post := blogpb.CreatePostRequest{
-		Post: &blogpb.Post{
-			AuthorId: "mike",
-			Title:    "The way I like it...",
-			Content:  "One day I was walking on the beach when I had a thought.",
-		},
+func create(client blogpb.BlogServiceClient, post *blogpb.Post) blogpb.Post {
+
+	req := blogpb.CreatePostRequest{
+		Post: post,
 	}
-	res, err := createBlogPost(client, post)
+
+	res, err := createBlogPost(client, req)
 	if err != nil {
 		statusErr, exists := status.FromError(err)
 		if exists {
@@ -72,12 +100,11 @@ func create(client blogpb.BlogServiceClient) {
 		}
 		log.Fatalf("createBlogPost() err = %s", err)
 	}
-	fmt.Println(res.Post)
+
+	return *res.Post
 }
 
-// read handles reading a post ... printing here but would manage the response from here based on
-// status code / error types etc.
-func read(client blogpb.BlogServiceClient, postID string) {
+func read(client blogpb.BlogServiceClient, postID string) blogpb.Post {
 
 	req := blogpb.ReadPostRequest{
 		PostId: postID,
@@ -94,10 +121,11 @@ func read(client blogpb.BlogServiceClient, postID string) {
 		}
 		log.Fatalf("readBlogPost() err = %s", err)
 	}
-	fmt.Println(res)
+
+	return *res.Post
 }
 
-func update(client blogpb.BlogServiceClient, updatedPost blogpb.Post) {
+func update(client blogpb.BlogServiceClient, updatedPost blogpb.Post) blogpb.Post {
 
 	req := blogpb.UpdatePostRequest{
 		Post: &updatedPost,
@@ -111,7 +139,42 @@ func update(client blogpb.BlogServiceClient, updatedPost blogpb.Post) {
 		}
 		log.Fatalf("updateBlogPost() err = %s", err)
 	}
-	fmt.Println(res)
+
+	return *res.Post
+}
+
+func delete (client blogpb.BlogServiceClient, postID string) string {
+
+	req := blogpb.DeletePostRequest{
+		PostId:               postID,
+	}
+
+	res, err := deleteBlogPost(client, req)
+	if err != nil {
+		statusErr, exists := status.FromError(err)
+		if exists {
+			log.Fatalf("deleteBlogPost() statusErr = %s", statusErr.Err())
+		}
+		log.Fatalf("deleteBlogPost() err = %s", err)
+	}
+
+	return res.PostId
+}
+
+func list(client blogpb.BlogServiceClient) []*blogpb.ListPostResponse {
+
+	req := blogpb.ListPostRequest{}
+
+	posts, err := listBlogPosts(client, req)
+	if err != nil {
+		statusErr, exists := status.FromError(err)
+		if exists {
+			log.Fatalf("listBlogPosts() statusErr = %s", statusErr.Err())
+		}
+		log.Fatalf("listBlogPosts() err = %s", err)
+	}
+
+	return posts
 }
 
 func createPostHandler(w http.ResponseWriter, r *http.Request) {
@@ -142,4 +205,34 @@ func updateBlogPost(client blogpb.BlogServiceClient, req blogpb.UpdatePostReques
 	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
 	defer cancel()
 	return client.UpdatePost(ctx, &req)
+}
+
+func deleteBlogPost(client blogpb.BlogServiceClient, req blogpb.DeletePostRequest) (*blogpb.DeletePostResponse, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
+	defer cancel()
+	return client.DeletePost(ctx, &req)
+}
+
+func listBlogPosts(client blogpb.BlogServiceClient, req blogpb.ListPostRequest) ([]*blogpb.ListPostResponse, error) {
+	ctx, cancel := context.WithTimeout(context.Background(), timeoutSeconds*time.Second)
+	defer cancel()
+
+	var posts []*blogpb.ListPostResponse
+	stream, err := client.ListPost(ctx, &req)
+	if err != nil {
+		return nil, err
+	}
+
+	for {
+		res, err := stream.Recv()
+		if err == io.EOF {
+			break
+		}
+		if err != nil {
+			log.Fatalf("resStream.Recv() err = %s", err)
+		}
+		posts = append(posts, res)
+	}
+
+	return posts, nil
 }

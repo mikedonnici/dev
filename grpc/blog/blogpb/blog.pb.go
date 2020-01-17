@@ -321,6 +321,155 @@ func (m *UpdatePostResponse) GetPost() *Post {
 	return nil
 }
 
+type DeletePostRequest struct {
+	PostId               string   `protobuf:"bytes,1,opt,name=post_id,json=postId,proto3" json:"post_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeletePostRequest) Reset()         { *m = DeletePostRequest{} }
+func (m *DeletePostRequest) String() string { return proto.CompactTextString(m) }
+func (*DeletePostRequest) ProtoMessage()    {}
+func (*DeletePostRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_6745b25902462fb1, []int{7}
+}
+
+func (m *DeletePostRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeletePostRequest.Unmarshal(m, b)
+}
+func (m *DeletePostRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeletePostRequest.Marshal(b, m, deterministic)
+}
+func (m *DeletePostRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeletePostRequest.Merge(m, src)
+}
+func (m *DeletePostRequest) XXX_Size() int {
+	return xxx_messageInfo_DeletePostRequest.Size(m)
+}
+func (m *DeletePostRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeletePostRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeletePostRequest proto.InternalMessageInfo
+
+func (m *DeletePostRequest) GetPostId() string {
+	if m != nil {
+		return m.PostId
+	}
+	return ""
+}
+
+type DeletePostResponse struct {
+	PostId               string   `protobuf:"bytes,1,opt,name=post_id,json=postId,proto3" json:"post_id,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *DeletePostResponse) Reset()         { *m = DeletePostResponse{} }
+func (m *DeletePostResponse) String() string { return proto.CompactTextString(m) }
+func (*DeletePostResponse) ProtoMessage()    {}
+func (*DeletePostResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_6745b25902462fb1, []int{8}
+}
+
+func (m *DeletePostResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_DeletePostResponse.Unmarshal(m, b)
+}
+func (m *DeletePostResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_DeletePostResponse.Marshal(b, m, deterministic)
+}
+func (m *DeletePostResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_DeletePostResponse.Merge(m, src)
+}
+func (m *DeletePostResponse) XXX_Size() int {
+	return xxx_messageInfo_DeletePostResponse.Size(m)
+}
+func (m *DeletePostResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_DeletePostResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_DeletePostResponse proto.InternalMessageInfo
+
+func (m *DeletePostResponse) GetPostId() string {
+	if m != nil {
+		return m.PostId
+	}
+	return ""
+}
+
+// filters could go here
+type ListPostRequest struct {
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListPostRequest) Reset()         { *m = ListPostRequest{} }
+func (m *ListPostRequest) String() string { return proto.CompactTextString(m) }
+func (*ListPostRequest) ProtoMessage()    {}
+func (*ListPostRequest) Descriptor() ([]byte, []int) {
+	return fileDescriptor_6745b25902462fb1, []int{9}
+}
+
+func (m *ListPostRequest) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListPostRequest.Unmarshal(m, b)
+}
+func (m *ListPostRequest) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListPostRequest.Marshal(b, m, deterministic)
+}
+func (m *ListPostRequest) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListPostRequest.Merge(m, src)
+}
+func (m *ListPostRequest) XXX_Size() int {
+	return xxx_messageInfo_ListPostRequest.Size(m)
+}
+func (m *ListPostRequest) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListPostRequest.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListPostRequest proto.InternalMessageInfo
+
+type ListPostResponse struct {
+	Post                 *Post    `protobuf:"bytes,1,opt,name=post,proto3" json:"post,omitempty"`
+	XXX_NoUnkeyedLiteral struct{} `json:"-"`
+	XXX_unrecognized     []byte   `json:"-"`
+	XXX_sizecache        int32    `json:"-"`
+}
+
+func (m *ListPostResponse) Reset()         { *m = ListPostResponse{} }
+func (m *ListPostResponse) String() string { return proto.CompactTextString(m) }
+func (*ListPostResponse) ProtoMessage()    {}
+func (*ListPostResponse) Descriptor() ([]byte, []int) {
+	return fileDescriptor_6745b25902462fb1, []int{10}
+}
+
+func (m *ListPostResponse) XXX_Unmarshal(b []byte) error {
+	return xxx_messageInfo_ListPostResponse.Unmarshal(m, b)
+}
+func (m *ListPostResponse) XXX_Marshal(b []byte, deterministic bool) ([]byte, error) {
+	return xxx_messageInfo_ListPostResponse.Marshal(b, m, deterministic)
+}
+func (m *ListPostResponse) XXX_Merge(src proto.Message) {
+	xxx_messageInfo_ListPostResponse.Merge(m, src)
+}
+func (m *ListPostResponse) XXX_Size() int {
+	return xxx_messageInfo_ListPostResponse.Size(m)
+}
+func (m *ListPostResponse) XXX_DiscardUnknown() {
+	xxx_messageInfo_ListPostResponse.DiscardUnknown(m)
+}
+
+var xxx_messageInfo_ListPostResponse proto.InternalMessageInfo
+
+func (m *ListPostResponse) GetPost() *Post {
+	if m != nil {
+		return m.Post
+	}
+	return nil
+}
+
 func init() {
 	proto.RegisterType((*Post)(nil), "blog.Post")
 	proto.RegisterType((*CreatePostRequest)(nil), "blog.CreatePostRequest")
@@ -329,30 +478,38 @@ func init() {
 	proto.RegisterType((*ReadPostResponse)(nil), "blog.ReadPostResponse")
 	proto.RegisterType((*UpdatePostRequest)(nil), "blog.UpdatePostRequest")
 	proto.RegisterType((*UpdatePostResponse)(nil), "blog.UpdatePostResponse")
+	proto.RegisterType((*DeletePostRequest)(nil), "blog.DeletePostRequest")
+	proto.RegisterType((*DeletePostResponse)(nil), "blog.DeletePostResponse")
+	proto.RegisterType((*ListPostRequest)(nil), "blog.ListPostRequest")
+	proto.RegisterType((*ListPostResponse)(nil), "blog.ListPostResponse")
 }
 
 func init() { proto.RegisterFile("blog.proto", fileDescriptor_6745b25902462fb1) }
 
 var fileDescriptor_6745b25902462fb1 = []byte{
-	// 289 bytes of a gzipped FileDescriptorProto
-	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x52, 0x4d, 0x4f, 0xb3, 0x40,
-	0x18, 0x2c, 0xbc, 0xbc, 0x94, 0x4e, 0x13, 0xb5, 0x4f, 0xd4, 0x6e, 0x6a, 0x62, 0xcc, 0x9e, 0x8c,
-	0x87, 0x1e, 0xc0, 0x9b, 0xa7, 0xd6, 0x53, 0x6f, 0x06, 0xe3, 0xc5, 0x4b, 0x03, 0xec, 0xa6, 0x92,
-	0x10, 0x16, 0x61, 0xeb, 0xef, 0xf4, 0x27, 0x19, 0x96, 0x50, 0x48, 0x39, 0x58, 0x6f, 0x3c, 0xf3,
-	0xc1, 0x30, 0x13, 0x80, 0x38, 0x53, 0xbb, 0x65, 0x51, 0x2a, 0xad, 0xc8, 0xa9, 0x9f, 0x79, 0x02,
-	0xe7, 0x45, 0x55, 0x9a, 0xce, 0x60, 0xa7, 0x82, 0x59, 0x77, 0xd6, 0xfd, 0x24, 0xb4, 0x53, 0x41,
-	0x37, 0x98, 0x44, 0x7b, 0xfd, 0xa1, 0xca, 0x6d, 0x2a, 0x98, 0x6d, 0x60, 0xaf, 0x01, 0x36, 0x82,
-	0x2e, 0xf1, 0x5f, 0xa7, 0x3a, 0x93, 0xec, 0x9f, 0x21, 0x9a, 0x83, 0x18, 0xc6, 0x89, 0xca, 0xb5,
-	0xcc, 0x35, 0x73, 0x0c, 0xde, 0x9e, 0x3c, 0xc0, 0xec, 0xb9, 0x94, 0x91, 0x96, 0x75, 0x54, 0x28,
-	0x3f, 0xf7, 0xb2, 0xd2, 0x74, 0x0b, 0xa7, 0x50, 0x95, 0x36, 0x99, 0x53, 0x1f, 0x4b, 0xf3, 0x69,
-	0x46, 0x60, 0x70, 0xfe, 0x08, 0xea, 0x9b, 0xaa, 0x42, 0xe5, 0x95, 0xfc, 0xd5, 0xf5, 0x80, 0xf3,
-	0x50, 0x46, 0xa2, 0x1f, 0x34, 0xc7, 0xb8, 0xa6, 0xb6, 0x87, 0x7e, 0x6e, 0x7d, 0x6e, 0x04, 0xf7,
-	0x71, 0xd1, 0x69, 0x4f, 0x7c, 0x7f, 0x80, 0xd9, 0x5b, 0x21, 0xfe, 0x5e, 0xa5, 0x6f, 0x3a, 0x2d,
-	0xca, 0xff, 0xb6, 0x30, 0x5d, 0x67, 0x6a, 0xf7, 0x2a, 0xcb, 0xaf, 0x34, 0x91, 0xb4, 0x02, 0xba,
-	0x41, 0x68, 0xde, 0xe8, 0x07, 0xbb, 0x2e, 0xd8, 0x90, 0x68, 0x02, 0xf9, 0x88, 0x9e, 0xe0, 0xb5,
-	0x8d, 0xe9, 0xaa, 0xd1, 0x1d, 0xad, 0xb5, 0xb8, 0x3e, 0x86, 0x0f, 0xe6, 0x15, 0xd0, 0xb5, 0x68,
-	0xf3, 0x07, 0x63, 0xb4, 0xf9, 0xc3, 0xc2, 0x7c, 0xb4, 0xf6, 0xde, 0xdd, 0x9a, 0x2c, 0xe2, 0xd8,
-	0x35, 0x3f, 0x61, 0xf0, 0x13, 0x00, 0x00, 0xff, 0xff, 0x3c, 0x25, 0xc0, 0xe0, 0x92, 0x02, 0x00,
+	// 353 bytes of a gzipped FileDescriptorProto
+	0x1f, 0x8b, 0x08, 0x00, 0x00, 0x00, 0x00, 0x00, 0x02, 0xff, 0x94, 0x53, 0xc1, 0x4a, 0xc3, 0x40,
+	0x10, 0x6d, 0x63, 0x6c, 0xd3, 0x57, 0xb0, 0x66, 0x50, 0x1b, 0x2a, 0x88, 0xec, 0x49, 0x44, 0x8b,
+	0xb4, 0xde, 0xc4, 0x43, 0xab, 0x97, 0x82, 0x07, 0xa9, 0x78, 0xf1, 0x52, 0xda, 0xee, 0x52, 0x03,
+	0xa1, 0x1b, 0x93, 0xad, 0x1f, 0xea, 0x17, 0x49, 0x36, 0x6e, 0x13, 0x13, 0x8a, 0xf1, 0x96, 0x79,
+	0xf3, 0x66, 0xde, 0xce, 0x7b, 0x04, 0x58, 0x04, 0x72, 0xd5, 0x0f, 0x23, 0xa9, 0x24, 0xd9, 0xc9,
+	0x37, 0x5b, 0xc2, 0x7e, 0x96, 0xb1, 0xa2, 0x03, 0x58, 0x3e, 0xf7, 0xea, 0xe7, 0xf5, 0x8b, 0xd6,
+	0xd4, 0xf2, 0x39, 0x9d, 0xa2, 0x35, 0xdf, 0xa8, 0x77, 0x19, 0xcd, 0x7c, 0xee, 0x59, 0x1a, 0x76,
+	0x52, 0x60, 0xc2, 0xe9, 0x08, 0xfb, 0xca, 0x57, 0x81, 0xf0, 0xf6, 0x74, 0x23, 0x2d, 0xc8, 0x43,
+	0x73, 0x29, 0xd7, 0x4a, 0xac, 0x95, 0x67, 0x6b, 0xdc, 0x94, 0x6c, 0x08, 0xf7, 0x21, 0x12, 0x73,
+	0x25, 0x12, 0xa9, 0xa9, 0xf8, 0xd8, 0x88, 0x58, 0xd1, 0x19, 0xec, 0x50, 0xc6, 0x4a, 0x6b, 0xb6,
+	0x07, 0xe8, 0xeb, 0xa7, 0x69, 0x82, 0xc6, 0xd9, 0x2d, 0x28, 0x3f, 0x14, 0x87, 0x72, 0x1d, 0x8b,
+	0x3f, 0xa7, 0x2e, 0xd1, 0x99, 0x8a, 0x39, 0xcf, 0x0b, 0x75, 0xd1, 0x4c, 0x5a, 0xb3, 0xed, 0x7d,
+	0x8d, 0xa4, 0x9c, 0x70, 0x36, 0xc0, 0x61, 0xc6, 0xad, 0xb8, 0x7f, 0x08, 0xf7, 0x35, 0xe4, 0xff,
+	0x3f, 0x25, 0x3f, 0x54, 0x51, 0xea, 0x0a, 0xee, 0xa3, 0x08, 0xc4, 0x6f, 0xa9, 0x9d, 0xc7, 0x5c,
+	0x83, 0xf2, 0xec, 0x1f, 0x8d, 0x9d, 0x74, 0x17, 0x9d, 0x27, 0x3f, 0x56, 0xb9, 0xd5, 0x89, 0x1d,
+	0x19, 0x54, 0xed, 0x8d, 0x83, 0x2f, 0x0b, 0xed, 0x71, 0x20, 0x57, 0x2f, 0x22, 0xfa, 0xf4, 0x97,
+	0x82, 0x46, 0x40, 0x16, 0x1a, 0x75, 0x53, 0x7e, 0x29, 0xfb, 0x9e, 0x57, 0x6e, 0xa4, 0x82, 0xac,
+	0x46, 0x77, 0x70, 0x4c, 0x2a, 0x74, 0x9c, 0xf2, 0x0a, 0x89, 0xf6, 0x4e, 0x8a, 0xf0, 0x76, 0x78,
+	0x04, 0x64, 0x4e, 0x1b, 0xfd, 0x52, 0x60, 0x46, 0xbf, 0x1c, 0x4a, 0xba, 0x22, 0x33, 0xd2, 0xac,
+	0x28, 0x05, 0x61, 0x56, 0x94, 0x3d, 0x67, 0x35, 0xba, 0x87, 0x63, 0x9c, 0x34, 0x27, 0x14, 0xcc,
+	0x36, 0x27, 0x14, 0x0d, 0x67, 0xb5, 0x9b, 0xfa, 0xd8, 0x79, 0x6b, 0x24, 0xcd, 0x70, 0xb1, 0x68,
+	0xe8, 0x5f, 0x75, 0xf8, 0x1d, 0x00, 0x00, 0xff, 0xff, 0x5c, 0x8d, 0x36, 0xfb, 0xb8, 0x03, 0x00,
 	0x00,
 }
 
@@ -371,6 +528,8 @@ type BlogServiceClient interface {
 	CreatePost(ctx context.Context, in *CreatePostRequest, opts ...grpc.CallOption) (*CreatePostResponse, error)
 	ReadPost(ctx context.Context, in *ReadPostRequest, opts ...grpc.CallOption) (*ReadPostResponse, error)
 	UpdatePost(ctx context.Context, in *UpdatePostRequest, opts ...grpc.CallOption) (*UpdatePostResponse, error)
+	DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostResponse, error)
+	ListPost(ctx context.Context, in *ListPostRequest, opts ...grpc.CallOption) (BlogService_ListPostClient, error)
 }
 
 type blogServiceClient struct {
@@ -408,11 +567,54 @@ func (c *blogServiceClient) UpdatePost(ctx context.Context, in *UpdatePostReques
 	return out, nil
 }
 
+func (c *blogServiceClient) DeletePost(ctx context.Context, in *DeletePostRequest, opts ...grpc.CallOption) (*DeletePostResponse, error) {
+	out := new(DeletePostResponse)
+	err := c.cc.Invoke(ctx, "/blog.BlogService/DeletePost", in, out, opts...)
+	if err != nil {
+		return nil, err
+	}
+	return out, nil
+}
+
+func (c *blogServiceClient) ListPost(ctx context.Context, in *ListPostRequest, opts ...grpc.CallOption) (BlogService_ListPostClient, error) {
+	stream, err := c.cc.NewStream(ctx, &_BlogService_serviceDesc.Streams[0], "/blog.BlogService/ListPost", opts...)
+	if err != nil {
+		return nil, err
+	}
+	x := &blogServiceListPostClient{stream}
+	if err := x.ClientStream.SendMsg(in); err != nil {
+		return nil, err
+	}
+	if err := x.ClientStream.CloseSend(); err != nil {
+		return nil, err
+	}
+	return x, nil
+}
+
+type BlogService_ListPostClient interface {
+	Recv() (*ListPostResponse, error)
+	grpc.ClientStream
+}
+
+type blogServiceListPostClient struct {
+	grpc.ClientStream
+}
+
+func (x *blogServiceListPostClient) Recv() (*ListPostResponse, error) {
+	m := new(ListPostResponse)
+	if err := x.ClientStream.RecvMsg(m); err != nil {
+		return nil, err
+	}
+	return m, nil
+}
+
 // BlogServiceServer is the server API for BlogService service.
 type BlogServiceServer interface {
 	CreatePost(context.Context, *CreatePostRequest) (*CreatePostResponse, error)
 	ReadPost(context.Context, *ReadPostRequest) (*ReadPostResponse, error)
 	UpdatePost(context.Context, *UpdatePostRequest) (*UpdatePostResponse, error)
+	DeletePost(context.Context, *DeletePostRequest) (*DeletePostResponse, error)
+	ListPost(*ListPostRequest, BlogService_ListPostServer) error
 }
 
 // UnimplementedBlogServiceServer can be embedded to have forward compatible implementations.
@@ -427,6 +629,12 @@ func (*UnimplementedBlogServiceServer) ReadPost(ctx context.Context, req *ReadPo
 }
 func (*UnimplementedBlogServiceServer) UpdatePost(ctx context.Context, req *UpdatePostRequest) (*UpdatePostResponse, error) {
 	return nil, status.Errorf(codes.Unimplemented, "method UpdatePost not implemented")
+}
+func (*UnimplementedBlogServiceServer) DeletePost(ctx context.Context, req *DeletePostRequest) (*DeletePostResponse, error) {
+	return nil, status.Errorf(codes.Unimplemented, "method DeletePost not implemented")
+}
+func (*UnimplementedBlogServiceServer) ListPost(req *ListPostRequest, srv BlogService_ListPostServer) error {
+	return status.Errorf(codes.Unimplemented, "method ListPost not implemented")
 }
 
 func RegisterBlogServiceServer(s *grpc.Server, srv BlogServiceServer) {
@@ -487,6 +695,45 @@ func _BlogService_UpdatePost_Handler(srv interface{}, ctx context.Context, dec f
 	return interceptor(ctx, in, info, handler)
 }
 
+func _BlogService_DeletePost_Handler(srv interface{}, ctx context.Context, dec func(interface{}) error, interceptor grpc.UnaryServerInterceptor) (interface{}, error) {
+	in := new(DeletePostRequest)
+	if err := dec(in); err != nil {
+		return nil, err
+	}
+	if interceptor == nil {
+		return srv.(BlogServiceServer).DeletePost(ctx, in)
+	}
+	info := &grpc.UnaryServerInfo{
+		Server:     srv,
+		FullMethod: "/blog.BlogService/DeletePost",
+	}
+	handler := func(ctx context.Context, req interface{}) (interface{}, error) {
+		return srv.(BlogServiceServer).DeletePost(ctx, req.(*DeletePostRequest))
+	}
+	return interceptor(ctx, in, info, handler)
+}
+
+func _BlogService_ListPost_Handler(srv interface{}, stream grpc.ServerStream) error {
+	m := new(ListPostRequest)
+	if err := stream.RecvMsg(m); err != nil {
+		return err
+	}
+	return srv.(BlogServiceServer).ListPost(m, &blogServiceListPostServer{stream})
+}
+
+type BlogService_ListPostServer interface {
+	Send(*ListPostResponse) error
+	grpc.ServerStream
+}
+
+type blogServiceListPostServer struct {
+	grpc.ServerStream
+}
+
+func (x *blogServiceListPostServer) Send(m *ListPostResponse) error {
+	return x.ServerStream.SendMsg(m)
+}
+
 var _BlogService_serviceDesc = grpc.ServiceDesc{
 	ServiceName: "blog.BlogService",
 	HandlerType: (*BlogServiceServer)(nil),
@@ -503,7 +750,17 @@ var _BlogService_serviceDesc = grpc.ServiceDesc{
 			MethodName: "UpdatePost",
 			Handler:    _BlogService_UpdatePost_Handler,
 		},
+		{
+			MethodName: "DeletePost",
+			Handler:    _BlogService_DeletePost_Handler,
+		},
 	},
-	Streams:  []grpc.StreamDesc{},
+	Streams: []grpc.StreamDesc{
+		{
+			StreamName:    "ListPost",
+			Handler:       _BlogService_ListPost_Handler,
+			ServerStreams: true,
+		},
+	},
 	Metadata: "blog.proto",
 }
