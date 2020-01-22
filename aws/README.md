@@ -54,7 +54,7 @@ Can create a customized login url for IAM users:
   - Optional tags for role, departments etc
 - Set up password policies
 
-These steps will result in all green ticks status fro security status:
+These steps will result in all green ticks status for security status:
 
 ![img](./IAM-security-status.png)
 
@@ -320,3 +320,329 @@ Roles are:
 - More secure that key id / secret key
 - Easier to manage and configure policies
 - Roles are universal like users
+
+## RDS - Relational Database Service
+
+- Multi-AZ for disaster recovery
+- Read replicas for performance
+
+## Route53 
+
+- Domain Name Service
+- Global scope, same as IAM and S3
+- Register domain names
+- Manage DNS zones
+
+## Elastic Beanstalk
+
+- Under _Compute_
+- Automates deployment of web app infrastructure
+- Configurable load balancing, scaling, monitoring
+
+## CloudFormation
+
+- Under _Management and Governance_
+- Infrastructure as code
+- Infrastructure deployment using code templates
+- Uses Stack templates that represent infrastructure as code
+- Handles the deployment of specified resources and their interconnectivity
+- Service is free, resources are charged
+
+## Best Practices
+
+Key points from whitepaper: [AWS Cloud Best Practices](https://d1.awsstatic.com/whitepapers/AWS_Cloud_Best_Practices.pdf)
+
+### Benefits of Cloud
+
+- IT assests as provisioned resources, not physical resource
+- Global, available and scalable capacity
+- Higher-level managed services available - eg as machine learning
+- Built-in security
+- Architecting for cost efficiency
+
+### Scalability design principles
+
+- Scale up - more computing power, CPU, RAM
+- Scale out - more instances behind a load balancer
+  - Stateless applications (Lambda)
+  - Load distribution
+  - Stateless components
+  - Stateful components
+  - Session affinity (ie session with same node)
+  - Distributed processing
+
+### Disposal resources
+
+Instantiating compute resource quickly using:
+
+- Bootstrapping
+- Golden images
+- Containers
+- Hybrid of above
+
+**Should be no need to manually configure compute resources.**
+
+Infrastructue as code using CloudFormation.
+
+### Automation
+
+Serverless management and deployment:
+
+- Code pipeline
+- Code deploy
+
+Infrastructure management and deployment: 
+
+- Elastic Beanstalk
+- EC2 auto recovery
+- Systems manager
+- Auto scaling
+
+Alarms and events:
+
+- CloudWatch alarms
+- CloudWatch events
+- Lambda scheduled events
+- WAF (Web Application Firewall) security automations
+
+### Loose coupling
+
+- Well-defined interfaces - API Gateway
+- Service discovery
+- Asynchronous integration - SQS (queues)
+- Graceful failure for distributed systems
+
+### Services not Servers
+
+- Managed services
+- Serverless architectures
+
+"No server is easier to manage than no server" - Werner Vogels
+
+### Databases
+
+Aurora: relational DB, MySQL / Postgres compatible, scalable & HA
+
+DynamoDB: No-SQL database, scalabale & HA
+
+Neptune: graph database, scalable & HA 
+
+### Removing single point of failure
+
+- Failure detection
+- Redundancy
+- Durable data storage
+- Automated multi-data centre resiliance
+- Fault isolation
+- Horizontal scaling
+- Sharding data
+
+### Optimise for cost
+
+- Right sizing
+- Elasticity
+- Purchasing options - eg reserved instances
+
+### Caching
+
+- Application caching - ElasticCache
+- Edge caching - CloudFront CDN
+
+### Security
+
+- Optimise for defence in depth - WAF etc
+- Shared responsibility with AWS
+- Use min permissions
+- Security as code
+- Real-time auditing - CloudTrail
+
+## Service Scope
+
+The following services are **global**:
+
+- IAM - Identity Access Management
+- Route53 - DNS services
+- CloudFront - CDN 
+- SNS - Simple Notification Service
+- SES - Simple Email Service
+
+Some services have a _global_ view but are **regional**:
+
+- S3 - Simple Storage Service
+
+## On-Premise Services
+
+- Snowball - a physical hard disk for transferring large amounts of data, shipped back to Amazon.
+- Snowball Edge - similar but has CPU so can use lambda functions. Used for where there is no connectivity but need AWS resources.
+- Storage Gateway - similar to Snowball but stays on premises. Used to cache files locally and then replicate to S3.
+- CodeDeploy - Can deploy locally as well as to remote servers. 
+- Opsworks - similar to ElasticBeanstalk, uses Chef
+- IoT Greengrass
+
+So, OpsWorks and CodeDeply can be used to deploy applications on-premise as well as to the cloud.
+
+## CloudWatch
+
+- A service to monitor resources and applications.
+- Can create custom metrics
+- Can create alarms to trigger notifications
+
+## AWS Systems Manager
+
+- Used to manage a large number of EC2 instances - an _EC2 Fleet_.
+- Can be used to run commands on many EC2 instances such as patching or updates.
+- It uses software installed on each instance so can also be used on non-EC2 machines on-premise.
+- Integrates with CloudWatch to give a dashboard of the entire estate.
+
+## Billing and Pricing
+
+Must read: <https://d0.awsstatic.com/whitepapers/aws_pricing_overview.pdf>
+
+5 basic pricing policies:
+
+- Pay as you go (for what you use)
+- Pay less when reserving capacity
+- Pay less (per unit) as usage increases
+- Pay less as AWS grows
+- Custom pricing
+
+
+**Capex** - Capital Expenditure is paid up-front and is a fixed, sunk cost.
+
+**Opex** - Operational Expenditure is pay for what you use, like utility billing.
+
+- Understand the fundamentals of pricing:
+   - Compute
+   - Storage
+   - _Outbound_ traffic
+   
+- Start early with cost optimisation
+   - Implement cost visibility and control mechanisms _before_ environment grows large and complex
+   
+- Maximise the power of flexibility
+   - Only use exactly what is needed, and no more
+   - No time-based contracts (except for reserved) 
+   - Don't pay for non-running resources so can switch on and off as required
+    
+   
+- Use the right pricing model for the job
+   - On-demand
+   - Dedicated instances
+   - Spot instances
+   - Reservations
+
+### Free Services
+
+- Amazon VPC
+- Elastic Beanstalk
+- CloudFormation
+- IAM
+- Auto scaling (mechanism)
+- Opsworks
+- Consolidated billing
+
+### Pricing factors
+
+#### EC2
+
+- Server up time
+- Instance type
+- Pricing model
+   - on-demand: fixed, time-based rate (hour or second)
+   - reserved: discount for 1 or 3 year contract
+   - spot: bid on price for capacity, where application running can be flexible
+   - dedicated host: where have existing server software licences
+- Number of instances
+- Load balancing
+- Detailed monitoring (per minute costs more)
+- Auto scaling (additional instances)
+- Elastic IP addresses
+- OS and software packages
+
+#### Lambda
+
+- Request pricing
+   - Free tier: 1 million requests per month
+   - $0.2 per 1 million requests
+- Duration pricing
+   - Free tier: 400K GB-seconds per month (up to 3.2 million seconds compute time)
+   - $0.00001667 per GB-second thereafter   
+- Additional charges
+   - Data transfer
+   - Read / write requests to S3
+ 
+#### EBS
+
+- Volumes
+- Snapshots (backups)
+- Data transfer    
+   
+#### S3
+
+- Storage classes
+- Amount of data stored
+- Requests (GET, PUT, COPY)
+- Data transfer
+
+#### Glacier
+
+- Storage
+- Data retrieval time (slower costs less)   
+
+#### Snowball
+
+- Service fee per job
+   - 50TB: $200
+   - 80TB: $250
+- Daily charge: 10 days free, then $15 per day
+- Data transfer: into S3 is free, out is charged   
+
+Note: Can be used to transfer data into amazon S3, or to migrate data OUT of S3.
+
+#### RDS
+
+- Server time
+- DB type
+- Number of instances
+- Provisioned storage and type
+- Requests
+- Deployment types (multi-AZ etc)
+- Data transfer  
+
+#### CloudFront
+
+- Traffic distribution
+- Requests
+- Outbound data transfer
+
+### AWS Budgets vs Cost Explorer
+
+- Budgets used BEFORE costs are incurred to alert when costs will (or have) exceeded budgets.
+- Cost Explorer allows investigation into costs that have been incurred. 
+
+### Support plans
+
+- Basic
+- Developer - $29/month
+- Business - $100/month
+- Enterprise - $15,000/month TAM
+
+Response times vary between levels.
+
+Business and Enterprise have < 1 hour response for production systems.
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
