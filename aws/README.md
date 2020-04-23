@@ -3,7 +3,7 @@ AWS Certifications
 Suggested Path for Cloud Architect gig:
 
 1. [Cloud Practitioner](./cloud-practitioner/)
-1. Solutions Architect - Associate
+1. [Solutions Architect - Associate](./solutions-architect-associate/)
 1. [Developer - Associate](./developer-associate/)
 1. SysOps Administrator - Associate
 1. Security - Specialty

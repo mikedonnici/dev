@@ -4,7 +4,12 @@
 - [Exceptions](./exceptions/)
 - [Files](./files/)
 - [Generators](./generators/)
+- [Iterators](./iterators/)
 - [Lambdas](./generators/)
 - [Object-Oriented Programming](./oop/)
 
-## [Generators](./generators/)
+
+## Data Science
+
+- [NumPy](./numpy/)
+- [Pandas](./pandas/)
