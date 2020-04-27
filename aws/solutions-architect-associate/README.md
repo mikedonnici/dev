@@ -24,7 +24,8 @@ Benefits are:
 
 Starts with a _template_ which is like a blueprint. The template is code so can be versioned, tested etc.
 
-The template is passed through some tooling which works out what needs to be done to get the infrastructure into the desired state.
+The template is passed through some tooling which works out what needs to be done to get the infrastructure into the 
+desired state.
 
 Examples of Infrastructure as code tooling:
 
