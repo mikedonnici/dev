@@ -54,7 +54,7 @@ df[df["colname"] > 10]    # can be used to subset
 
 # subsetting with multiple conditions
 condition1 = df["colname"] == "value"
-condition2 = df["date"] > "1999-12-31"
+condition2 = df["date"] > "1999-12-31"head
 df[condition1 & condition2]
 
 # subsetting with `isin()`
@@ -242,6 +242,50 @@ df.fillna(0)     # replaces missing values with a value - also may not be ideal 
 df = pd.read_csv("data.csv") # read csv at file path
 df.to_csv("new_data.csv")    # write to a csv
 ```
+
+
+### Working with datetimes
+
+- If a csv contains datetimes can tell pandas to parse them on load
+
+```python
+data = pd.read_csv("data.csv", parse_dates = ["date col1", "date col 2"])
+```
+
+- It will try to determine format automatically, if it can't use `pd.to_datetime()`
+
+```python
+data["date col1"] = pd.to_datetime(data["date col1"], format="%Y-%m-%d %H:%M:%S")
+```
+
+- pandas uses a `pandas.timestamp` object which can be used similarly to a `datetime` 
+- Can use `.mean()`, `.sum()` etc on a timedelta column
+
+
+- `.resample()` can be used for frequency stats, eg to change to months... like grouping by date level
+
+
+- Timezones are also an important factor working with pandas 
+- To set a timezone use `.dt.tz_localize()`
+
+```python
+data['date col'].dt.tz_localize('Australia/Sydney')
+```
+
+- assigning timezone info to pandas datetime series, where one or more values occurs in the daylight savings _fold_, 
+ will result in an `AmbiguousTimeError`
+- handle _ambiguous_ times with `ambiguous='NaT'` (not a time)
+
+```python
+data['date col'].dt.tz_localize('Australia/Sydney', ambiguous="NaT")
+```
+
+- `.dt.tz_convert()` is used where datetimes are already timezone-aware
+
+
+
+
+
 
 
  

@@ -8,6 +8,9 @@
 - [Lambdas](./generators/)
 - [Object-Oriented Programming](./oop/)
 
+- [Performance and efficiency](./performance/)
+- [Strings and regular expressions](./strings/)
+
 
 ## Data Science
 

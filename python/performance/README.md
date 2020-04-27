@@ -110,6 +110,69 @@ poke_zscores2 = [*zip(names, hps, z_scores)]
 highest_hp_pokemon2 = [(name, hps, z_score) for name,hps,z_score in poke_zscores2 if z_score > 2]
 
 
+### Efficiency with pandas
+
+- `.iloc()` is pretty inefficient
+- `.iterrows()` is better
+- `.itertuples()` is generally better still  - it returns _named tuples_ (a type from  the `collections` module)
+
+Instead of looping can use pandas `.apply()` method, which works like `map`. It takes a function and applies it to 
+all of the elements specified by the `axis` argument:
+ 
+- `axis = 0` to iterate over columns
+- `axis = 1` to iterate over rows
+
+```python
+df.apply(
+    lambda row: foo(row['col1'], row['col']),   # arg 1 is func
+    axis = 1                                    # arg 2 is axis
+)
+```
+
+But wait! 
+
+Should also try to eliminate loops even when using pandas.
+
+So can take advantage of _vectoring_ (broadcasting)  to do operations on entire data sets.
+
+Attribute `.values` on a pandas dataframe returns a NumPy array.
+
+Note: pandas docs say to prefer `to_numpy()` method.
+
+This is by far the most efficient way to work with dataframes.
+
+USE NUMPY ARRAYS!!
+
+```python
+%%timeit
+win_perc_preds_loop = []
+for row in baseball_df.itertuples():
+    runs_scored = row.RS
+    runs_allowed = row.RA
+    win_perc_pred = predict_win_perc(runs_scored, runs_allowed)
+    win_perc_preds_loop.append(win_perc_pred)
+69.4 ms
+
+
+%%timeit
+win_perc_preds_apply = baseball_df.apply(lambda row: predict_win_perc(row['RS'], row['RA']), axis=1)
+227 ms
+
+    %%timeit
+    baseball_df['WP_preds'] = predict_win_perc(baseball_df['RS'].values, baseball_df['RA'].values)
+```
+
+
+
+
+
+
+
+
+
+
+
+
 
 
 
