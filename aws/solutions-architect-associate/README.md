@@ -223,7 +223,7 @@ Resources:
 ```
 The above creates the following stack:
 
-![img](ec2_secgrp_noref.png)
+![img](./ec2_secgrp_noref.png)
 
 The `Ref` will add the EC2 instance to the security group:
 
@@ -251,7 +251,7 @@ Resources:
         ToPort: 22
 ```
 
-![img](ec2_secgrp_ref.png)
+![img](./ec2_secgrp_ref.png)
 
 An important thing to note is that if the above two templates are run one after the other, in either order - that is, 
 the security group is added or removed, the the Ec2 instance is re-created and the original is deleted. This is a simple 
