@@ -13,7 +13,7 @@ which has a parent ID that's equal to its own ID.
 
 An example tree:
 
-```text
+```
 root (ID: 0, parent ID: 0)
 |-- child1 (ID: 1, parent ID: 0)
 |    |-- grandchild1 (ID: 2, parent ID: 1)

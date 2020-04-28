@@ -25,7 +25,7 @@ Human-readable `.proto` files are used to generate boilerplate code in your lang
 
 Protocol buffer exchanges messages, which are defined in a `.proto` files, eg:
 
-```proto
+```
 syntax = "proto3";
 
 // type name = tag;
@@ -45,7 +45,7 @@ message fooMessage {
 
 Example:
 
-```proto
+```
 syntax = "proto3";
 
 message Person {
@@ -76,7 +76,7 @@ Implements the concept of _lists_ or _arrays_ comprised of 0 to many elements.
 
 For example:
 
-```proto
+```
 syntax = "proto3";
 
 message Person {
@@ -111,7 +111,7 @@ Useful for documenting schemas.
 - First valeu is the _default_
 - Must start with tag `0`
 
-```proto
+```
 syntax = "proto3";
 
 message Person {
@@ -140,7 +140,7 @@ message Person {
 
 A `.proto` file can contain multiple messages:
 
-```proto
+```
 syntax = "proto3";
 
 message Person {
@@ -176,7 +176,7 @@ message Date {
 
 Message types can alsobe nested:
 
-```proto
+```
 syntax = "proto3";
 
 message Person {
@@ -227,7 +227,7 @@ message Date {
 
 Types can be imported from other `.proto` files, eg:
 
-```proto
+```
 syntax = "proto3";
 
 import "proto/date.proto";
@@ -246,7 +246,7 @@ which is specified with `--proto_path`.
 
 Package names are used to create an arbitrary namespace, eg:
 
-```proto
+```
 syntax = "proto3";
 
 package my.date;
@@ -260,7 +260,7 @@ message Date {
 
 Then, when this is imported:
 
-```proto
+```
 syntax = "proto3";
 
 import "proto/date.proto";
@@ -304,7 +304,7 @@ code is generated.
 For example, the default package names when generating `Go` code tend to
 be not very _idiomatic_. So, can do:
 
-```proto
+```
 syntax = "proto3";
 
 option go_package = "foopb";
@@ -324,7 +324,7 @@ For example:
 
 _v1_
 
-```proto
+```
 syntax = "proto3";
 
 message Foo {
@@ -334,7 +334,7 @@ message Foo {
 
 _v2_
 
-```proto
+```
 syntax = "proto3";
 
 message Foo {
@@ -363,7 +363,7 @@ This is done with the `reserved` keyword:
 
 _v3_
 
-```proto
+```
 syntax = "proto3";
 
 message Foo {
@@ -376,7 +376,7 @@ message Foo {
 
 Note: Can specify multiple tags and tag ranges as well as multiple field names with the `reserved` keyword, but cannot mix tags and field names in the same statement:
 
-```proto
+```
 message Foo {
   reserved 1, 3, 5 to 9;
   reserved "field1", "field2", "field3";
@@ -426,7 +426,7 @@ The idea is to save memory by not serialising a bunch of empty, unrequired field
 
 eg:
 
-```proto
+```
 message Foo {
   int32 id = 1;
   oneof {
@@ -449,7 +449,7 @@ Maps cannot be `repeated` and the order cannot be guaranteed as it is an in-memo
 
 eg:
 
-```proto
+```
 message Foo {
   map<int, float> tempAfterSeconds= 1;
 }
@@ -463,7 +463,7 @@ In protobuf, a `timestamp` is seconds plus nanoseconds from UTC epoch.
 
 The `timestamp` type is imported thus:
 
-```proto
+```
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";
@@ -497,7 +497,7 @@ Clients appear to be calling the server functions directly (ie, RPC) and all of 
 
 The `.proto` file defines the service, and the messages that are involved:
 
-```proto
+```
 syntax = "proto3";
 
 import "google/protobuf/timestamp.proto";

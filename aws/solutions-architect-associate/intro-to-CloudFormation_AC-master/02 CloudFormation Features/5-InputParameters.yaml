@@ -1,6 +1,6 @@
 Parameters:
   NameOfService:
-    Description: "The name of the service this stack is to be used for."
+    Description: "The Leo breakfast service."
     Type: String
   KeyName:
     Description: Name of an existing EC2 KeyPair to enable SSH access into the server

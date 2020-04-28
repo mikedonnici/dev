@@ -32,7 +32,7 @@ In the protocol buffers these four types of contract are easily defined:
 
 eg:
 
-```proto
+```
 syntax = "proto3";
 
 service GreetService {

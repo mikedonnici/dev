@@ -353,8 +353,41 @@ Resources:
           CidrIp: 0.0.0.0/0
 ```
 
+#### Input Parameters
 
+- allow input of custom values to a template
+- defined in top-level `Parameters` section
+- must be assigned a value at run time, can have a default value
+- only required attribute is `Type`
+- supported types
+   - String
+   - Number
+   - List<Number>
+   - CommaDelimitedList
+   - AWS-specific types, eg AWS::EC2::Image::Id
+   - Systems Manager Parameter types
 
+Example:
+
+```yaml
+# definition
+Parameters:
+  MyInstType:      # defined logical name
+    Type: String
+    Default: t2.micro
+    AllowedValues:
+      - t2.micro
+      - m1.small
+      - m1.large
+    Description: EC2 instance type
+Resources:
+  Ec2Instance:
+    Type: AWS::EC2::Instance
+  Properties:
+    InstanceType:
+      Ref: MyInstType   # <- reference to input
+    ImageId: ami-2f726546 
+```
 
 
  

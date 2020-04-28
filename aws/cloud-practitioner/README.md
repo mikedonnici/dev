@@ -13,7 +13,7 @@
 
 Billing Dashboard -> Billing Preferences -> Receive Billing Alerts
 
-![img](billing-alert.png)
+![img](./billing-alert.png)
 
 Then:
 
@@ -28,7 +28,7 @@ CloudWatch ->Alarms: Billing -> Create Alarm
 
 Can create a customized login url for IAM users:
 
-![img](IAM-users-signin-link.png)
+![img](./IAM-users-signin-link.png)
 
 - Enable MFA on root account, eg with Google Authenticator
 - Set up an IAM user, 3 options for ways to access:
@@ -43,7 +43,7 @@ Can create a customized login url for IAM users:
 
 These steps will result in all green ticks status for security status:
 
-![img](IAM-security-status.png)
+![img](./IAM-security-status.png)
 
 #### Key Points
 

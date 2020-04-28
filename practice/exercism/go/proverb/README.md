@@ -4,7 +4,7 @@ For want of a horseshoe nail, a kingdom was lost, or so the saying goes.
 
 Given a list of inputs, generate the relevant proverb. For example, given the list `["nail", "shoe", "horse", "rider", "message", "battle", "kingdom"]`, you will output the full text of this proverbial rhyme:
 
-```text
+```
 For want of a nail the shoe was lost.
 For want of a shoe the horse was lost.
 For want of a horse the rider was lost.

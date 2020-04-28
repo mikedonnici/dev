@@ -8,7 +8,7 @@ The Zen of Python by Tim Peters - https://www.python.org/dev/peps/pep-0020/
 import this
 ```
 
-```text
+```
 Beautiful is better than ugly.
 Explicit is better than implicit.
 Simple is better than complex.
