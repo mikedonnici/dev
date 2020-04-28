@@ -27,7 +27,7 @@
 - Root account should not be used for day-to-day management
 - Should use _least privilege principle_
   
-![img](../01-practitioner/IAM-overview.png)
+![img](../cloud-practitioner/IAM-overview.png)
 
 **IAM Federation** is available for large enterprises to integrate with their own repository of users using SAML (Active Directory).
 
