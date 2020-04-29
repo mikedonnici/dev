@@ -360,24 +360,16 @@ info.group("postcode")
 # '2540'
 ```
 
- 
+### Lookaround
 
-
-
-
-
-
- 
-
-
-
-
-
-
- 
-
-
-
-
+- Confirms a sub-pattern is behind or ahead of a main pattern
+- Look-ahead:
+   - non-capturing group
+   - checks if first part of expression is followed (or not) by the lookahead expression
+   - returns only the first part 
+   - look-ahead can be positive `(?=regex)` or negative `(?!regex)`
+- look-behind:
+   - positive `(?<=regex)`, negative `(?<!regex)`  
+   
 
 

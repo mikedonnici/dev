@@ -383,11 +383,127 @@ Parameters:
 Resources:
   Ec2Instance:
     Type: AWS::EC2::Instance
-  Properties:
-    InstanceType:
-      Ref: MyInstType   # <- reference to input
-    ImageId: ami-2f726546 
+    Properties:
+      InstanceType:
+        Ref: MyInstType   # <- reference to input
+        ImageId: ami-2f726546 
 ```
+
+#### Outputs
+
+- allows access to information about resource in a stach, eg IP, DNS
+- `Outputs` are defined at the top level of the template
+
+```yaml
+Outputs:
+  InstanceDns:      # logical name
+    Description: The instance Dns
+    Value: !GetAtt    # instrinsic function 
+      - EC2Instance   # logical name of the resource
+      - PublicDnsName # attribute
+```
+
+### Setting up EC2 instances
+
+- generally don't want an empty EC2 instance
+- want to install and set up users, an application, configuration etc
+
+#### UserData
+
+- Resource type `AWS::EC2::Instance` has a property `UserData`
+
+```yaml
+Resources:
+  Ec2Instance: # logical name
+    Type: AWS::EC2::Instance
+    Properties:
+      UserData:
+```
+
+- `UserData` is Base64 encoded
+- works on Linux and Windows (with slight differences)
+- only runs on first boot cycle
+- Windows:
+   - Runs as local admin
+   - Can run batch or powershell scrips
+   - executed by EC2Config or EC2Launch (log locations vary)   
+- Linux:
+   - runs as root
+   - non-interactive
+   - logs output to `/var/log/cloud-init-output.log`
+   - script specifies interpreter with `!#`, eg `#/bin/bash`
+ 
+Example:
+
+```yaml
+Resources:
+   EC2Instance: # logical name
+      Type: AWS::EC2::Instance
+      Properties:
+         UserData: 
+            !Base64 |  # intrinsic func, followed by | to denote literal block 
+               #!/bin/bash -xe
+               yum update -y
+               yum install httpd -y
+               service httpd start
+```
+
+- procedural scripting is not ideal
+- CloudFormation provides Python helper scripts which are pre-installed on Amazon Linux
+- these are _not_ executed automatically, but need to be called from the template
+- the scripts themselves can / should be updated periodically via `yum` repo
+
+##### Helper Scripts
+
+- `cf-init` - reads and interprets metadata to execute AWS::CloudFormation::Init
+- `cfn-signal` - signal when a resource or application is ready
+- `cfn-get-metadata` - retrieve metadata based an a specific key
+- `cfn-hup` - checks for updates to metadata end execute custom hooks
+
+#### CloudFormation Init
+
+- `cf-init` script enables the use of `AWS::CloudFormation::Init`
+
+```yaml
+Resources:
+   MyInstance:
+      Type: AWS::EC2::Instance
+      MetaData: 
+         AWS::CloudFormation::Init:
+            config:      # config key named 'config' when only one, more than one uses `Configsets` (see below)
+               packages: # a set of configuration sections  
+               groups:
+               users:
+               sources:
+               files:
+               commands:
+               services:
+      Properties:
+```
+
+- `ConfigSets` used when more than one config set is required, specifies the order of execution
+- See AWS CloudFormation Docs: [ConfigSets](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-resource-init.html#aws-resource-init-configsets) 
+
+
+### Change Sets
+
+- Aimed at reducing the risk of changing resources in production
+- Change sets allow a preview of how changes will impact resources
+- A Change Set consists of 4 possible ops:
+   - **Create**: submit modified template and / or param values , nothing is modified
+   - **View**: Shows proposed changes
+   - **Execute**: performs the updates on the existing stack
+   - **Delete:** deletes the Change Set without performing the updates
+
+- [AWS Resource and Property Types Reference](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/aws-template-resource-type-ref.html)
+- [Update Behaviors of Stack Resources](https://docs.aws.amazon.com/AWSCloudFormation/latest/UserGuide/using-cfn-updating-stacks-update-behaviors.html)
+
+
+
+
+
+
+
 
 
  

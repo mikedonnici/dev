@@ -1,21 +1,53 @@
+Parameters:
+  NameOfService:
+    Description: "The Leo breakfast service."
+    Type: String
+  KeyName:
+    Description: Name of an existing EC2 KeyPair to enable SSH access into the server
+    Type: AWS::EC2::KeyPair::KeyName
+Mappings:
+  RegionMap:
+    us-east-1:
+      AMI: ami-1853ac65
+    us-west-1:
+      AMI: ami-bf5540df
+    eu-west-1:
+      AMI: ami-3bfab942
+    ap-southeast-1:
+      AMI: ami-e2adf99e
+    ap-southeast-2:
+      AMI: ami-43874721
 Resources:
-  MyEc2Instance:
-    Type: AWS::EC2::Instance
+  ec2Instance:
+    Type: 'AWS::EC2::Instance'
     Properties:
       InstanceType: t2.micro
-      ImageId: ami-467ca739 # Amazon Linux AMI in N.Virginia
-      Tags:
-        - Key: Description
-          Value: "An EC2 instance that *will* belongs to a security group"
+      ImageId:
+        Fn::FindInMap:
+          - RegionMap
+          - !Ref AWS::Region
+          - AMI
       SecurityGroups:
         - !Ref MySecurityGroup
-  MyEc2SecurityGroup:
-    Type: AWS::EC2::SecurityGroup
+      Tags:
+        - Key: "Name"
+          Value: !Ref NameOfService
+      KeyName: !Ref KeyName
+  MySecurityGroup:
+    Type: 'AWS::EC2::SecurityGroup'
     Properties:
-      GroupDescription: "Allow ssh port 22"
+      GroupDescription: Enable SSH access via port 22
       SecurityGroupIngress:
-        CidrIp: 0.0.0.0/0
-        Description: "SSH"
-        IpProtocol: tcp
-        FromPort: 22
-        ToPort: 22
+        - IpProtocol: tcp
+          FromPort: '22'
+          ToPort: '22'
+          CidrIp: 0.0.0.0/0
+Outputs:
+  serverDns:
+    Value: !GetAtt
+      - ec2Instance
+      - PublicDnsName
+  publicIP:
+    Value: !GetAtt
+      - ec2Instance
+      - PublicIp
