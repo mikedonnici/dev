@@ -40,9 +40,17 @@ df.shape       # (rows, columns)
 df.columns     # list of column names
 df.index       # list of row index numbers
 
-# view columns
+# selecting columns [row,col] (explicit)
+df.loc[:, "colname"]
+df.loc[:, ["col1", "col2"]]
+df.loc[:, ["col1":"col7"]]
+
+# selecting columns (shorthand)
 df["colname"]        # view one column
 df[["col1", "col2"]] # view multi - note subset is a list 
+
+# selecing rows
+df.loc["rowname",]
 
 # Sorting data
 df.sort_values("colname", ascending=False)                # sort descending
@@ -89,7 +97,7 @@ df["colname"].cumprod() # returns cumulative product
 df.drop_duplicates(subset="colname")         # drops duplicate rows based on value in colname
 df.drop_duplicates(subset=["col1", "col2"])  # drops duplicate rows based on pair value in col1 and col2
 
-# Counting
+# Counting (series)
 df["colname"].value_counts()                  # count
 df["colname"].value_counts(sort=True)         # count and sort
 df["colname"].value_counts(normalize=True)    # counts as proportion of total
@@ -183,6 +191,11 @@ temperatures_ind["2010-08":"2011-02"]
 temperatures_ind["2010":"2011"]
 ```
 
+_Summary of label selection mechanisms_
+
+![img](./label-selection.png)
+
+
 Slicing with `.iloc` is done using index numbers, and in this case the final value is _not_ included.
 
 ```python
@@ -225,15 +238,16 @@ plt.show()
 
 ## Missing values
 
-- In a dataframe missing values are indicated by `NaN`
+- In a dataframe missing values are indicated by `NaN` or `None`
 
 ```python
-df.isna()        # shows bool for presence of all values
-df.isna().any()  # shows if any values missing for entire column (easier to read)
-df.isna().sum()  # counts missing values in each column, and then can bar plot to visualise
+df.isna()         # shows bool for presence of all values
+df.isna().any()   # shows if any values missing for entire column (easier to read)
+df.isna().sum()   # counts missing values in each column, and then can bar plot to visualise
 
-df.dropna()      # drop rows with missing values - may not be ideal
-df.fillna(0)     # replaces missing values with a value - also may not be ideal depending on data
+df.dropna()       # drop rows with missing values, same as df.dropna(axis=0)
+df.dropna(axis=1) # drop cols with missing values
+df.fillna(0)      # replaces missing values with a value - also may not be ideal depending on data
 ```
 
 ### Working with CSVs 

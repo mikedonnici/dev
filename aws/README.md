@@ -11,3 +11,11 @@ Suggested Path for Cloud Architect gig:
 1. Advanced Networking - Specialty (opt)
 1. DevOps Engineer - Professional
 1. Solutions Architect - Professional
+
+Resources:
+
+- [How I Passed the AWS Certified Developer Associate Exam](https://www.freecodecamp.org/news/how-i-passed-the-aws-certified-developer-associate-exam/)
+- https://thefreeccp.com (free practitioner)
+- https://www.exampro.co (paid - cheaper that cloud guru)
+
+
