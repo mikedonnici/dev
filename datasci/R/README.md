@@ -230,3 +230,165 @@ sum(matrix["row",])
 
 ### Resources
 - [Documentation on indexing matrices in R](https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Indexing-matrices-and-arrays)
+
+---
+
+## Working with Lists
+
+### Creating Lists
+
+- Create a list:
+```r
+new_list <- list("data scientist", c(50000,40000), "programming experience")
+```
+
+- Assign names to list objects:
+```r
+names(new_list) <- c("job title", "salaries", "requirements")
+```
+
+- Creating list with names:
+```r
+new_list <- list(name1 = vector_1, name2 = vector2)
+```
+
+### Indexing lists
+
+- Return a list of selected elements:
+```
+new_list[1]
+new_list["job title"]
+new_list[c(1,3)]
+```
+
+- Return a single element:
+```r 
+new_list[[1]]
+new_list[["job title"]]
+new_list$"job title"
+```
+
+- Return a value contained in a list element:
+```r 
+new_list[[c(1,3)]]
+```
+
+### Manipulating lists
+
+- Modifying List Elements
+```r
+new_list[[1]] <- "junior data scientist"
+new_list[[c(2,1)]] <- 40000
+```
+
+- Adding Elements to Lists
+```
+new_list[[4]] <- c("healthcare", "vacation")
+new_list[["benefits"]] <- c("healthcare", "vacation")
+```
+
+- Combining Multiple Lists
+```r
+new_list_2 <- c(new_list, new_list_1)
+```
+
+- Creating a List of Lists (Nested List)
+```r
+new_list_3 <- list(new_list, new_list_1)
+```
+
+### Concepts
+
+- In R, lists are specialized vectors that can contain multiple objects. The objects may consist of different data 
+structures, including single data elements, vectors, and matrices.
+- Storing objects in lists allows you to make use of R's features for performing the same operation on each object in 
+your list.
+- Lists of lists contain multiple lists as objects. Each list contained in a nested list may, in turn, contain 
+objects of any data structure or type.
+
+### Resources
+- [Documentation on Lists in R](https://cran.r-project.org/doc/manuals/r-patched/R-intro.html#Lists)
+
+---
+
+### Working with Data Frames
+
+INSTALLING AND LOADING PACKAGES
+Install packages:
+
+install_packages("package_name")
+
+Load packages:
+
+library(package_name)
+
+IMPORTING DATA INTO R
+Save data as a data frame (data in .csv format)
+
+new_data_frame <- read_csv("data_set.csv")
+
+WORKING WITH DATA FRAME COLUMNS
+Select data frame columns:
+
+data_frame_2 <- data_frame %>%
+select(column_2, column_4, column_6)
+
+Add a new column to a data frame:
+
+data_frame_2 <- data_frame_1 %>%
+mutate(new_column = (column_2/column_4)*100)
+
+FILTERING A DATA FRAME BY A SINGLE CONDITION
+Numeric data
+
+data_frame_2 <- data_frame_1 %>%
+  filter(column_2 < 70)
+
+Character data
+
+data_frame_2 <- data_frame_1 %>%
+filter(column_3 == "Variable Name")
+
+FILTERING A DATA FRAME BY MULTIPLE CONDITIONS
+Meeting at least one criterion (the | operator):
+
+data_frame_2 <- data_frame_1 %>% 
+filter(column_6 == "Variable Name" | column_4 > 1000)
+
+Meeting multiple criteria (the & operator):
+
+data_frame_2 <- data_frame_1 %>% 
+    filter(column_6 == "Variable Name" & column_4 > 1000)
+
+ARRANGING DATA FRAMES BY VARIABLES
+Arrange by a variable from smallest to largest:
+
+data_frame_2 <- data_frame_1 %>% 
+  arrange(column_2)
+
+Arrange by a variable from largest to smallest:
+
+data_frame_2 <- data_frame_1 %>% 
+  arrange(desc(column_2))
+
+Arrange by multiple variables:
+
+data_frame_2 <- data_frame_1 %>% 
+  arrange(column_2, desc(column_4))
+
+Concepts
+In R, packages consist of user-contributed functions, code and data that extend R's capabilities.
+
+The tidyverse is a collection of packages designed to make using R for data science more effective.
+
+Tibbles are a specialized type of data frame. They are a feature of packages in the tidyverse family that have been introduced to extend R's functionality for modern data science tasks.
+
+The pipe operator (%>%) is used to write code that chains series of operations together
+
+Resources
+- [CRAN repository, which contains R packages]https://cran.r-project.org/()
+- [the tidyverse family of packages](https://www.tidyverse.org/)
+- [readr package documentation](https://readr.tidyverse.org/)
+- [Documentation on tibbles](https://cran.r-project.org/web/packages/tibble/vignettes/tibble.html)
+- [dplyr package documentation](https://dplyr.tidyverse.org/)
+
