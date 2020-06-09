@@ -506,3 +506,67 @@ for i in 1:nrow(data_frame)){
 - [Wikipedia article on for-loops](https://en.wikipedia.org/wiki/For_loop)
 - [Wikipedia article on while-loops](https://en.wikipedia.org/wiki/While_loop)
 - [R-bloggers introduction to for-loops](https://www.r-bloggers.com/how-to-write-the-first-for-loop-in-r/)
+
+---
+
+## Working With Vectorized Functions
+
+### Writing vectorized if-else statements:
+
+- Using the if_else() function to write an if-else statement:
+```r 
+if_else(vector_1 == vector_2, "condition_1", "condition_2")
+```
+
+- Nesting if_else() functions to chain if-else statements:
+```r 
+if_else(vector_1 > vector_2, "condition_1",
+    if_else(vector_1 < vector_2, "condition_2",
+        if_else(vector_1 == vector_2, "condition_3", "condition_4")))
+```
+
+### Grouping data using `dplyr::group_by()`:
+
+- Grouping by one variable:
+```r 
+data_frame %>% 
+     group_by(variable)
+```
+
+- Grouping by multiple variables:
+```r 
+data_frame %>% 
+    group_by(variable_1, variable_2) %>% 
+    summarize(variable_name = function(variable_1))
+```
+
+### Summarising grouped data using `dplyr::summarize()`:
+
+- Calculating one summary:
+```r 
+data_frame %>% 
+    group_by(variable) %>% 
+    summarize(variable_name = function(variable))
+```
+
+- Calculating multiple summaries:
+```r 
+data_frame %>% 
+    group_by(variable_1) %>% 
+    summarize(variable_name_1 = function_1(variable_1), variable_name_2 = function_2(variable_1))
+```
+
+### Concepts
+- In R, vectorized solutions are often faster than using loops, and the code is usually easier to understand.
+- Problems that involve splitting data into groups, applying a function to each group each group, and summarizing the 
+results are known as "split_apply-combine" problems in R.
+- Chaining functions using the pipe operator allows you to write more efficient code and avoid cluttering 
+the global environment with intermediate variables.
+
+### Resources
+- [Blog Post on Vectorization in R](http://www.noamross.net/blog/2014/4/16/vectorization-in-r--why.html)
+- [Wickham et al. paper on split-apply-combine problems](http://citeseerx.ist.psu.edu/viewdoc/download?doi=10.1.1.182.5667&rep=rep1&type=pdf)
+- [maggritR package documentation](https://cran.r-project.org/web/packages/magrittr/vignettes/magrittr.html)
+
+---
+
