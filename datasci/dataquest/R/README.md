@@ -570,3 +570,166 @@ the global environment with intermediate variables.
 
 ---
 
+## Writing Custom Functions
+
+- Writing a Function With One Variable:
+```r
+mult_by_100 <- function(x) {
+  x * 100
+}
+```
+
+- Writing a Function With Two Variables:
+```r
+mult_xy <- function(x, y) {
+  x * y
+}
+```
+
+- Writing a Function With Three Variables:
+```r
+mult_xyz <- function(x, y, z) {
+  x * y * z
+}
+```
+
+- Writing Functions for Conditional Execution:
+```r
+add_subtract_3 <- function(x) {
+  if(x > 5) {
+    x + 3
+  } else {
+    x - 3
+  }
+}
+```
+
+### Concepts
+
+- Functions have three components:
+   - Body: The code inside the function
+   - Arguments: The list of inputs that control how you call the function
+   - Environment: The location (such as the global environment) where the function was created
+- Functions can take one, two, or more variables as arguments.
+- When you find yourself copying and pasting blocks of code repeatedly to perform a task, it is best 
+to streamline your workflow by writing a function.
+
+### Resources
+- [Wikipedia article on functions](https://en.wikipedia.org/wiki/Function_(mathematics))
+- [Documentation on writing functions in R](https://cran.r-project.org/doc/manuals/r-release/R-lang.html#Writing-functions)
+
+--- 
+
+## Working With Functionals
+
+- Applying a Function With One Variable to a List and Returning a List:
+```r 
+map(data_frame$x, function)
+```
+
+- Applying a Function with Two Variables to a List and Returning a List:
+```r
+map2(data_frame$x, data_frame$y, function)
+```
+
+- Applying a Function with More Than Two Variables to a List and Returning a List:
+```r 
+argument_list <- list(x = data_frame$x, y = data_frame$y, z = data_frame$z)
+pmap(argument_list, function)
+```
+
+### Using functionals to return vectors of specified types:
+
+- Return a logical vector:
+```r 
+map_lgl(data_frame$x, function)
+map2_lgl(data_frame$x, data_frame$y, function)
+pmap_lgl(arg_list, function)
+```
+
+- Return an integer vector:
+```r 
+map_int(data_frame$x, function)
+map2_int(data_frame$x, data_frame$y, function)
+pmap_int(arg_list, function)
+```
+
+- Return a double vector:
+```
+map_dbl(data_frame$x, function)
+map2_dbl(data_frame$x, data_frame$y, function)
+pmap_dbl(arg_list, function)
+```
+
+- Return a character vector:
+```r 
+map_chr(data_frame$x, function)
+map2_chr(data_frame$x, data_frame$y, function)
+pmap_chr(arg_list, function)
+```
+
+### Concepts
+- Functionals take a function as an input and return a list or vector as an output. They can often be 
+used in place of for-loops.
+- The map() functionals in the purrr package return consistent output types.
+
+### Resources
+- [Functionals background](https://adv-r.hadley.nz/functionals.html)
+- [`purrr` package documentation](https://cran.r-project.org/web/packages/purrr/purrr.pdf)
+- [`map()` documentation](https://purrr.tidyverse.org/reference/map.html)
+- [`map2()` and pmap() documentation](https://purrr.tidyverse.org/reference/map2.html)
+
+---
+
+## Fundamentals of String Manipulation
+
+### Subsetting a string
+
+- Subset from left to right by position:
+```r
+str_sub(string, 1, 3)
+```
+
+- Subset from right to left by position:
+```r 
+str_sub(string, -3, -1)
+```
+
+### Splitting a string
+
+- Return a list:
+```r 
+str_split(string, " ")
+```
+
+- Return a matrix:
+```r 
+str_split(string, " ", simplify = TRUE)
+```
+
+### Combining strings
+
+- Combine multiple strings:
+```
+str_c(string_1, string_2, sep = " ")
+```
+
+### Padding a string
+
+- Pad a string to a length of two characters by adding 0 to the left:
+```r
+str_pad(string, 2, side = "left", pad = "0")
+```
+
+### Concepts
+
+- When working with character strings, spaces count as characters.
+- Functions in the `stringr` package have consistent syntax: All begin with the prefix `str_`.
+
+### Resources
+- [Wikipedia article on string data](https://en.wikipedia.org/wiki/String_(computer_science))
+- [`stringr` CRAN documentation](https://cran.r-project.org/web/packages/stringr/index.html)
+- [`stringr` tidyverse documentation](https://stringr.tidyverse.org/articles/stringr.html)
+
+---
+
