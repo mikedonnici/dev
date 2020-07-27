@@ -266,6 +266,10 @@ show("hello")
 # 3
 ```
 
+## Further reading
+
+- [An excellent stackoverflow article](https://stackoverflow.com/questions/739654/how-to-make-a-chain-of-function-decorators/1594484#1594484)
+
 
 
 
