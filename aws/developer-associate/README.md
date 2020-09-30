@@ -188,16 +188,171 @@ requirements
 ![eni](eni_link2.png)
 
 
+### EC2 Pricing
 
+- Priced per hour, depending on:
+    - Region
+    - Instance type
+    - Launch type (On-Demand, Spot etc)
+    - OS
+- Billed by the second with a min of 60 seconds
+- Additional charges for storage, data transfer, elastic IP, load balancing etc
+- **YOU DO NOT PAY IF THE INSTANCE IS STOPPED**
+- https://aws.amazon.com/ec2/pricing/on-demand/
 
+### Custom AMI
 
+- Can create custom AMI for more efficient deployments
+- **AMI ARE BUILT FOR A SPECIFIC AWS REGION**
 
- 
+### EC2 Instance Type 
+
+- Five distinct characteristics: RAM, CPU, I/O, Network, GPU (Graphical Processing Unit)
+- Over 50 types: https://aws.amazon.com/ec2/instance-types/
+- Comparison tool: https://ec2instances.info/
+- Main categories:
+    - R/C/P/G/H/X/I/F/Z/CR are specialised for RAM, CPU, I/O, Network, GPU
+    - M instances are _balanced_ combination of all
+    - T2/T3 instances are _burstable_
+        - Can burst when load becomes high, this uses _burst credits_
+        - Once credits are used reverts back to standard
+        - Credits are re-accumulated over time
+    - T2 Unlimited allows unlimited bursts but pay for extra credit
+    
+### EC2 Checklist
+
+- SSH into EC2 instance, change `.pem` permissions
+- Use security groups
+- Know difference between private, public and elastic IP
+- Use User Data to customise instance at boot time
+- Know that can build custom AMI to enhance your OS
+- EC2 instances are billed by the second and can be easily created and discarded
+
+## High Availability and Scalability for EC2
+
+- Vertical Scaling - instance size up / down
+- Horizontal Scaling - number of instances increase / decrease (scale out / in)
+    - Auto scaling group
+    - Load balancer
+- High Availability
+    - Auto scaling group multi AZ
+    - Load balancer multi AZ
+    
+---
+    
+### ELB (Elastic Load Balancer)
+
+- Servers that fwd internet traffic to multiple backend instances
+- Spreads load across multiple downstream instances
+- Exposes a single point of access to the service
+- Seamlessly handles failure of downstream instances
+- Does regular health checks of instances
+- Provides SSL termination
+- Enforce stickiness with cookies
+- High availability across zones
+- Separate public traffic from private traffic
+
+Advantages:
+- Completely managed by AWS and guaranteed to work
+- A lot less effort to configure 
+- Integrated with a lot of existing AWS services
+
+#### ELB Health Checks
+
+- Crucial for load balancers to know if instances are able to reply to requests
+- Health check done on a port and route, eg /health:80
+- Response 200 OK is healthy
+- Happen every 5 seconds (configurable)
+
+#### ELB Types
+
+- **Classic Load Balancer** - CLB (v1 - old generation)
+    - Supports HTTP & HTTPS (layer 7) and TCP (layer 4)
+    - Health checks are TCP or HTTP-based
+    - Fixed hostname `xxx.region.elb.amazonaws.com`, but _not_ a fixed IP
+    
+- **Application Load Balancer** - ALB (v2 - new generation)
+    - supports HTTP, HTTP/2, HTTPS, WebSocket (Layer 7 only)
+    - load balancing to multiple http applications across machines (_target groups_)
+    - load balancing to multiple applications on the same machine (eg containers)
+    - supports redirects (eg HTTP -> HTTPS)
+    - supports routing tables to different target groups base on:
+        - URL paths
+        - host names
+        - query strings and headers
+    - Can route to multiple target groups
+    - Health checks are at the target group level
+    - Target groups can include:
+            - EC2 Instances - can be managed by an Auto Scaling Group
+            - ECS Tasks
+            - Lambda functions - HTTP request translated to JSON event
+            - IP addresses - must be private     
+    - Great for micro-services and container-based applications - Docker and Amazon ECS 
+    - Supports port mapping to redirect to dynamic ports in ECS
+    - A single ALB can replace need to multiple CLBs 
+    - ALB has a fixed host name `xxx.region.elb.amazonaws.com`, but _not_ a fixed IP
+    - App servers don't see the client IP directly, get the following headers added to the request":
+        - `X-Fowarded-For` - client IP 
+        - `X-Forwarded-Port` - request port number
+        - `X-Forwarded-Proto` - request protocol
+            
+- **Network Load Balancer** - NLB (v2 - new generation)
+    - supports TCP, TLS (Secure TCP) & UDP (Layer 4 - lower level)
+    - Forwards TCP / UDP traffic to instances
+    - Much higher performance (lower latency ~ 100 ms vs ~400 ms for ALB)
+    - Is not part of a security group and traffic is passed through as is - so security group containing target 
+    instances specifies where traffic is allowed from 
+    - Handles millions of requests per second
+    - Has _one static IP per AZ_ and supports assigning Elastic IP
+    - Not included in FREE tier
+    
     
 
+Can set up **internal** (private) load balancers or **external** (public) load balancers.
 
-   
-   
-   
+#### Load Balancer Security Groups
+
+Typically set up all traffic allowed to the load balancer, and traffic to EC2 instance 
+ only from ELB:
+ 
+![ELB Security](elb_security_groups.png)
+
+#### Load Balancer Stickiness
+
+- CLB and ALB only
+- Maintains client connection to same target using a cookie
+- Cookie has a controllable expiration date
+- Use case eg, to maintain session data
+- May create a load imbalance to EC2 targets 
+- Enabled at the target group level (ALB)
+
+#### Cross-Zone Load Balancing
+
+- Normally, each LB distributes load to instances in the same AZ
+- This ensures LB in each AZ distributed requests evenly amongst all registered instances in each AZ
+- Classic Load Balancer - disabled by default, no additional charge
+- Application Load Balancer - always on, no additional charges
+- Network Load Balancer - disabled by default, additional charges
+ 
 
 
+#### Load Balancer Checklist
+
+- ELB can scale but not instantaneously - can contact AWS for 'warm up'
+- Troubleshooting:
+    - 4xx errors are client-induced
+    - 5xx errors and application-induced
+    - Load Balancer 503 means LB is _at capacity_ or _no registered target_
+    - If LB can't connect to app, _check security groups_
+- Monitoring
+    - ELB access logs will log _all_ requests so can debug at request level
+    - CloudWatch Metrics provides aggregate statistics
+    
+
+ 
+   
+
+     
+ 
+
+  

@@ -1,0 +1,18 @@
+<div>
+  <button (click)="pHidden = !pHidden; logClick()">Details</button>
+</div>
+
+<p [hidden]="pHidden">
+  Lorem ipsum dolor sit amet, consectetur adipisicing elit. Adipisci, animi aut autem consequatur, dicta doloremque
+  eligendi eveniet hic illum in iusto officiis omnis quaerat qui voluptatum! Ipsam minus provident tenetur!
+</p>
+
+<div *ngFor="let click of loggedClicks; let i = index"
+     [ngStyle]="{'background-color': i > 4 ? 'blue' : 'transparent'}"
+     [ngClass]="{'white-text': i > 4}"
+>
+  {{ i }} - {{ click }}
+</div>
+
+
+
