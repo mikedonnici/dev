@@ -1,4 +1,4 @@
-import { Component, OnInit } from '@angular/core';
+import {Component, ElementRef, OnInit, ViewChild} from '@angular/core';
 
 @Component({
   selector: 'app-server-manager',
@@ -9,7 +9,8 @@ export class ServerManagerComponent implements OnInit {
 
   serverList = [];
   newServerName = '';
-  newServerContent = '';
+  // newServerContent = '';
+  @ViewChild('newServerContent') newServerContent: ElementRef;
 
   constructor() {
   }
@@ -17,19 +18,19 @@ export class ServerManagerComponent implements OnInit {
   ngOnInit(): void {
   }
 
-  onAddServer() {
+  onAddServer(serverName: HTMLInputElement) {
     this.serverList.push({
       type: 'server',
-      name: this.newServerName,
-      content: this.newServerContent
+      name: serverName.value,
+      content: this.newServerContent.nativeElement.value
     });
   }
 
-  onAddBlueprint() {
+  onAddBlueprint(serverName: HTMLInputElement) {
     this.serverList.push({
       type: 'blueprint',
-      name: this.newServerName,
-      content: this.newServerContent
+      name: serverName,
+      content: this.newServerContent.nativeElement.value
     });
   }
 

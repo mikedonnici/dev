@@ -1,2 +1,2 @@
-Child component is in the parent template, with te 'foo' value bound to...
-<app-child [childName]="nameFromParent"></app-child>
+<app-child (speak)="onHear($event)"></app-child>
+<div *ngIf="heard">I heard you say: '{{ heard }}'</div>

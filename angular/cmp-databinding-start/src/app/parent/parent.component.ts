@@ -1,4 +1,4 @@
-import {Component} from '@angular/core';
+import {Component, EventEmitter, Output} from '@angular/core';
 
 @Component({
   selector: 'app-parent',
@@ -6,7 +6,8 @@ import {Component} from '@angular/core';
   styleUrls: ['./parent.component.css']
 })
 export class ParentComponent {
-
-  // Want this to be available in the child component
-  nameFromParent = 'Maia';
+  heard: string;
+  onHear(message) {
+    this.heard = message;
+  }
 }
