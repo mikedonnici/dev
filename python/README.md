@@ -1,5 +1,19 @@
 # Python Notes
 
+## Setup
+
+- [Intro to pip and virtualenv](https://www.dabapps.com/blog/introduction-to-pip-and-virtualenv-python/)
+
+This approach stores the complete Python environment, and all packages, into an arbitrary directory, eg:
+
+```bash
+$ pip install virtualenv
+$ virtualenv env
+$ source env/bin/activate
+```
+
+## Language
+
 - [Closures](./closures/)
 - [Context](./context/)
 - [Dates](./dates/)
