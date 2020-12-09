@@ -1,11 +1,10 @@
-// Union Types allows for multiple types to satisfy a requirement, use the | operator.
-// this function only works with numbers
-function add(n1, n2) {
-    return n1 + n2;
+function combine(a, b) {
+    if (typeof a === "number" && typeof b == "number") {
+        return a + b;
+    }
+    else {
+        return a.toString() + b.toString();
+    }
 }
-// this version works with numbers and strings
-// function combined(item1: number | string, )
-console.log(add(1, '2'));
-var user;
-user = "Mike";
-user = false;
+console.log(combine(3, 4));
+console.log(combine("Big", "Dog"));
