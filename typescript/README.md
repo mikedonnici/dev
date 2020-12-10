@@ -285,3 +285,84 @@ function combine(a: number | string, b: number | string) {
 console.log(combine(3,4))         // -> 7
 console.log(combine("Big","Dog")) // -> BigDog
 ```
+
+#### Literal Types
+
+A literal is an exact value of a type, eg:
+
+```ts
+function printFooString(s: "Foo") {
+    console.log(s)
+}
+printFooString("Foo")    // -> OK
+printFooString("FooBar") // ->  Argument of type '"FooBar"' is not assignable to parameter of type '"Foo"'
+```
+
+Works well with Union Type to ensure type safety with params, eg:
+
+```ts
+function printFooString(s: "Foo" | "Bar" | "FooBar") {
+    console.log(s)
+}
+printFooString("Foo")    // -> OK
+printFooString("Bar")    // -> OK
+printFooString("FooBar") // -> 
+printFooString("bingo")  // -> Argument of type '"bingo"' is not assignable to parameter of type '"Foo" | "Bar" | "FooBar"'.
+```
+
+#### Type Aliases
+
+Provides a more convenient way to represent custom types, eg:
+
+```ts
+type FooBarStr = "Foo" | "Bar" | "FooBar"
+function printFooString(s: FooBarStr) {
+    console.log(s)
+}
+printFooString("Foo")    // -> OK
+printFooString("Bar")    // -> OK
+printFooString("FooBar") // -> 
+printFooString("bingo")  // -> Argument of type '"bingo"' is not assignable to parameter of type 'FooBarStr'
+```
+
+Or, more complex types, eg:
+
+```ts
+type User = {
+ name: string,
+ age: number,
+}
+```
+
+#### Function Return Types
+
+Return types can be inferred:
+
+```ts
+function add(n1: number, n2: number) {
+    return n1 + n2 // -> return type is inferred as : number
+}
+```
+
+...or declared explicitly:
+
+```ts
+function add(n1: number, n2: number): number {
+    return n1 + n2 // -> return type is inferred as : number
+}
+```
+
+Generally, allow the return type to be inferred.
+
+For a function with only a side-effect, the `: void` type is returned:
+
+```ts
+function printLine(line: string) { // -> : void
+    console.log(line)
+}
+```
+
+The type `void` will end up as `undefined` in JS, however TS distinguishes 
+between `void` and `undefined`.
+
+
