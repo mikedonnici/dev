@@ -1,3 +1,4 @@
-function printLine(line) {
-    console.log(line);
+function error(msg, code) {
+    throw { message: msg, code: code };
 }
+console.log(error('Something went wrong', 500));
