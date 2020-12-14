@@ -1,3 +1,4 @@
+"use strict";
 function error(msg, code) {
     throw { message: msg, code: code };
 }

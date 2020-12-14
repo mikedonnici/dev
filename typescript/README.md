@@ -60,7 +60,7 @@ n = 5   // infers type `: number`
 n = "5" // infers type `: string`
 ```
 
-### Core Types 
+### Core Types
 
 Types that exist in both JS and TS:
 
@@ -190,7 +190,7 @@ let xa2: any[] = ["b", 2, true] // same
 
 #### Tuple
 
-Tuples are arrays with fixed length and type(s) and can be used in situation 
+Tuples are arrays with fixed length and type(s) and can be used in situation
 where the elements of an array need to be strictly controlled.
 
 ```ts
@@ -200,8 +200,8 @@ console.log(tup)
 // ->  [ 'admin', 4, 'another string' ]
 ```
 
-The above  infers union type `tup: (string|number)[]` so can have a string or 
-a number type in either position. Can also add to the length so not _fixed_.
+The above infers union type `tup: (string|number)[]` so can have a string or a
+number type in either position. Can also add to the length so not _fixed_.
 
 To specify a tuple specify type explicitly:
 
@@ -211,16 +211,16 @@ console.log(tup[0]) // -> "admin"
 console.log(tup[2]) // -> ERR: Tuple type '[string, number]' of length '2' has no element at index '2'.
 ```
 
-So protects code against trying access an element that does not exist. 
+So protects code against trying access an element that does not exist.
 
-Will also prevent the following: 
+Will also prevent the following:
 
 ```ts
 let tup: [string, number] = ["admin", 4, "what?"]
 // -> Type '[string, number, string]' is not assignable to type '[string, number]'.
 ```
 
-However, it does _not_ prevent an additional element being _pushed_ onto the 
+However, it does _not_ prevent an additional element being _pushed_ onto the
 array:
 
 ```ts
@@ -230,8 +230,8 @@ tup.push("another string") // -> no problem
 
 #### Enum
 
-Human-readable labels that provide a convenient way to handle a _flag_ or 
-_state_ value without having to remember the strings or numbers that represents 
+Human-readable labels that provide a convenient way to handle a _flag_ or
+_state_ value without having to remember the strings or numbers that represents
 those values.
 
 For example:
@@ -242,12 +242,13 @@ enum Colour {
     Green,
     Blue,
 }
+
 const red = Colour.Red
 console.log(red)
 // -> 0
 ```
 
-Numerical values are assigned (by default) from 0...n, but can override with 
+Numerical values are assigned (by default) from 0...n, but can override with
 number, strings or a combination of both.
 
 ```ts
@@ -256,13 +257,14 @@ enum Colour {
     Green = "#00FF00",
     Blue = "#0000FF",
 }
+
 console.log(Colour.Blue)
 // => #0000FF
 ```
 
 #### Any
 
-Specifies non-specific type which is removed all of the advantages of TS - so 
+Specifies non-specific type which is removed all of the advantages of TS - so
 generally avoid as much as possible.
 
 ```ts
@@ -282,8 +284,9 @@ function combine(a: number | string, b: number | string) {
     }
 
 }
-console.log(combine(3,4))         // -> 7
-console.log(combine("Big","Dog")) // -> BigDog
+
+console.log(combine(3, 4))         // -> 7
+console.log(combine("Big", "Dog")) // -> BigDog
 ```
 
 #### Literal Types
@@ -294,6 +297,7 @@ A literal is an exact value of a type, eg:
 function printFooString(s: "Foo") {
     console.log(s)
 }
+
 printFooString("Foo")    // -> OK
 printFooString("FooBar") // ->  Argument of type '"FooBar"' is not assignable to parameter of type '"Foo"'
 ```
@@ -304,6 +308,7 @@ Works well with Union Type to ensure type safety with params, eg:
 function printFooString(s: "Foo" | "Bar" | "FooBar") {
     console.log(s)
 }
+
 printFooString("Foo")    // -> OK
 printFooString("Bar")    // -> OK
 printFooString("FooBar") // -> 
@@ -316,9 +321,11 @@ Provides a more convenient way to represent custom types, eg:
 
 ```ts
 type FooBarStr = "Foo" | "Bar" | "FooBar"
+
 function printFooString(s: FooBarStr) {
     console.log(s)
 }
+
 printFooString("Foo")    // -> OK
 printFooString("Bar")    // -> OK
 printFooString("FooBar") // -> 
@@ -329,8 +336,8 @@ Or, more complex types, eg:
 
 ```ts
 type User = {
- name: string,
- age: number,
+    name: string,
+    age: number,
 }
 ```
 
@@ -362,7 +369,249 @@ function printLine(line: string) { // -> : void
 }
 ```
 
-The type `void` will end up as `undefined` in JS, however TS distinguishes 
+The type `void` will end up as `undefined` in JS, however TS distinguishes
 between `void` and `undefined`.
+
+#### Functions as Types
+
+Specify `Function` as a type:
+
+```ts
+function add(n1: number, n2: number) {
+    return n1 + n2;
+}
+
+let a: Function = add // -> OK
+let b: Function = 10  // -> Type 'number' is not assignable to type 'Function'
+```
+
+Specify the signature:
+
+```ts
+function add(n1: number, n2: number) {
+    return n1 + n2;
+}
+
+type adder = (x: number, y: number) => number
+let a: adder = add    // -> OK
+let b: adder = print  // -> Type '() => void' is not assignable to type 'adder'
+```
+
+Specify the signature for a callback:
+
+```ts
+function addHandler(n1: number, n2: number, callback: (n: number) => void) {
+    const sum = n1 + n2
+    callback(sum);
+}
+
+function printNum(n: number) {
+    console.log(n)
+}
+
+addHandler(3, 7, printNum) // printNum satisfies callback signature
+```
+
+#### Unknown
+
+There's a subtle difference between `unknown` type and the default `any` type:
+
+```ts
+let a: any
+let b: string
+a = 5
+a = 'Dog'
+b = a // -> ok 
+```
+
+```ts
+let a: unknown
+let b: string
+a = 5
+a = 'Dog'
+b = a // -> Type 'unknown' is not assignable to type 'string'.
+```
+
+`unknown` is a bit more restrictive and the underlying type needs to be checked
+before assigning to a value with a fixed type. This make it a better choice
+that `any` as it still requires some specification:
+
+```ts
+let a: unknown
+let b: string
+a = 5
+a = 'Dog'
+if (typeof a === 'string') {
+    b = a // -> Ok    
+}
+```
+
+#### Never
+
+The `never` type implies a type that can never have a value.
+
+The code below can never return anything, including `void` or `undefined`:
+
+```ts
+function error(msg: string, code: number) { // -> infers : void type  
+    throw {message: msg, code: code}
+}
+```
+
+Can (and should) be more explicit when a function can `never` return:
+
+```ts
+function infiniteLoop(): never {
+    while (true) {
+    }
+}
+```
+
+## Compiler
+
+### Watch Mode
+
+Run the compiler each time a file changes:
+
+```shell
+$ tsc --watch file.ts
+# or
+$ tsc -w file.ts
+```
+
+### Multiple files
+
+Initialise a project:
+
+```shell
+$ tsc --init
+# -> tsconfig.json
+```
+
+Compile all `.ts` files:
+
+```shell
+$ tsc
+```
+
+Watch all files, recompile on any change:
+
+```shell
+$ tsc --watch
+```
+
+Excluding files in `tsconfig.json` - note that `node_modules` is excluded by
+default:
+
+```json
+{
+  "exclude": [
+    "foo.ts",
+    "**/*.dev.ts",
+    "node_modules"
+  ]
+}
+```
+
+Conversely, `include` allws you to specify _only_ those files that should be
+compiled:
+
+```json
+{
+  "include": [
+    "foo.ts",
+    "bar.ts"
+  ]
+}
+```
+
+### Compilation Target
+
+The target JS version (ie `es5` or `es6`) for the compiled project is set in
+`tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "target": "es5"
+  }
+}
+```
+
+### Library Options
+
+The `lib` section in `tsconfig.json` allows you to specify certain libraries
+that TS can assume are available, and hence it will not throw compilation errors
+in relation to.
+
+The default libraries will depend on the target JS version. For example, if set
+to `es6` then `es6` features such as `Map()` will be available to TS.
+
+By default, all DOM APIs are available as well:
+
+```json5
+{
+  "compilerOptions": {
+    "target": "es6",
+    // "lib": []  // -> defaults for es6
+  }
+}
+```
+
+If uncommented then available libraries must be specified. Note, the settings
+below are the default when the target is set to `es6`:
+
+```json5
+{
+  "compilerOptions": {
+    "target": "es6",
+    "lib": [
+      // these are the defaults for es6
+      "es6",
+      "dom",
+      "dom-iterable",
+      "scripthost"
+    ]
+  }
+}
+```
+
+### Sourcemap
+
+If set to `true` the `.js.map` files are generated by the compiler:
+
+```json
+{
+  "compilerOptions": {
+    "sourcemap": true
+  }
+}
+```
+This allows the developer tools in the browser to link to the original TS input 
+files - breakpoints can be set so this is good for debugging. 
+
+### outdir and rootdir
+
+Specifies the target for compiled code, eg:
+
+```json5
+{
+  "compilerOptions": {
+    "outDir": "./dist", 
+    "rootDir": "./src",
+  }
+}
+```
+
+### noEmitOnError
+
+
+
+
+
+
+
+
+
 
 
