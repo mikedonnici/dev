@@ -709,7 +709,7 @@ console.log(dep2.describe()) // ->
 ```
 
 TS implements `private` and `public` (default) access modifiers for properties
-and methods. 
+and methods.
 
 These can also be included in the constructor for convenience.
 
@@ -739,7 +739,7 @@ class Foo {
 }
 ```
 
-TS also adds a `readonly` keyword to indicate that a value cannot be changed 
+TS also adds a `readonly` keyword to indicate that a value cannot be changed
 after initialisation:
 
 ```ts
@@ -751,7 +751,7 @@ class Foo {
 
 ### Inheritence
 
-A subclass `extends` a base class: 
+A subclass `extends` a base class:
 
 ```ts
 class Foo {
@@ -767,8 +767,8 @@ const foobar = new Bar("A")
 console.log(foobar.c)
 ```
 
-If the subclass has a constructor, it should call `super()` on base class
-before any use of `this`:
+If the subclass has a constructor, it should call `super()` on base class before
+any use of `this`:
 
 ```ts
 class Foo {
@@ -778,7 +778,8 @@ class Foo {
 
 class Bar extends Foo {
     b: string
-    constructor(public a: string, b: string){
+
+    constructor(public a: string, b: string) {
         super(a)
         this.b = b
     }
@@ -797,7 +798,7 @@ class Foo {
 }
 
 class Bar extends Foo {
-    constructor(a: string){
+    constructor(a: string) {
         super(a)
         this.a = "foo" // -> Property 'a' is private and only accessible within class 'Foo'.
     }
@@ -815,7 +816,7 @@ class Foo {
 }
 
 class Bar extends Foo {
-    constructor(a: string){
+    constructor(a: string) {
         super(a)
         this.a = "foo"
     }
@@ -830,16 +831,18 @@ Can override methods of a base class, as usual:
 class Foo {
     constructor(protected a: string) {
     }
+
     thing() {
         console.log("Foo thing")
     }
 }
 
 class Bar extends Foo {
-    constructor(a: string){
+    constructor(a: string) {
         super(a)
         this.a = "foo"
     }
+
     thing() {
         console.log("Bar thing")
     }
@@ -851,13 +854,15 @@ foobar.thing() // -> "Bar thing"
 
 ### Getters and Setters
 
-TS has `get` and `set` keywords for creating methods that behave like properties, 
-but allow for more logic to be associated with setting and getting properties:
+TS has `get` and `set` keywords for creating methods that behave like
+properties, but allow for more logic to be associated with setting and getting
+properties:
 
 ```ts
 class Foo {
 
-    constructor(private a = 1) {}
+    constructor(private a = 1) {
+    }
 
     get aVal() {
         return this.a
@@ -873,5 +878,644 @@ console.log(f.aVal)
 f.aVal = 10
 console.log(f.aVal)
 ```
+
+### Static Methods and Properties
+
+Static methods and properties can be accessed without an instance of the class.
+
+These are commonly used for global variables accessed via class, or utility
+methods grouped within a class.
+
+Important to note that static properties cannot be accessed using `this`
+because this refers to an _instance_ of the class. They can, however, be
+accessed via the class name:
+
+```ts
+class Foo {
+
+    static BooBoo = "Bear"
+
+    constructor(private bb: string = Foo.BooBoo) {
+        console.log(bb)
+    }
+
+    static doThing() {
+        console.log("thing")
+    }
+}
+
+Foo.doThing()
+```
+
+### Abstract Classes
+
+Use the `abstract` keyword to enforce the implementation of a property or method
+on subclasses:
+
+```ts
+abstract class Animal {
+    abstract sound: string
+
+    abstract talk(): void
+}
+
+class Dog extends Animal {
+    sound: string = "woof"
+
+    talk() {
+        console.log(this.sound)
+    }
+}
+
+const milo = new Dog()
+milo.talk()
+```
+
+### Private constructors and singleton pattern
+
+Might not use but can create a singleton pattern using a private constructor:
+
+```ts
+class Life {
+    private static instance: Life
+    private static meaning: number
+
+    private constructor(meaning = 42) {
+        Life.meaning = meaning
+    }
+
+    static getInstance() {
+        if (Life.instance) {
+            return Life.instance
+        }
+        return new Life(42)
+    }
+
+    getMeaning(): number {
+        return Life.meaning
+    }
+}
+
+const l = Life.getInstance()
+console.log(l.getMeaning())
+```
+
+### Interfaces
+
+Interfaces are used to create custom object types that can be type-checked.
+
+This is a pure TS feature so nothing is translated to the compiled JS code.
+
+```ts
+interface Dog {
+    size: string
+    colour: string
+    volume: string
+
+    bark(): string  // method signature
+}
+
+const milo: Dog = {
+    size: "large",
+    colour: "brown",
+    volume: "loud",
+    bark: () => "WOOF!"
+}
+
+milo.bark()
+```
+
+An interface are very close, but not _exactly_ the sample thing.
+
+Whilst a custom `type` would work ok in the above example, as interfaces can
+only be used to describe an object, generally and interface is used in this
+case.
+
+Custom types can be more flexible as they can have union types and describe
+non-object types.
+
+Interfaces can be used in a similar way to Go, that is, to provide a contract
+definition such that classes can _implement_ (one or more) interfaces:
+
+```ts
+interface Edible {
+    salt: number
+    fat: number
+    carbohydrate: number
+    protein: number
+
+    healthScore(): number
+}
+
+class Hamburger implements Edible {
+
+    constructor(public salt: number, public fat: number,
+                public carbohydrate: number, public protein: number) {
+    }
+
+    healthScore(): number {
+        return this.protein + this.carbohydrate - this.fat - this.salt
+    }
+}
+
+const cheeseBurger = new Hamburger(10, 15, 20, 2)
+const homeBurger = new Hamburger(3, 5, 15, 20)
+
+console.log(cheeseBurger.healthScore())
+console.log(homeBurger.healthScore())
+```
+
+The `readonly` keyword can be used in an interface definition to ensure that a
+property can only be set once.
+
+```ts
+interface Runner {
+    readonly legs: number
+    topSpeed: number
+}
+```
+
+Interfaces can extend multiple interfaces as they end up all merged into one:
+
+```ts
+interface Named {
+    name: string
+}
+
+interface Speaks {
+    languages: string[]
+}
+
+interface Greetable extends Named, Speaks {
+    greet(): string
+}
+
+interface Runner {
+    readonly legs: number
+    speed: number
+}
+
+class Person implements Greetable, Runner {
+    legs = 2
+
+    constructor(
+        public name: string,
+        public languages: string[],
+        public speed: number = 15
+    ) {
+    }
+
+    greet(): string {
+        return `Hello, ${this.name}.`
+    }
+}
+
+const mike = new Person("Mike", ["English", "Italian"])
+console.log(mike.greet())
+```
+
+Interfaces can also be used to define a function type, although would generally
+use a type:
+
+```ts
+// function type
+type addFn1 = (a: number, b: number) => number
+let add1: addFn1 = (a: number, b: number) => a + b
+
+// Interface type
+interface addFn2 {
+    (a: number, b: number): number
+}
+
+let add2: addFn2 = (a: number, b: number) => a + b
+```
+
+### Optional parameters and properties
+
+Use the `?:` operator to designate properties optional:
+
+```ts
+interface Named {
+    name?: string
+}
+
+class Person implements Named {
+    constructor(age?: number, legs: number = 2) {
+    }
+}
+
+const p = new Person()
+```
+
+The above example has an _optional_ `name` property via the `Named` interface,
+an optional `age` parameter in the `Person` constructor, and an optional `legs`
+parameter by setting a default value in the constructor.
+
+So this code compiles without issue.
+
+## Advanced Types
+
+### Intersection types
+
+Combines two or more types:
+
+```ts
+type A = {
+    a1: string
+}
+type B = {
+    b1: number
+}
+
+// Intersection type
+type AB = A & B
+
+const foo: AB = {
+    a1: "abc",
+    b1: 123
+}
+```
+
+### Type guards
+
+Used when need to check properties that may contain union types. To do this can
+use the `in` keyword to check that a property is `in` an object, and therefore
+deduce the required type:
+
+```ts
+type A = {
+    a: number
+}
+type B = {
+    b: string
+}
+type C = A | B
+
+const foo: C = {
+    a: 1
+}
+
+// This is a type guard expression using 'in'
+if ('a' in foo) {
+    console.log(`foo must be type A, so foo.a exists and is equal to ${foo.a}  `)
+}
+// No type guard so TS unsure if property exists
+console.log(`${foo.b} will error`) // -> property 'b' does not exist on type 'A'    
+```
+
+With a class can use `instanceof` type guard:
+
+```ts
+if (vehicle instanceof Truck) {
+    vehicle.loadCargo()
+}
+```
+
+## Discriminated unions
+
+A pattern to help with type guarding for union types - add a common, literal
+property to types / interfaces and use `switch`:
+
+```ts
+type Dog = {
+    type: 'dog'
+    groundSpeed: number
+}
+
+type Bird = {
+    type: 'bird'
+    maxHeight: number
+}
+
+type Animal = Dog | Bird
+
+function description(animal: Animal): string {
+    switch (animal.type) {
+        case 'bird':
+            return `Bird can fly up to ${animal.maxHeight}m high`
+        case 'dog':
+            return `Dog can run ${animal.groundSpeed}km per hour`
+        default:
+            return "Unknown animal"
+    }
+}
+
+const a: Animal = {
+    type: 'bird',
+    maxHeight: 200
+}
+console.log(description(a))
+```
+
+### Type casting
+
+Used to tell TS that the type is known - two options:
+
+```ts
+// This syntax clashes with JSX
+const el1 = <HTMLInputElement>document.getElementById("user-input")
+// This syntax does not
+const el2 = document.getElementById("user-input") as HTMLInputElement
+```
+
+### Index properties
+
+Used to build objects with properties of a single type, but where the number and
+name of the properties is not known in advance:
+
+```ts
+interface Errors {
+    [code: number]: string
+}
+
+const errs: Errors = {
+    200: "OK",
+    400: "Bad Request",
+    401: "Unauthorised",
+    404: "Not found",
+}
+```
+
+Note: can only use a single property type in these objects.
+
+### Function overloads
+
+Multiple function signatures to explicitly declare return types:
+
+```ts
+type Combinable = string | number
+
+function add(a: string, b: string): string;
+function add(a: number, b: number): number;
+function add(a: Combinable, b: Combinable) {
+    if (typeof a === 'string' || typeof b === 'string') {
+        return a.toString() + b.toString()
+    }
+    return a + b
+}
+```
+
+### Optional chaining
+
+Check nested properties exist before accessing them using `?.`:
+
+```ts
+// Standard JS way
+if (user.job && user.job.title) {
+    console.log(user.job.title)
+}
+// TS optional chaining
+if (user?.job?.title) {
+    console.log(user.job.title)
+}
+```
+
+### Nullish coalescing
+
+The `??` checks if a value is `null` or `undefined` rather than _falsey_:
+
+```ts
+const s = ''
+const msg1 = s || 'UNDEFINED' // s1 is falsey
+console.log(msg1)
+// -> UNDEFINED
+const msg2 = s ?? 'UNDEFINED'
+console.log(msg2)
+// -> '' because empty string is NOT null or undefined
+```
+
+## Generics
+
+Generic types are not set in stone when a function is created, but are set
+_dynamically_ when the function is called:
+
+```ts
+function whatTypeIs<T>(t: T) {
+    switch (typeof t) {
+        case 'string':
+            return "STRING"
+        case 'number':
+            return "NUMBER"
+        case 'boolean':
+            return "BOOLEAN"
+        case 'function':
+            return "FUNCTION"
+        default:
+            return "OTHER"
+    }
+}
+
+console.log(whatTypeIs("a"))
+console.log(whatTypeIs(12))
+console.log(whatTypeIs(false))
+console.log(whatTypeIs(() => {
+}))
+console.log(whatTypeIs({a: 1}))
+```
+
+In this first example TS has no way of knowing what the properties are on the
+objects that get passed to `merge()`:
+
+```ts
+function merge(a: Object, b: object) {
+    return Object.assign(a, b)
+}
+
+const merged = merge({name: "Mike"}, {age: 50})
+console.log(merged.age) // -> Error
+// -> Property 'age' does not exist on type 'Object & object'
+```
+
+Using generics:
+
+```ts
+function merge<T, U>(a: T, b: U) { // return type is T & U
+    return Object.assign(a, b)
+}
+
+const merged1 = merge({name: "Mike"}, {age: 50})
+console.log(merged1.age) // -> OK
+
+const merged2 = merge({biscuitId: 1234}, {tastinessRating: 17})
+console.log(merged2.tastinessRating)  // -> Also OK
+```
+
+Although redundant, can specify concrete types being passed:
+
+```ts
+function foo<T>(t: T) {
+    console.log(typeof t)
+}
+
+foo<string>("this is string")
+foo<number>(42)
+```
+
+### Generic constraints
+
+In the above examples, the generic types are _unconstrained_ - that is, they can
+be any type at all. However, it may be practical to ensure that a generic type
+is limited to one or more types. This can be done using the `extends` keyword.
+
+For example, in the `merge()` function it would make sense to ensure that the
+objects passed in are at least actual objects:
+
+```ts
+function merge<T extends object, U extends object>(a: T, b: U) { // return type is T & U
+    return Object.assign(a, b)
+}
+
+const merged1 = merge({name: "Mike"}, {age: 50})
+const merged2 = merge({name: "Mike"}, 50) // -> Error:
+// -> Argument of type 'number' is not assignable to parameter of type 'object'.
+```
+
+Can constrain with union types as well:
+
+```ts
+function foo<T extends string | number>(t: T) {
+    console.log(typeof t)
+}
+```
+
+Using `keyof` constraint:
+
+```ts
+// This will error
+function valueAt(obj: Object, key: string) {
+    return obj[key] // -> Error
+}
+```
+
+```ts
+// This ensures the  key arg exists in the object
+function valueAt<T extends object, U extends keyof T>(obj: T, key: U) {
+    return obj[key]
+}
+```
+
+### Generic classes
+
+Example:
+
+```ts
+class List<T> {
+
+    private items: T[] = []
+
+    add(item: T) {
+        this.items.push(item)
+    }
+}
+
+const stringList = new List<string>()
+stringList.add("a")
+stringList.add(1) // -> Error: 
+// -  Argument of type 'number' is not assignable to parameter of type 'string'.
+```
+
+## Decorators
+
+Note: set `tsconfig.json`:
+
+```json
+{
+  "compilerOptions": {
+    "target": "es6",
+    "experimentalDecorators": true
+  }
+}
+```
+
+Enable meta-programming - code that becomes easier to use by other developers.
+
+By convention, use an uppercase character for decorator function name.
+
+A decorator receives a function to be _decorated_, and returns a new, _decorated_ 
+function.
+
+A simple example:
+
+```ts
+function DecoratorFunc(f: Function) {
+    console.log("This is a decorator...")
+}
+
+@DecoratorFunc
+class Foo {
+    constructor() {
+        console.log("Foo constructor")
+    }
+}
+
+const f = new Foo()
+// This is a decorator
+// Foo constructor
+```
+
+To pass arguments to a decorator can use a decorator factory. Also note that
+the decorator is triggered by the class definition and not by instantiation 
+of an object:
+
+```ts
+// This RETURNS a decorator function
+function DecoratorFunc(s: string) {
+    return (f: Function) => {
+        console.log(`Decorator received arg: ${s}`)
+    }
+}
+
+@DecoratorFunc("hello")
+class Foo {
+    constructor() {
+        console.log("Foo constructor")
+    }
+}
+// Decorator received arg: hello
+```
+
+Multiple decorators run from the bottom, up:
+
+```ts
+function a(_: Function) {
+    console.log("A")
+}
+
+function b(_: Function) {
+    console.log("B")
+}
+
+@a
+@b
+class F {
+    constructor() {
+        console.log("Class F")
+    }
+}
+// B
+// A
+```
+
+Decorators can be added to properties, methods, accessors and parameters. The
+arguments received by the decorator varies depending on where the decorator 
+is used.
+
+See: https://www.typescriptlang.org/docs/handbook/decorators.html#decorators
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
+
 
 

@@ -1,17 +1,18 @@
-class Foo {
-
-    constructor(private a = 1) {}
-
-    get aVal() {
-        return this.a
-    }
-
-    set aVal(n: number) {
-        this.a = n
-    }
+function a(_: Function) {
+    console.log("A")
 }
 
-const f = new Foo(6)
-console.log(f.aVal)
-f.aVal = 10
-console.log(f.aVal)
+function b(_: Function) {
+    console.log("B")
+}
+
+@a
+@b
+class F {
+    constructor() {
+        console.log("Class F")
+    }
+}
+// B
+// A
+
