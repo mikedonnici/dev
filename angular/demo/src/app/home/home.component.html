@@ -1,0 +1,14 @@
+<div class="alert alert-secondary" role="alert">
+  {{ message }}
+</div>
+
+<div *ngFor="let clr of colours">
+  <div *ngIf="contains(clr)" class='{{ "alert " + colourCSS[clr] }}' role="alert">
+    This above message contains the string "{{ clr }}".
+  </div>
+</div>
+
+<div>
+  <input type="text" [(ngModel)]="message">
+  <button (click)="clearMessage()">clear</button>
+</div>

@@ -1,0 +1,47 @@
+<h1>Times Tables</h1>
+
+<div class="alert alert-info">
+
+  <div class="container">
+    <div class="row row-cols-auto">
+      <div *ngFor="let n of tables" class="col">
+        <button class="btn btn-outline-dark"
+                (click)="practice(n)">{{ n }}</button>
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<div *ngIf="currentTable > 0" class="container">
+  <h3>{{ currentTable }} times tables</h3>
+
+  <div class="col-4" *ngIf="nextQuestion()">
+    <div class="input-group mb-3">
+      <span class="input-group-text">{{ currentQuestion?.n1 }}</span>
+      <span class="input-group-text">x</span>
+      <span class="input-group-text">{{ currentQuestion?.n2 }}</span>
+      <span class="input-group-text">=</span>
+      <input type="text" class="form-control" [(ngModel)]="currentQuestion.answer">
+      <button class="btn btn-primary form-control">n</button>
+      <span class="input-group-text">{{ currentQuestion?.prod }}</span>
+    </div>
+  </div>
+
+
+<!--  <div class="col-4" *ngFor="let q of currentQuestionSet; let i = index">-->
+<!--    <div class="input-group mb-3">-->
+<!--      <span class="input-group-text">{{ q.n1 }}</span>-->
+<!--      <span class="input-group-text">x</span>-->
+<!--      <span class="input-group-text">{{ q.n2 }}</span>-->
+<!--      <span class="input-group-text">=</span>-->
+<!--      <input type="text" class="form-control" value="">-->
+<!--      <button class="btn btn-primary form-control">n</button>-->
+<!--      <span class="input-group-text">{{ q.prod }}</span>-->
+<!--    </div>-->
+<!--  </div>-->
+
+
+</div>
+
+

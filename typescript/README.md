@@ -1503,6 +1503,65 @@ is used.
 See: https://www.typescriptlang.org/docs/handbook/decorators.html#decorators
 
 
+## Routing
+
+- Routes are set up and registered in `app.module.ts`:
+
+```typescript
+
+// Set up routes
+import {RouterModule, Routes} from '@angular/router';
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent},
+  { path: 'dog', component: DogComponent},
+  { path: 'cat', component: CatComponent},
+];
+
+// register routes
+@NgModule({
+  // ... //
+  imports: [
+    RouterModule.forRoot(appRoutes),
+  ]
+})
+```
+
+- The location for the output for he currently selected route is specified 
+  with the `router-outlet` directive:
+  
+```angular2html
+<router-outlet></router-outlet>
+```
+
+- Linking to routes with normal `href` creates a new request which reloads the 
+  page and loses state.
+- Use `routerLink` to specify path or bind to `[routerLink]` to create more 
+  complex paths:
+
+```angular2html
+<a routerLink="/">Home</a>
+<a routerLink="/parent">Parent</a>
+<a [routerLink]="['/parent', 'child']">Child</a>
+```
+
+- Note that route paths are relative without a leading `/`
+- Can also use dir path notation, eg `./same-level`, `../up-one`
+
+
+
+## Observables
+
+- A pattern used to handle asynchronous tasks
+- The **Observable** represents a source of data such as events, http requests
+- The **Observer** subscribes to the _Observable_ and executes code that:
+    - Handles data
+    - Handles errors
+    - Handles completion (where applicable)
+- An alternative approach to promises
+
+
+    
+
 
 
 

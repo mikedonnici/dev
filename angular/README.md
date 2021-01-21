@@ -18,8 +18,12 @@ $ ng new app-name
 
 # create a component
 $ ng generate component component-name
-# or
+
+# ...short version
 $ ng g c component-name
+
+# create a component without testing code
+$ ng g c component-name --spec false
 
 # serve the app
 $ ng serve
@@ -31,29 +35,36 @@ $ ng serve
 
 - `js` injected into index.html
 - `main.ts` imports the main module - `app.module.ts`
-- `AppModule` decorator received a list of components for bootstrapping, starting with `AppComponent`
-- `AppComponent` injects itself into the specified selector in`index.html`, eg `<app-root></app-root>`
+- `AppModule` decorator received a list of components for bootstrapping,
+  starting with `AppComponent`
+- `AppComponent` injects itself into the specified selector in`index.html`,
+  eg `<app-root></app-root>`
 
 ---
 
 ## AppModule and Component Declarations
 
 - Most projects generally have just the one main module - `app.module.ts`
-- New components must be _registered_ in the `@NgModule` decorator, `declarations` property
-- `@NgModule` `imports` property lists other modules that are _imported_ into this main app module
+- New components must be _registered_ in the `@NgModule`
+  decorator, `declarations` property
+- `@NgModule` `imports` property lists other modules that are _imported_ into
+  this main app module
 
 ---
 
 ## Components
 
 - create with cli: `ng g c name`, or nested with `ng g c dir/name`
-- [`@Component`](https://angular.io/api/core/Component) decorator sets up the components attributes
-    - `selector` - css selector by: `element-name`, `[attribute-name]`, `.class-name`, _not_ by css id
-    - `templateUrl` - path to html template file, can also use `template` for inline html template
+- [`@Component`](https://angular.io/api/core/Component) decorator sets up the
+  components attributes
+    - `selector` - css selector by: `element-name`, `[attribute-name]`
+      , `.class-name`, _not_ by css id
+    - `templateUrl` - path to html template file, can also use `template` for
+      inline html template
     - `styleUrls` - an array of CSS files, can also use `styles` for inline css
 
 ---    
-    
+
 ## Data binding
 
 - Communication between component (typsecript code) and the template (html code)
@@ -63,61 +74,172 @@ $ ng serve
 - Input: template -> component
     - [Event binding](https://angular.io/guide/event-binding): `(event) = "expression"`
 - Bi-directional: component <-> template
-    - [Two-way binding](https://angular.io/guide/two-way-binding) does both of the above, ie sets an element property and listens for an element change event
-    - `[(ngModel)] = "data"` - remember as _banana in a box_, `[()]`    
+    - [Two-way binding](https://angular.io/guide/two-way-binding) does both of
+      the above, ie sets an element property and listens for an element change
+      event
+    - `[(ngModel)] = "data"` - remember as _banana in a box_, `[()]`
 
-To see a list of `properties` or `events` for a particular element can `console.log(element)`, also see 
-MDN [HTML attribute reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes) and 
+To see a list of `properties` or `events` for a particular element
+can `console.log(element)`, also see
+MDN [HTML attribute reference](https://developer.mozilla.org/en-US/docs/Web/HTML/Attributes)
+and
 [Event reference](https://developer.mozilla.org/en-US/docs/Web/Events).
 
 ---
 
 ## Directives
 
-- Directives are instructions in the DOM.
-- Putting content into a location specified by a selector, eg `<app-foo></app-foo>` is a directive that includes a template
-- Directives without templates are also possible, for example:
-
-```typescript
-@Directive({
-    selector: '[appGreenText]'
-})
-export class GreenTextDirective{
-    // ...
-}
-```
-
-Which would be used like this:
-
-```angular2html
-<p appGreenText>This would be green</p>
-``` 
+- Directives are instructions in the DOM
+- Two types:
+    - **Attribute Directives**
+        - look like an HTML attribute, can have data or event binding
+        - only affect elements they are added to
+    - **Structural Directives**
+        - look like an HTML attribute but with leading `*` (for desugaring)
+        - affect an area of the DOM as elements can be added or removed
+        - Can only have one structural directive on an element
+- Putting content into a location specified by a selector,
+  eg `<app-foo></app-foo>` is a directive that includes a template
 
 ### Built-in directives
 
-- `ngIf` - used with `*` to indicate it is a _structural_ directive, ie `*ngIf`, eg
+#### `ngIf` structural directive
+
 ```angular2html
 <p *ngIf="boolExpression">P tag shown if true</p>
 ```
 
-- `ngStyle` - apply a css style, eg:
-- Note the property binding is not part of the directive 
+#### `ngFor` structural directive
+
+```angular2html
+
+<div *ngFor="let item of itemList">{{ item.property }}</div>
+<! -- with index -->
+<div *ngFor="let item of itemList; let i = index">{{ i }}
+    - {{ item.property }}</div>
+```
+
+#### `ngStyle` attribute directive
+
+- Note that the square brackets indicate a binding to some property on the
+  `ngClass` directive and are not part of the directive itself.
+
 ```angular2html
 <p [ngStyle]="{'background-color': getColour()}"></p>
 <p [ngStyle]="{backgroundColor: getColour()}"></p>
 ```
 
-- `ngClass` - apply a css class, eg:
+#### `ngClass` attribute directive
+
 ```angular2html
 <p [ngClass]="{'class-name': boolExpression}"></p>
 <p [ngClass]="{className: boolExpression}"></p>
 ```
 
-- `ngFor` - structural directive for loops, eg
+### Custom Directives
+
+- Typically create a folder and file for a custom directive, eg:
+  `src/green-text/green-text.directive.ts`
+- Use `@Directive` decorator and specify a selector:
+    - Note that specifying the selector with square brackets indicates that the
+      selector can be used as a stand-alone attribute on the element, ie in the
+      form: `<p someSelector>Hello!</p>`
+- Angular will instantiate the class and pass the ElementRef to `constructor()`
+- Directive needs to be imported in `app.module.ts`
+
+```shell
+# Generate a directive
+$ ng generate directive greenText 
+# or ng g d greenText
+```
+
+```typescript
+import {Directive, ElementRef, OnInit} from "@angular/core"
+
+@Directive({
+    selector: '[appGreenText]'
+})
+export class GreenTextDirective implements OnInit {
+
+    constructor(private elementRef: ElementRef) {
+    }
+
+    ngOnInit() {
+        this.elementRef.nativeElement.style.backgroundColor = 'green';
+    }
+}
+```
+
+- use like this:
+
 ```angular2html
-<div *ngFor="let item of itemList">{{ item.property }}</div>
-<! -- with index -->
-<div *ngFor="let item of itemList; let i = index">{{ i }} - {{ item.property }}</div>
+<p appGreenText>This would be green</p>
+```
+
+The above works, however, accessing elements directly like this is _not_ good
+practice.
+
+A better way is to use the Renderer:
+
+```typescript
+import {Directive, ElementRef, OnInit, Renderer2} from '@angular/core';
+
+@Directive({
+    selector: '[appGreenText]'
+})
+export class GreenTextDirective implements OnInit {
+
+    constructor(private elementRef: ElementRef, private renderer: Renderer2) {
+    }
+
+    ngOnInit(): void {
+        this.renderer.setStyle(this.elementRef.nativeElement, 'background-color', 'green');
+    }
+}
+```
+
+`@HostListener()` decorator can be used to create a _reactive_ directive.
+
+For example, to change text colour only on hover:
+
+```typescript
+@Directive({
+    selector: '[appGreenText]'
+})
+export class GreenTextDirective {
+
+    constructor(private elementRef: ElementRef, private renderer: Renderer2) {
+    }
+
+    @HostListener('mouseenter') hoverOn(_: Event) {
+        this.renderer.setStyle(this.elementRef.nativeElement, 'background-color', 'green');
+    }
+
+    @HostListener('mouseleave') hoverOff(_: Event) {
+        this.renderer.setStyle(this.elementRef.nativeElement, 'background-color', 'transparent');
+    }
+}
+```
+
+`@HostBinding()` decorator can also be used to achieve the above, in an even
+simpler way:
+
+```typescript
+@Directive({
+    selector: '[appGreenText]'
+})
+export class GreenTextDirective {
+
+    @HostBinding('style.backgroundColor') backgroundColor: string = 'transparent';
+
+    @HostListener('mouseenter') hoverOn(_: Event) {
+        this.backgroundColor = 'green';
+    }
+
+    @HostListener('mouseleave') hoverOff(_: Event) {
+        this.backgroundColor = 'transparent';
+    }
+}
 ```
 
 ---
@@ -125,64 +247,77 @@ Which would be used like this:
 ## Debugging with Developer Console
 
 - In developer tools, under **sources** tab
-- When running in developer mode source mapping is used to link bundled code to the original source files
-- Under `localhost:4200`, `main.js` - clicking any line number will open source file
+- When running in developer mode source mapping is used to link bundled code to
+  the original source files
+- Under `localhost:4200`, `main.js` - clicking any line number will open source
+  file
 - All source files are also located in the `webpack://` section
 - Can add breakpoints etc
-- Chrome extension _Augury_ can be added to dev tools 
+- Chrome extension _Augury_ can be added to dev tools
 
 ---
 
 ## Binding to Custom Properties
 
 - Allows data to be passed _into_ a component
-- `@Input()` decorator is used to expose a class field such that it can be bound to properties from enclosing 
-components, ie. passed in as 'props' in Vue parlance, eg:
+- `@Input()` decorator is used to expose a class field such that it can be bound
+  to properties from enclosing components, ie. passed in as 'props' in Vue
+  parlance, eg:
 
 ```typescript
 // Parent component
 import {Component} from '@angular/core';
-@Component({ selector: 'app-parent' })
+
+@Component({selector: 'app-parent'})
 export class ParentComponent {
-  nameFromParent = 'Maia'; // Want this to be passed to child component
+    nameFromParent = 'Maia'; // Want this to be passed to child component
 }
 
 // Child component
-@Component({ selector: 'app-child'})
+@Component({selector: 'app-child'})
 export class ChildComponent {
-  @Input() name: string; // decorator makes this a 'prop' 
+    @Input() name: string; // decorator makes this a 'prop' 
 }
 ```
 
-In the `parent` component, where `nameFromParent` is available, the `name` field can be bound to `nameFromParent`:
+In the `parent` component, where `nameFromParent` is available, the `name` field
+can be bound to `nameFromParent`:
+
 ```angular2html
+
 <app-child [name]="nameFromParent"></app-child>
 ```
 
-Then,  in the `child` component `name` will have the value of `nameFromParent`:
+Then, in the `child` component `name` will have the value of `nameFromParent`:
 
 ```angular2html
+
 <div>{{ name }}</div>
 ```
 
-- **Assigning an alias** for the bound property is also possible, by passing an arg to `@Input()`:
+- **Assigning an alias** for the bound property is also possible, by passing an
+  arg to `@Input()`:
 
-```angular2
+```typescript
 // Child component
-@Component({ selector: 'app-child'})
+@Component({selector: 'app-child'})
 export class ChildComponent {
-  @Input('childName') name: string; // now need to bind to childName in template 
+    // now need to bind to childName in template  
+    @Input('childName') name: string;
 }
 ```
 
 `parent.component.html` binds to the aliases property:
+
 ```angular2html
+
 <app-child [childName]="nameFromParent"></app-child>
 ```
 
-`child.component.html` still uses the local property name:
+Note that `child.component.html` still uses the local property name:
 
 ```angular2html
+
 <div>{{ name }}</div>
 ```
 
@@ -195,22 +330,26 @@ export class ChildComponent {
 - `Output('aliasName)` will assign an alias to the property
 
 `child.component.ts`:
-```angular2
-@Component({ selector: 'app-child'})
+
+```typescript
+@Component({selector: 'app-child'})
 export class ChildComponent {
-  message: string;
-  @Output() speak = new EventEmitter<string>();
-  onSpeak() {
-    this.speak.emit(this.message);
-  }
+    message: string;
+    @Output() speak = new EventEmitter<string>();
+
+    onSpeak() {
+        this.speak.emit(this.message);
+    }
 }
 ```
 
 `child.component.html`:
+
 ```angular2html
+
 <div>
-  <input type="text" [(ngModel)]="message">
-  <button (click)="onSpeak()">Speak!</button>
+    <input type="text" [(ngModel)]="message">
+    <button (click)="onSpeak()">Speak!</button>
 </div>
 ```
 
@@ -218,31 +357,41 @@ export class ChildComponent {
 
 ## View Encapsulation
 
-- CSS styles defined in the scope of a component are applied only to that component
-- Angular ensures this by adding the same attribute to all elements in a component and applying styles to that attribute
+- CSS styles defined in the scope of a component are applied only to that
+  component
+- Angular ensures this by adding the same attribute to all elements in a
+  component and applying styles to that attribute
 
 Eg:
 
 `some.component.css`
+
 ```css
-p { color: red; }
+p {
+    color: red;
+}
 ```
 
 `some.component.html`
+
 ```angular2html
 <p>Style me!</p>
 ```
 
-The source will look like: 
+The source will look like:
+
 ```html
 <p _ngcontent-abc-123></p>
 ```
 
 ```css
-p[_ngcontent-abc-123] { color: red; }
+p[_ngcontent-abc-123] {
+    color: red;
+}
 ```
 
-- [View encapsulation](https://angular.io/api/core/ViewEncapsulation) can be turned of at the component level, in the `@Component` decorator:
+- [View encapsulation](https://angular.io/api/core/ViewEncapsulation) can be
+  turned of at the component level, in the `@Component` decorator:
 
 ```angular2
 import { ViewEncapsulation } from '@angular/core'
@@ -258,8 +407,8 @@ import { ViewEncapsulation } from '@angular/core'
 - Alternative to to two-way binding
 - Can be used on _any_ HTML element
 - Syntax is `#arbitrayName`
-- Creates a reference to the complete HTML element, not just its value
-- The scope of this var is ONLY in the template, not in typsecript code
+- Creates a reference to the _complete HTML element_, not just its value
+- The scope of this var is ONLY in the template, not in TS code
 - Useful when the value just needs to be passed in from template, eg an input
 
 ```angular2html
@@ -267,14 +416,21 @@ import { ViewEncapsulation } from '@angular/core'
 <button (click)="onClick(fooBar)">go</button>
 ```
 
-```angular2
-onClick(input: HTMLInputElement) {
+```typescript
+onClick(input
+:
+HTMLInputElement
+)
+{
     console.log(input.value)
 }
 ```
 
-- [`@VueChild()`](https://angular.io/api/core/ViewChild) decorator provides another way to access properties in the template
-- It takes an argument which is the selector 
+## Accessing the Template and DOM with @ViewChild
+
+- [`@VueChild()`](https://angular.io/api/core/ViewChild) decorator provides
+  another way to access properties in the template
+- It takes an argument which is the selector
 - Creates an `ElementRef` type
 - Both `ViewChild` and `ElementRef` must be imported from `@angular/core`
 
@@ -283,11 +439,13 @@ onClick(input: HTMLInputElement) {
 <button (click)="onClick()">go</button>
 ```
 
-```angular2
-import { ViewChild, ElementRef } from '@angular/core'
+```typescript
+import {ViewChild, ElementRef} from '@angular/core'
+
 // ... //
-class Foo{
-    @ViewChild('fooBar') fooBar: ElementRef;
+class Foo {
+    @ViewChild('fooBar', {static: true}) fooBar: ElementRef;
+
     onClick() {
         console.log(this.fooBar)
         console.log(this.fooBar.nativeElement.value)
@@ -301,44 +459,212 @@ class Foo{
 
 ## Projecting Content into Components with `ng-content`
 
-- `ng-content` is a directive (a hook) used to pass more complex HTML into a child component
-- By default, anything added between opening and closing tags of an own component is ignored
-- If `<ng-content></ng-content>` (nothing between) is located in a component template, the content between the opening 
-and closing tags of that component, will be rendered.
+- `ng-content` is a directive (a hook) used to pass more complex HTML into a
+  child component
+- By default, anything added between opening and closing tags of a custom
+  component is ignored
+- If `<ng-content></ng-content>` (nothing between) is located in a component
+  template, the html between the opening and closing tags where that component
+  is used, will be rendered.
 
 `some.component.html`
+
 ```angular2html
+
 <app-foo>
-  <p>Hello!</p>
+    <p>Hello!</p>
 </app-foo>
 ``` 
 
 `foo.component.html`
+
 ```angular2html
-<p>The content between <app-foo></app-foo> will appear below:</p>
+
+<p>The content between
+    <app-foo></app-foo>
+    will appear below:
+</p>
 <ng-content></ng-content>
+```
+
+---
+
+## Accessing `ng-content` with @ContentChild
+
+- Provides a way to access local template references in the _parent_ component
+
+For example:
+
+```angular2html
+<p>This is app-parent</p>
+<app-child>
+    <p>
+        This content will appear in app-child at the position of ng-content
+    </p>
+    <p #aParagraph>
+        This paragraph is referenced by a local template var: aParagraph. To
+        access
+        this in app-child we could use @ViewChild. BUT, to access this paragraph
+        in app-parent we can use @ContentChild.
+    </p>
+</app-child>
+```
+
+```angular2html
+<p>This is app-child</p>
+<ng-content></ng-content>
+```
+
+```typescript
+class ParentComponent {
+    // This provides access to a local reference that appears in the template 
+    // between the opening and closing tags of a component.
+    // Note that this is not available until after ngOnInit().
+    @ContentChild('aParagraph') aParagraph: ElementRef;
+
+    ngOnInit(): void {
+        console.log(this.aParagraph.nativeElement.textContent) // -> empty 
+    }
+
+    ngAfterInit(): void {
+        console.log(this.aParagraph.nativeElement.textContent) // -> OK
+    }
+}
 ```
 
 ---
 
 ## [Component Lifecycle Hooks](https://angular.io/guide/lifecycle-hooks)
 
-Note that some of these hooks can be triggered frequently so can affect performance. 
+Note that some of these hooks can be triggered frequently so can affect
+performance.
 
-- `ngOnChanges()` - called on startup, and whenever a _bound_ property changes, properties with `@Input`
-- `ngOnIt()` -  called once component is initialised, runs after constructor
-- `ngDoCheck()` - called whenever change detection is run, which is on anything significant where a change is possible 
-- `ngAfterContentInit()` - called after content (`ng-content`) has been projected into view
-- `ngAfterContentChecked()` - called every time _projected_ content has been checked
-- `ngAfterViewInit()` - called after the component's own view, and child views, have been initialised
-- `ngAfterViewChecked()` - called when the component's own view, and child views, have been checked
+- `ngOnChanges()` - called on startup, and whenever a _bound_ property changes,
+  properties with `@Input`
+- `ngOnIt()` - called once component is initialised, runs after constructor
+- `ngDoCheck()` - called whenever change detection is run, which is on anything
+  significant where a change is possible
+- `ngAfterContentInit()` - called after content (`ng-content`) has been
+  projected into view
+- `ngAfterContentChecked()` - called every time _projected_ content has been
+  checked
+- `ngAfterViewInit()` - called after the component's own view, and child views,
+  have been initialised
+- `ngAfterViewChecked()` - called when the component's own view, and child
+  views, have been checked
 - `ngOnDestroy()` - Called when component is about to be destroyed
 
+## Services and Dependency Injection
 
+- Classes used to centralise functionality and communicate between components
+- Can generate with cli: `ng generate service foo` or `ng g s foo`  
+- For example, a simple logging service `logging.service.ts`:
 
+```typescript
+export class LoggingService {
+    logStatusChange(status: string) {
+        console.log("Status changed to " + status)
+    }
+}
+```
 
- 
+- Dependency injection is used to access services from a component
+- Objects of the required service classes will be automatically _injected_ into
+  the components constructor as determined by the argument types
+- For example, to access the `LoggingService` from a component:
+    - Add `providers` to `Component` decorator arg
+    - Add service param to the component constructor
+
+```typescript
+import {Component} from '@angular/core'
+import {LoggingService} from 'logging.service'
+
+@Component({
+    // ... //
+    providers: [LoggingService]
+})
+export class FooComponent {
+
+    // Service param added here...
+    constructor(logger: LoggingService) {
+    }
+
+    // service object available as a property
+    someFunc() {
+        this.logger.logStatusChange('bla bla')
+    }
+}
+```
+
+### Hierarchical Injection
+
+- The same instance of a service object is available from the point of injection
+  and at every point below, in the component hierarchy:
+  
+| Injection Site  | Availability                                         |
+|-----------------|------------------------------------------------------|
+| `AppModule`     | **application-wide** , ie all components and services|
+|`AppComponent`   | **all components**, but nout other services          |
+| other component | Same component and all child components              |
+
+- Important to note that instantiating a service object will override any 
+  instances that were created at a higher level.
+- The `providers` array in the `@Component` decorator specifies which service 
+objects will be _instantiated_. 
+- Hence, if a service object already exists, and the same object is required, 
+  that service should be _omitted_ from the `providers` array, but maintained 
+  as an argument to the component constructor:
   
 
+```typescript
+// In this component we need to access Service1 and Service2
+// Service1 was instantiated somewhere above this point in the hierarchy
+@Component({
+    providers: [Service2] // Note: Service1 omitted
+})
+export class FooComponent {
+    // Both services added to constructor, Service2 will be instantiated here
+    constructor(private srvc1: Service1, private srvc2: Service2) {
+    }
+}
+```
 
+### Injecting services into services
 
+- If a service is added to the `providers` array in `AppModule` it is available
+  _application-wide_
+- The `@Injectible()` decorator must then be added to any service that is to 
+  _receive_ the instance of this top-level service.
+- Note that even though the `Injectible()` decorator is only required on 
+  service _receiving_ another service, it is now recommended practice to 
+  add the `@Injectible()` decorator to service that are _being_ injected.
+  
+```typescript
+@NgModule({
+  //...//
+  providers: [Service1], // now available everywhere
+  bootstrap: [AppComponent]
+})
+export class AppModule { }
+```
+
+```typescript
+@Injectible() // can now have other services injected
+export class Service2 {
+    constructor(srvc1: Service1) {}
+}
+```
+
+- From Angular 6 onwards there is another way to achieve the same as above.
+- Provide an arg to `@Injectible()` and the service does not have to be added 
+  to `providers` in `AppModule`:
+
+```typescript
+@Injectible({providedIn: 'root'}) 
+export class Service2 {
+    constructor(srvc1: Service1) {}
+}
+```
+
+- This allows Angular to _lazy load_ code and may result in better performance 
+  for larger apps. 
