@@ -4,6 +4,7 @@ Refs:
 
 - [ProGit](https://git-scm.com/book/en/v2)
 - [Git Tutorial](https://git-scm.com/docs/gittutorial)
+- [Git Cheat Sheet](https://training.github.com/downloads/github-git-cheat-sheet.pdf)
 
 
 ## Diffing files
@@ -147,7 +148,7 @@ Resolves: #123
 See also: #456, #789
 ```
 
-## Commands
+## File management
 
 ### `git commit -a`
 
@@ -172,6 +173,69 @@ See also: #456, #789
 ### `git add -p [file]`
 
 - Shows changes before staging
+
+### `git mv [file] [newname]`
+
+- Rename a tracked file
+- NB: using standard shell `mv` will delete / add the file
+
+### `git rm [file]`
+
+- Remove files, stops file being tracked and removes from git repo
+
+## Branching
+
+- A branch is a pointer to a particular commit
+
+### `git branch`
+
+- List current branches
+
+### `git branch [newbranch]`
+
+- Create a new branch
+
+### `git checkout newbranch`
+
+- Switch to new branch
+
+### `git checkout [newbranch]`
+
+- Create and checkout new branch in one step
+
+### `git branch -d [newbranch]`
+
+- Delete branch, warns if uncommitted changes
+
+### `git branch -D [newbranch]`
+
+- Delete branch, ignoring uncommitted changes
+
+## Merging branches
+
+- Combines branch data and history
+- Both branches will point to the same commit 
+- Uses two different algorithms to perform a merge:
+   - **Fast Forward** 
+      - when no commits have occurred in the receiving branch
+      - no actual _merging_ takes place, just point branches to same commit 
+   - **Three-Way Merge** or `'recursive' strategy`
+      - when commit(s) have occurred in divergent branches
+      - attempts to _merge_ changes
+      - may result in merge conflicts
+
+### `git merge [somebranch]`
+
+- Merges `somebranch` into current branch
+
+### `git merge --abort`
+
+- Abandon the current merge attempt
+
+### `git log --graph --oneline`
+
+- Shows nice log format to see merges
+
 
 ## Mike's `.gitconfig` set up
 

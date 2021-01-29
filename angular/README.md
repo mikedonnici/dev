@@ -8,6 +8,27 @@
 - New release every 6 months, now at Angular10
 - Mostly backwards compatible
 
+
+- [CLI fundamentals](#cli-fundamentals)
+- [Loading and start up](#loading-and-start-up)
+- [AppModule and component declarations](#appmodule-and-component-declarations)
+- [Components](#components)
+- [Data binding](#data-binding)
+- [Directives](#directives)
+   - [Built-in directives](#built-in-directives) 
+   - [Custom directives](#custom-directives)
+- [Debugging with developer console](#debugging-with-developer-console)
+- [Binding to custom properties](#binding-to-custom-properties)
+- [Binding to custom events](#binding-to-custom-events)
+- [View encapsulation](#view-encapsulation)
+- [Local references in templates](#local-references-in-templates)
+- [Accessing the template and DOM with @ViewChild](#accessing-the-template-and-DOM-with-@viewchild)
+- [Projecting content into components with `ng-content`](#projecting-content-into-components-with-ng-content)
+- [Accessing `ng-content` with @ContentChild](#accessing-ng-content-with-@contentchild)
+- [Component lifecycle hooks](#component-lifecycle-hooks)
+- [Services and dependency injection](#services-and-dependency-injection)
+   - [Hierarchical injection](#hierarchical-injection)
+   - [Injecting services into services](#injecting-services-into-services)
 ---
 
 ## CLI fundamentals
@@ -42,7 +63,7 @@ $ ng serve
 
 ---
 
-## AppModule and Component Declarations
+## AppModule and component declarations
 
 - Most projects generally have just the one main module - `app.module.ts`
 - New components must be _registered_ in the `@NgModule`
@@ -136,7 +157,7 @@ and
 <p [ngClass]="{className: boolExpression}"></p>
 ```
 
-### Custom Directives
+### Custom directives
 
 - Typically create a folder and file for a custom directive, eg:
   `src/green-text/green-text.directive.ts`
@@ -244,7 +265,7 @@ export class GreenTextDirective {
 
 ---
 
-## Debugging with Developer Console
+## Debugging with developer console
 
 - In developer tools, under **sources** tab
 - When running in developer mode source mapping is used to link bundled code to
@@ -257,7 +278,7 @@ export class GreenTextDirective {
 
 ---
 
-## Binding to Custom Properties
+## Binding to custom properties
 
 - Allows data to be passed _into_ a component
 - `@Input()` decorator is used to expose a class field such that it can be bound
@@ -323,7 +344,7 @@ Note that `child.component.html` still uses the local property name:
 
 ---
 
-## Binding to Custom Events
+## Binding to custom eventss
 
 - Allows data to be passed _out of_ (emitted from) a component
 - `Output()` decorator marks a class field as an output property
@@ -355,7 +376,7 @@ export class ChildComponent {
 
 ---
 
-## View Encapsulation
+## View encapsulation
 
 - CSS styles defined in the scope of a component are applied only to that
   component
@@ -402,7 +423,7 @@ import { ViewEncapsulation } from '@angular/core'
 
 ---
 
-## Local References in Templates
+## Local references in templates
 
 - Alternative to to two-way binding
 - Can be used on _any_ HTML element
@@ -426,7 +447,7 @@ HTMLInputElement
 }
 ```
 
-## Accessing the Template and DOM with @ViewChild
+## Accessing the template and DOM with @ViewChild
 
 - [`@VueChild()`](https://angular.io/api/core/ViewChild) decorator provides
   another way to access properties in the template
@@ -457,7 +478,7 @@ class Foo {
 
 ---
 
-## Projecting Content into Components with `ng-content`
+## Projecting content into components with `ng-content`
 
 - `ng-content` is a directive (a hook) used to pass more complex HTML into a
   child component
@@ -534,7 +555,7 @@ class ParentComponent {
 
 ---
 
-## [Component Lifecycle Hooks](https://angular.io/guide/lifecycle-hooks)
+## [Component lifecycle hooks](https://angular.io/guide/lifecycle-hooks)
 
 Note that some of these hooks can be triggered frequently so can affect
 performance.
@@ -554,7 +575,7 @@ performance.
   views, have been checked
 - `ngOnDestroy()` - Called when component is about to be destroyed
 
-## Services and Dependency Injection
+## Services and dependency injection
 
 - Classes used to centralise functionality and communicate between components
 - Can generate with cli: `ng generate service foo` or `ng g s foo`  
@@ -596,7 +617,7 @@ export class FooComponent {
 }
 ```
 
-### Hierarchical Injection
+### Hierarchical injection
 
 - The same instance of a service object is available from the point of injection
   and at every point below, in the component hierarchy:
