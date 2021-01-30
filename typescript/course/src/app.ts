@@ -1,18 +1,12 @@
-function a(_: Function) {
-    console.log("A")
+function dec(superConstructor: Function) {
+  console.log("dec() called...");
+  return class {
+    super();
+  };
 }
 
-function b(_: Function) {
-    console.log("B")
+class Foo {
+  constructor() {
+    console.log("Foo constructor");
+  }
 }
-
-@a
-@b
-class F {
-    constructor() {
-        console.log("Class F")
-    }
-}
-// B
-// A
-
