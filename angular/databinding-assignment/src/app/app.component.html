@@ -1,0 +1,21 @@
+<div class="container">
+  <h3>Game Control</h3>
+  <app-game-control (counter)="onCounterUpdate($event)"></app-game-control>
+</div>
+
+<hr>
+
+<div class="container">
+  <div class="row">
+    <div class="col-1"><h3>ODD</h3></div>
+    <div class="col-1"><h3>EVEN</h3></div>
+  </div>
+  <div class="row">
+    <div class="col-1">
+      <app-odd *ngFor="let n of oddNumbers" [display]="n"></app-odd>
+    </div>
+    <div class="col-1">
+      <app-even *ngFor="let n of evenNumbers" [display]="n"></app-even>
+    </div>
+  </div>
+</div>

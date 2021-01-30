@@ -1,8 +1,66 @@
 # Git
 
+Refs:
+
+- [ProGit](https://git-scm.com/book/en/v2)
+- [Git Tutorial](https://git-scm.com/docs/gittutorial)
+- [Git Cheat Sheet](https://training.github.com/downloads/github-git-cheat-sheet.pdf)
+
+
+## Diffing files
+
+- Using `diff`
+
+```shell
+$ diff file1.py file2.py 
+2c2,3 <-- indicates line format and change (c)
+<     return n * n
+---
+>     """A comment"""
+>     return (n+2) * n
+```
+
+- Using `diff -u` (unified format)
+
+```shell
+ $ diff -u file1.py file2.py 
+--- file1.py    2021-01-26 12:29:54.881984323 +1100
++++ file2.py    2021-01-26 12:34:41.767966975 +1100
+@@ -1,2 +1,4 @@
+ def foo(n):
+-    return n * n
++    return (n+2) * n
++
++print("Add a new line")
+```
+
+- Other diff tools include `kdiff3`, `meld`, `vimdiff`, `wdiff`
+- Create a diff file:
+
+```shell
+$ diff -u file1.py file2.py > changes.diff
+```
+
+- Apply a diff file using `patch`
+
+```shell
+$ patch file1.py < changes.diff 
+patching file file1.py
+```
+
+Version Control Systems (VCS) use this approach under the hood.
+
+
+
+
 ## Config
 
-.gitconfig
+```shell
+$ git config --global user.email "michael@mesa.net.au"
+$ git config --global user.name "Mike Donnici"
+```
+
+`.gitconfig`
 
 ```
 [user]
@@ -18,6 +76,26 @@
 
 ---
 
+## Structure and Basic Workflow
+
+- `.git` directory contains configuration and the complete change history of 
+  all _tracked_ files
+- The **working tree** contains the _current_ state of the project
+- The **staging area** contains changes marked for the next _commit_   
+- _Tracked_ files can be in 3 states:
+   - **Modified** - the file has been changed
+   - **Staged** - the change will be added to next commit 
+   - **Committed** - a snapshot of the _staged_ changes has been recorded
+- Basic workflow:
+
+```shell
+$ git init
+$ git config -l # check identity for commits
+$ git status
+$ git add 
+$ git commit
+```
+
 ## Commit message
 
 Refs:
@@ -27,11 +105,11 @@ Refs:
 
 ### Guidelines
 
-1. Separate subject from body with a blank line
 1. Limit the subject line to 50 characters
 1. Capitalize the subject line
 1. Do not end the subject line with a period
 1. Use the imperative mood in the subject line
+1. Separate subject from body with a blank line   
 1. Wrap the body at 72 characters
 1. Use the body to explain what and why vs. how
 
@@ -69,3 +147,115 @@ like this:
 Resolves: #123
 See also: #456, #789
 ```
+
+## File management
+
+### `git commit -a`
+
+- Stage and commit tracked files in one step
+- Does not `add` files
+
+### `git log -p`
+
+- _patch_ flag with similar output to `diff -u`
+
+### `git show [commit id]`
+
+- Shows the diff for the specified commit
+- `git show --stat [commit id]` shows some stats
+
+### `git diff [file]`
+
+- Show all changes, or specific file
+- Default shows only _unstaged_ changes
+- `git diff --staged` shows only _staged_ changes 
+
+### `git add -p [file]`
+
+- Shows changes before staging
+
+### `git mv [file] [newname]`
+
+- Rename a tracked file
+- NB: using standard shell `mv` will delete / add the file
+
+### `git rm [file]`
+
+- Remove files, stops file being tracked and removes from git repo
+
+## Branching
+
+- A branch is a pointer to a particular commit
+
+### `git branch`
+
+- List current branches
+
+### `git branch [newbranch]`
+
+- Create a new branch
+
+### `git checkout newbranch`
+
+- Switch to new branch
+
+### `git checkout [newbranch]`
+
+- Create and checkout new branch in one step
+
+### `git branch -d [newbranch]`
+
+- Delete branch, warns if uncommitted changes
+
+### `git branch -D [newbranch]`
+
+- Delete branch, ignoring uncommitted changes
+
+## Merging branches
+
+- Combines branch data and history
+- Both branches will point to the same commit 
+- Uses two different algorithms to perform a merge:
+   - **Fast Forward** 
+      - when no commits have occurred in the receiving branch
+      - no actual _merging_ takes place, just point branches to same commit 
+   - **Three-Way Merge** or `'recursive' strategy`
+      - when commit(s) have occurred in divergent branches
+      - attempts to _merge_ changes
+      - may result in merge conflicts
+
+### `git merge [somebranch]`
+
+- Merges `somebranch` into current branch
+
+### `git merge --abort`
+
+- Abandon the current merge attempt
+
+### `git log --graph --oneline`
+
+- Shows nice log format to see merges
+
+
+## Mike's `.gitconfig` set up
+
+```
+[user]
+  email = michael@mesa.net.au
+  name = Mike Donnici
+[core]
+  editor = vim
+[alias]
+  last = log -1 HEAD
+  ll = log --abbrev-commit --oneline --decorate --graph --all
+  unstage = reset HEAD --
+```
+
+
+
+
+
+
+
+
+

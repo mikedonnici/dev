@@ -25,8 +25,13 @@ Docker required root access so will require `sudo` to run things. This is painfu
 so to run docker as non-root user need to add user account to 'docker' group, eg:
 
 ```bash
-$ sudo usermod -aG docker mike
+$ sudo usermod -aG docker $USER
+# Reload groups and verify
+$ newgrp docker
+$ docker run hello-world
 ```
+
+
 
 *This won't work on Red Hat flavours of Linux.*
 

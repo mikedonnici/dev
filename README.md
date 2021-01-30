@@ -1,5 +1,6 @@
 # Mike's Dev Notes
 
+- [Angular](./angular/)
 - [AWS](./aws/)
 - [Docker](./docker/)
 - [Git](./git/)
