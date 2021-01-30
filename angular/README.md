@@ -29,6 +29,8 @@
 - [Services and dependency injection](#services-and-dependency-injection)
    - [Hierarchical injection](#hierarchical-injection)
    - [Injecting services into services](#injecting-services-into-services)
+- [Routing](#routing)  
+   - [Navigating programmatically](#navigating-programmatically)
 ---
 
 ## CLI fundamentals
@@ -689,3 +691,140 @@ export class Service2 {
 
 - This allows Angular to _lazy load_ code and may result in better performance 
   for larger apps. 
+
+
+## Routing
+
+- Routes are set up and registered in `app.module.ts`
+- `RouterModule.forRoot()` registers the routes for the main application
+
+```typescript
+// Set up routes
+import {RouterModule, Routes} from '@angular/router';
+const appRoutes: Routes = [
+  { path: '', component: HomeComponent},
+  { path: 'dog', component: DogComponent},
+  { path: 'cat', component: CatComponent},
+];
+
+// register routes
+@NgModule({
+  // ... //
+  imports: [
+    RouterModule.forRoot(appRoutes),
+  ]
+})
+```
+
+
+- The location for the output for the currently selected route is specified
+  with the `router-outlet` directive:
+
+```angular2html
+<router-outlet></router-outlet>
+```
+
+- Linking to routes with normal `href` creates a new request which reloads the
+  page and loses state.
+- Use `routerLink` to specify path or bind to `[routerLink]` to create more
+  complex paths (`["a", "b", "c"]` = `/a/b/c`):
+
+```angular2html
+<a routerLink="/">Home</a>
+<a routerLink="/parent">Parent</a>
+<a [routerLink]="['/parent', 'child']">Child</a>
+```
+
+- Note that route paths without a leading `/` will be relative to _current path_
+- Can also use dir path notation, eg `./same-level`, `../up-one`
+
+- `routerLinkActive` can be used to assign a css class to the currently active 
+  route:
+  
+```angular2html
+<li routerLinkActive="some-class"><a routerLink="/">Home</a></li>
+<li routerLinkActive="some-class"><a routerLink="/foo">Foo</a></li>
+```
+
+- However, `routerLinkActive` matches the path from left to right, so in the 
+  example above `/` would match both home and foo.
+- To alleviate this the `routerLinkActiveOptions` is used.
+- This will mark the route as active based on the _entire_ path, as opposed to
+  the first match from the left
+
+```angular2html
+<li routerLinkActive="some-class" [routerLinkActiveOptions]="{exact: true}">
+  <a routerLink="/">Home</a>
+</li>
+```
+
+### Navigating programmatically
+
+- Inject the router into a component constructor:
+
+```typescript
+import { Router } from "@angular/core"
+export class SomeComponent {
+    
+    constructor(private router: Router) {        
+    }
+    
+    onSomething() {
+        this.router.navigate(["/to", "this", "path"])
+    }
+}
+```
+
+- for relative paths need access to the current route, via `ActivatedRoute`, 
+  and pass a second arg to `.navigate()`:
+
+```typescript
+import { Router, ActivatedRoute } from "@angular/core"
+export class SomeComponent {
+    
+    constructor(private router: Router, private route: ActivatedRoute) {        
+    }
+    
+    onSomething() {
+        this.router.navigate(["child"], {relativeTo: this.route} )
+    }
+}
+```
+
+
+
+
+
+
+
+
+## Observables
+
+- A pattern used to handle asynchronous tasks
+- The **Observable** represents a source of data such as events, http requests
+- The **Observer** subscribes to the _Observable_ and executes code that:
+  - Handles data
+  - Handles errors
+  - Handles completion (where applicable)
+- An alternative approach to promises
+
+
+
+
+
+
+
+
+```
+
+- Navigating to routes should be done with the `routerlink` directive, rather 
+than `href`, as the latter will reload the page and lose state.
+- Each of the following will work:   
+  
+```angular2html
+
+```
+
+
+
+
