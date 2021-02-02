@@ -1,0 +1,4 @@
+# Geospatial Notes
+
+## Terminology
+

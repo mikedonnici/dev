@@ -15,8 +15,8 @@
 - [Components](#components)
 - [Data binding](#data-binding)
 - [Directives](#directives)
-   - [Built-in directives](#built-in-directives) 
-   - [Custom directives](#custom-directives)
+    - [Built-in directives](#built-in-directives)
+    - [Custom directives](#custom-directives)
 - [Debugging with developer console](#debugging-with-developer-console)
 - [Binding to custom properties](#binding-to-custom-properties)
 - [Binding to custom events](#binding-to-custom-events)
@@ -27,10 +27,13 @@
 - [Accessing `ng-content` with @ContentChild](#accessing-ng-content-with-@contentchild)
 - [Component lifecycle hooks](#component-lifecycle-hooks)
 - [Services and dependency injection](#services-and-dependency-injection)
-   - [Hierarchical injection](#hierarchical-injection)
-   - [Injecting services into services](#injecting-services-into-services)
-- [Routing](#routing)  
-   - [Navigating programmatically](#navigating-programmatically)
+    - [Hierarchical injection](#hierarchical-injection)
+    - [Injecting services into services](#injecting-services-into-services)
+- [Routing](#routing)
+    - [Navigating programmatically](#navigating-programmatically)
+    - [Route parameters](#passing-route-parameters)
+    - [Query Parameters](#query-parameters)
+
 ---
 
 ## CLI fundamentals
@@ -580,7 +583,7 @@ performance.
 ## Services and dependency injection
 
 - Classes used to centralise functionality and communicate between components
-- Can generate with cli: `ng generate service foo` or `ng g s foo`  
+- Can generate with cli: `ng generate service foo` or `ng g s foo`
 - For example, a simple logging service `logging.service.ts`:
 
 ```typescript
@@ -623,21 +626,20 @@ export class FooComponent {
 
 - The same instance of a service object is available from the point of injection
   and at every point below, in the component hierarchy:
-  
+
 | Injection Site  | Availability                                         |
 |-----------------|------------------------------------------------------|
 | `AppModule`     | **application-wide** , ie all components and services|
 |`AppComponent`   | **all components**, but nout other services          |
 | other component | Same component and all child components              |
 
-- Important to note that instantiating a service object will override any 
+- Important to note that instantiating a service object will override any
   instances that were created at a higher level.
-- The `providers` array in the `@Component` decorator specifies which service 
-objects will be _instantiated_. 
-- Hence, if a service object already exists, and the same object is required, 
-  that service should be _omitted_ from the `providers` array, but maintained 
-  as an argument to the component constructor:
-  
+- The `providers` array in the `@Component` decorator specifies which service
+  objects will be _instantiated_.
+- Hence, if a service object already exists, and the same object is required,
+  that service should be _omitted_ from the `providers` array, but maintained as
+  an argument to the component constructor:
 
 ```typescript
 // In this component we need to access Service1 and Service2
@@ -656,42 +658,44 @@ export class FooComponent {
 
 - If a service is added to the `providers` array in `AppModule` it is available
   _application-wide_
-- The `@Injectible()` decorator must then be added to any service that is to 
+- The `@Injectible()` decorator must then be added to any service that is to
   _receive_ the instance of this top-level service.
-- Note that even though the `Injectible()` decorator is only required on 
-  service _receiving_ another service, it is now recommended practice to 
-  add the `@Injectible()` decorator to service that are _being_ injected.
-  
+- Note that even though the `Injectible()` decorator is only required on
+  service _receiving_ another service, it is now recommended practice to add
+  the `@Injectible()` decorator to service that are _being_ injected.
+
 ```typescript
 @NgModule({
-  //...//
-  providers: [Service1], // now available everywhere
-  bootstrap: [AppComponent]
+    //...//
+    providers: [Service1], // now available everywhere
+    bootstrap: [AppComponent]
 })
-export class AppModule { }
+export class AppModule {
+}
 ```
 
 ```typescript
 @Injectible() // can now have other services injected
 export class Service2 {
-    constructor(srvc1: Service1) {}
+    constructor(srvc1: Service1) {
+    }
 }
 ```
 
 - From Angular 6 onwards there is another way to achieve the same as above.
-- Provide an arg to `@Injectible()` and the service does not have to be added 
+- Provide an arg to `@Injectible()` and the service does not have to be added
   to `providers` in `AppModule`:
 
 ```typescript
-@Injectible({providedIn: 'root'}) 
+@Injectible({providedIn: 'root'})
 export class Service2 {
-    constructor(srvc1: Service1) {}
+    constructor(srvc1: Service1) {
+    }
 }
 ```
 
-- This allows Angular to _lazy load_ code and may result in better performance 
-  for larger apps. 
-
+- This allows Angular to _lazy load_ code and may result in better performance
+  for larger apps.
 
 ## Routing
 
@@ -701,26 +705,27 @@ export class Service2 {
 ```typescript
 // Set up routes
 import {RouterModule, Routes} from '@angular/router';
+
 const appRoutes: Routes = [
-  { path: '', component: HomeComponent},
-  { path: 'dog', component: DogComponent},
-  { path: 'cat', component: CatComponent},
+    {path: '', component: HomeComponent},
+    {path: 'dog', component: DogComponent},
+    {path: 'cat', component: CatComponent},
 ];
 
 // register routes
 @NgModule({
-  // ... //
-  imports: [
-    RouterModule.forRoot(appRoutes),
-  ]
+    // ... //
+    imports: [
+        RouterModule.forRoot(appRoutes),
+    ]
 })
 ```
 
-
-- The location for the output for the currently selected route is specified
-  with the `router-outlet` directive:
+- The location for the output for the currently selected route is specified with
+  the `router-outlet` directive:
 
 ```angular2html
+
 <router-outlet></router-outlet>
 ```
 
@@ -738,23 +743,25 @@ const appRoutes: Routes = [
 - Note that route paths without a leading `/` will be relative to _current path_
 - Can also use dir path notation, eg `./same-level`, `../up-one`
 
-- `routerLinkActive` can be used to assign a css class to the currently active 
+- `routerLinkActive` can be used to assign a css class to the currently active
   route:
-  
+
 ```angular2html
+
 <li routerLinkActive="some-class"><a routerLink="/">Home</a></li>
 <li routerLinkActive="some-class"><a routerLink="/foo">Foo</a></li>
 ```
 
-- However, `routerLinkActive` matches the path from left to right, so in the 
+- However, `routerLinkActive` matches the path from left to right, so in the
   example above `/` would match both home and foo.
 - To alleviate this the `routerLinkActiveOptions` is used.
 - This will mark the route as active based on the _entire_ path, as opposed to
   the first match from the left
 
 ```angular2html
+
 <li routerLinkActive="some-class" [routerLinkActiveOptions]="{exact: true}">
-  <a routerLink="/">Home</a>
+    <a routerLink="/">Home</a>
 </li>
 ```
 
@@ -763,39 +770,136 @@ const appRoutes: Routes = [
 - Inject the router into a component constructor:
 
 ```typescript
-import { Router } from "@angular/core"
+import {Router} from "@angular/core"
+
 export class SomeComponent {
-    
-    constructor(private router: Router) {        
+
+    constructor(private router: Router) {
     }
-    
+
     onSomething() {
         this.router.navigate(["/to", "this", "path"])
     }
 }
 ```
 
-- for relative paths need access to the current route, via `ActivatedRoute`, 
-  and pass a second arg to `.navigate()`:
+- for relative paths need access to the current route, via `ActivatedRoute`, and
+  pass a second arg to `.navigate()`:
 
 ```typescript
-import { Router, ActivatedRoute } from "@angular/core"
+import {Router, ActivatedRoute} from "@angular/core"
+
 export class SomeComponent {
-    
-    constructor(private router: Router, private route: ActivatedRoute) {        
+
+    constructor(private router: Router, private route: ActivatedRoute) {
     }
-    
+
     onSomething() {
-        this.router.navigate(["child"], {relativeTo: this.route} )
+        this.router.navigate(["child"], {relativeTo: this.route})
     }
 }
 ```
 
+### Route parameters
 
+- Use a colon in route path to designate a path variable, eg `/users/:id`
+- To access the variable inject `ActivatedRoute` into the component constructor
+  and access via `.snapshot.params[name], eg:
 
+```typescript
+import {ActivatedRoute} from "@angular/core"
 
+export class UserComponent {
+    user: { id: number, name: string }
 
+    constructor(private route: ActivatedRoute) {
+    }
 
+    ngOnInit() {
+        this.user = {
+            id: this.route.snapshot.params['id'],
+            name: getUserName(this.route.snapshot.params['id'])
+        }
+    }
+}
+```
+
+- The approach above will only modify the `user` object when the compnent is
+  reloaded
+- If the url params are changed from within the _current_ component then a
+  different approach is required
+- To update url params _reactively_, need to subscribe to the `params`
+  observable:
+
+```typescript
+import {ActivatedRoute} from "@angular/core"
+
+export class UserComponent {
+    user: { id: number, name: string }
+
+    constructor(private route: ActivatedRoute) {
+    }
+
+    ngOnInit() {
+        this.user = {
+            id: this.route.snapshot.params['id'],
+            name: getUserName(this.route.snapshot.params['id'])
+        }
+        this.route.params.subscribe((params: Params) => {
+            this.user.id = params['id']
+            this.user.name = getUserName(params['id'])
+        })
+    }
+}
+```
+
+- In this case, Angular will take care of running`.unsubscribe()` to clean up
+  memory when a component is destroyed. In some cases, such as custom
+  observables you might need to run `.unsubscribe()` in the `onDestroy()`
+  lifecycle hook.
+
+### Query Parameters and Fragments
+
+- Query params can be added to a router link by binding to `queryParams` 
+  and passing it an object or key-value pairs.
+- A fragment is added by binding to `fragment`.
+
+```angular2html
+<a
+        [routerLink]="['/some', 'path']"
+        [queryParams]="{key1: 'value1', key2: 10}"
+        fragment="here"
+>Foo</a>
+```
+- This is: `/some/path?key1=value1&key2=10#here`
+- To do this programmatically:
+
+```typescript
+this.router.navigate(
+    ['/some', 'path'], 
+    {queryParams: {key1: 'value1', key2: 10}, fragment: "here"}
+)
+```
+
+- Query params and fragment are also available on the `ActivatedRoute` which can 
+  be injected into a module
+- Values can be retrieved in a similar way to params, ie via the snapshot 
+  or using observables:
+
+```typescript
+export class SomeComponent {
+  ngOnInit() {
+    console.log(this.route.snapshot.queryParams)
+    console.log(this.route.snapshot.fragment)
+    this.route.queryParams.subscribe()
+    this.route.fragment.subscribe()
+  }    
+}
+```
+
+```typescript
+
+```
 
 
 ## Observables
@@ -803,17 +907,10 @@ export class SomeComponent {
 - A pattern used to handle asynchronous tasks
 - The **Observable** represents a source of data such as events, http requests
 - The **Observer** subscribes to the _Observable_ and executes code that:
-  - Handles data
-  - Handles errors
-  - Handles completion (where applicable)
+    - Handles data
+    - Handles errors
+    - Handles completion (where applicable)
 - An alternative approach to promises
-
-
-
-
-
-
-
 
 ```
 

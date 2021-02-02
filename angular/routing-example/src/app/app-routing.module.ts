@@ -15,7 +15,7 @@ const routes: Routes = [
   {path: 'one/a', component: AComponent},
   {path: 'one/a/dog', component: DogComponent},
   {path: 'one/b', component: BComponent},
-  {path: 'two', component: TwoComponent},
+  {path: 'two/:foo', component: TwoComponent},
 ];
 
 @NgModule({
