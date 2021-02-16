@@ -1,0 +1,9 @@
+.active-route {
+  background-color: #606060;
+  padding: 0.2em;
+}
+
+.active-route a {
+  color: whitesmoke;
+  text-decoration: underline;
+}

@@ -35,8 +35,8 @@ $ docker run hello-world
 
 *This won't work on Red Hat flavours of Linux.*
 
-[`docker-machine`](https://docs.docker.com/machine) and [`docker-compose`](https://docs.docker.com/compose/) are not installed automatically on Linux so need to 
-install those manually. 
+[`docker-machine`](https://docs.docker.com/machine) and [`docker-compose`](https://docs.docker.com/compose/) 
+are not installed automatically on Linux so need to install those manually. 
 
 Check GitHub releases for latest version and there is a curl script to install.
 

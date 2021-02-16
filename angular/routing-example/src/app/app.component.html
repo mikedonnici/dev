@@ -1,0 +1,20 @@
+<ul>
+  <li routerLinkActive="active-route" [routerLinkActiveOptions]="{exact: true}">
+    <a routerLink="">Index</a></li>
+  <li routerLinkActive="active-route"><a routerLink="/one">One</a></li>
+  <ul>
+    <li routerLinkActive="active-route"><a routerLink="/one/a">A</a></li>
+    <ul>
+      <li routerLinkActive="active-route"><a routerLink="/one/a/dog">Dog</a>
+      </li>
+    </ul>
+    <li routerLinkActive="active-route"><a routerLink="/one/b">B</a></li>
+  </ul>
+  <li routerLinkActive="active-route"><a routerLink="/two/bar">Two/bar</a></li>
+  <li routerLinkActive="active-route"><a routerLink="/two/baz">Two/baz</a></li>
+  <li routerLinkActive="active-route"><a routerLink="/two/fizz">Two/fizz</a></li>
+  <li routerLinkActive="active-route"><a routerLink="/two/buzz">Two/buzz</a></li>
+</ul>
+
+
+<router-outlet></router-outlet>
