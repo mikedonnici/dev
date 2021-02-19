@@ -4,7 +4,7 @@
 
 ## Overview
 
-gRPC is an RPC framework that can be run in many different environments.
+gRPC is an RPC framework that can be run in many environments.
 
 It can use protocol buffers as its _Interface Definition Languages_ (IDL) as well as its
 message exchange format. It can use others (such as JSON) but protobuf is the default and most common.

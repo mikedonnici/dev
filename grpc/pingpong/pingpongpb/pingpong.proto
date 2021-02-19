@@ -1,0 +1,32 @@
+syntax = "proto3";
+
+package pingpong;
+option go_package = ".;pingpongpb";
+
+message Game {
+  int32 my_score = 1;
+  int32 opponent_score = 2;
+}
+
+message NewGameRequest {}
+
+message NewGameResponse {
+  string hello = 1;
+}
+
+message HitRequest {
+  int32 num = 1;
+}
+
+message HitResponse {
+  int32 num = 1;
+}
+
+
+
+service GameService {
+
+  rpc NewGame(NewGameRequest) returns (NewGameResponse) {};
+
+  rpc Hit(HitRequest) returns (HitResponse) {};
+}
