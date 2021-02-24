@@ -93,7 +93,7 @@ _Elastic Compute Cloud_
 - Run with root privileges
 - Is on step 3 when configuring EC2 instance:
 
-![ec2 user data](ec2_user_data.png)
+![ec2 user data](./ec2_user_data.png)
 
 Example User Data script:
 
@@ -185,15 +185,15 @@ depending on if workload resilience is required.
 - ENI can be created independently and can be attached / moved to EC2 instances
   for failover
 
-![eni](eni.png)
+![eni](./eni.png)
 
 - Access ENIs via left menu on EC2 page:
 
-![eni](eni_link1.png)
+![eni](./eni_link1.png)
 
 - Or via `eth0` link on an EC2 instance:
 
-![eni](eni_link2.png)
+![eni](./eni_link2.png)
 
 ### EC2 Pricing
 
@@ -328,7 +328,7 @@ balancers.
 Typically set up all traffic allowed to the load balancer, and traffic to EC2
 instance only from ELB:
 
-![ELB Security](elb_security_groups.png)
+![ELB Security](./elb_security_groups.png)
 
 #### Load Balancer Stickiness
 
