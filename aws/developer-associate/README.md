@@ -432,3 +432,244 @@ In summary:
   re-created - extra safety!
 - For example, an instance might be marked as unhealthy by a load balancer, the
   ASG would then terminate and replace that unhealthy instance.
+
+#### Scaling Policies
+
+- _Target Tracking Scaling_
+   - Simplest to set up
+   - Eg, set average CPU usage for an ASG
+- _Simple /Step Scaling_
+   - Triggered by a CloudWatch alarm
+   - Eg, alarm1: CPU > 70% then add 2 units, alarm2: CPU < 30% remove 1 unit
+- _Scheduled Actions_
+   - Anticipate scaling based on know usage patterns
+   - Eg, scale up at start of business 9am.
+  
+#### Scaling Cooldowns
+
+- Ensures previous scaling activity is able to complete before the next one is 
+  initiated.
+- Can set default cooldown as well as scaling-policy specific cooldowns, the 
+  latter will override default.
+  
+---
+
+## Elastic Block Storage (EBS) and Elastic File System (EFS)
+
+### EBS
+
+- EBS provides a network drive for attaching to EC2 instances
+- Generally used to ensure persistent data storage if instance is terminated
+- Scoped to a specific AZ, can be moved via a snapshot
+- Get billed for provisioned capacity regardless of what is actually used
+- Four types:
+   - **GP2** (SSD) - general purpose
+      - 1 GiB - 16 TiB
+      - Small GP2 volumes can burst IOPS to 3000
+      - Max IOPS is 16,000
+      - 3 IOPS per GB so at 5334GB will be max IOPS 
+   - **IO1** (SSD) - Highest performance for low-latency / high-throughput
+      - Good for large database workloads
+      - 4 GiB - 16 TiB
+      - PIOPS (Provisioned IOPS) min 100 - max 32,000 (64,000 for Nitro 
+        instances)
+      - Max of 50 PIOPS per GiB
+   - **ST1** (HDD) - Low cost HDD for frequently accessed high throughput
+      - Streaming workloads requiring consistent, fast throughput, eg kafka, log 
+        processing
+      - 500 GiB - 16 TiB
+      - Max throughput of 500 MB/s, can burst
+      - Get 40 MB/s of throughput per TiB volume size
+   - **SC1** (HDD) - Lowest cost HDD for lower throughput
+     - 500 GiB - 16 TiB
+     - Max throughput of 250 MB/s, can burst
+- Only GP2 and IO1 can be used as boot volumes
+ 
+#### EBS vs Instance Store
+
+- Some instances have Instance Store rather than a root EBS volume  
+- Instance Store is ephemeral storage - a physical disk attached to instance
+- No network, so faster and data survives reboot
+- Can't resize and is lost on instance stop or termination
+- Backup must be done manually as cannot snapshot like EBS volumes
+- IOPS is significantly higher than EBS
+
+### EFS
+
+- Managed Network File System (NFS) that can be mounted by multiple EC2 
+  instances across multiple availability zones
+- Highly available, scalable
+- Approx 3 x cost of GP2 volume BUT only pay for what you use so cost effective 
+  for small amount of storage
+- Uses standard protocol NFSv4.1
+- Control access to EFS using security group
+- Can encrypt at rest using KMS (Key Management System)  
+- Only works for POSIX file systems (ie Linux) that have standard file API
+- File system scales automatically, pay-per-use so no capacity planning!
+- Performance and Scale:
+   - Thousands of concurrent NFS clients
+   - 10GB+/s throughput
+   - Can grow to petabyte scale
+   - Two performance modes, set at EFS creation time:
+      - General purpose - lower latency, good for web server, CMS etc
+      - Max I/O - higher latency and throughput, highly parallel, for big data, 
+        media processing etc
+- Storage Tiers:
+   - Standard for frequently accessed files
+   - Infrequent Access (EFS-IA), lower storage fee but cost to retrieve files
+   - Lifecycle management feature - move file after N days
+
+See [Mounting EFS](https://docs.aws.amazon.com/efs/latest/ug/mounting-fs.html)   
+   
+
+---
+
+## RDS - Relational Database Service
+
+- Managed SQL databases as a service, available for:
+   - Postgres
+   - MySQL
+   - MariaDB
+   - Oracle
+   - MS SQL
+   - Aurora (proprietary, MySQL-compatible)
+- Automated provisioning and patching
+- Continuous backups and point-in-time restore
+- Monitoring dashboards
+- Multi-AZ for disaster recovery
+- Maintenance windows for upgrades
+- Vertical and horizontal scaling capacity
+- Storage backed by EBS - GP2 or IO1
+- CANNOT ssh into an RDS instance
+
+### Automated Backups
+
+- Daily full backups during maintenance window and transaction logs backed up 
+  every 5 minutes
+- This allows for a point-in-time restore to _any_ time up to five minutes ago   
+- Default is 7 day retentions but can extend to 35 days
+- Also has manual snapshots which any retention time
+
+### Read Replicas
+
+- Used for read scalability
+- Can be same AZ, cross AZ and cross region
+- Asynchronous replication so reads are eventually consistent
+- Can promote a read replica to become its own database
+- Application connection string is updated to be able to access read replicas
+- Good for reporting, analytics and similar use cases
+- There is a cost associated with data going across AZ
+- Traffic within one AZ does not incur costs
+
+### Multi-AZ for Disaster Recovery
+
+- Synchronous replication to a different AZ
+- Endpoint is a single DNS name which allows automatic failover
+- Cannot read from, or write to the standby database - it is just there for 
+  disaster recovery
+- However, Read Replicas _can_ be set up as Multi-AZ for disaster recovery.  
+
+### Security
+
+- At-rest encryption
+   - Can encrypt master and read replicas with AMS KMS - AES-246 encryption
+   - Encryption is set and launch time
+   - If master is not encrypted then read replicas cannot be encrypted
+   - Transparent Data Encryption (TDE) available for Oracle and MS SQL 
+    
+- In-flight encryption:
+   - Provide SSL options with trust certificate when connecting to the database
+   - To _enforce_ SSL:
+      -  Postgres: Parameter groups `rds.force_ssl=1` in console
+      - MySQL within DB: `GRANT USAGE ON *.* TO 'mysqluser'@'%' REQUIRE SSL`
+       
+#### RDS Encryption Operations
+
+- If RDS database is encrypted then snapshots will be encrypted, and vice-versa
+- To encrypt and unencrypted database:
+   - Create snapshot of unencrypted database 
+   - Copy the snapshot and enable encryption for the snapshot
+   - Restore the database from the encrypted snapshot
+   - Migrate applications to the new database, delete old database
+    
+#### Network and IAM 
+
+- RDS databases are usually deployed in a private subnet
+- Leverage security groups in the same was as for EC2
+- Access Management:
+   - IAM policies used to control who can _manage_ AWS RDS
+   - DB username and passwords used to login to the database, ie from an app
+   - For Postgres and MySQL can also used IAM-based authentication
+      - Requires an authentication token obtained via IAM and RDS API calls
+      - Auth token has a lifetime of 15 minutes
+      - Benefits: network io is encrypted, use IAM to manage DB users and can 
+        leverage IAM Roles and EC2 instance profiles
+
+### Aurora DB
+
+- Compatible with Postgres and MySQL
+- Cloud-optimised with significant performance improvements
+- Aurora storage will automatically grow from 10GB - 64TB
+- Can have up to 15 read replicas
+- Failover is instantaneous and it is HA by design
+- Costs about 20% more but is more efficient
+- Key features:
+   - Automatic failover
+   - Backup and recovery
+   - Industry compliance
+   - Push-button scaling
+   - Automated patching with zero downtime
+   - Advanced monitoring
+   - Routine maintenance 
+   - Backtrack - point-in-time restore without relying on backups 
+
+#### Aurora High Availability and Read Scaling
+
+- Creates 6 copies of data across 3 AZ:
+   - 4 copies of 6 needed for writes
+   - 3 copies of 6 needed for reads
+   - self-healing with peer-to-peer replication
+   - Storage is striped across 100s of volumes
+- One master instance is used for writes, master failover is generally < 30 secs
+- Master plus up to 15 read replicas, each of which can be promoted on failover
+- Supports cross-regional replication
+- Provides both _writer_ and _reader_ endpoints (DNS name) in order to provide
+  failover and read load balancing
+  
+![Aurora](./aurora.png)
+
+#### Aurora Security
+
+- Similar to RDS - same db engines
+- Encryption at rest using KMS
+- Automatic backups, snapshots and replicas are also encrypted
+- In-flight encryption using SSL (same as Postgres and MySQL)
+- Possible to authenticate using IAM tokens (same as RDS)
+- Still need to protect with security groups
+
+#### Aurora Serverless
+
+- Automatic database instantiation and autoscaling based on actual usage
+- Good for infrequent, intermittent and unpredictable workloads
+- Requires NO capacity planning
+- Pay per second so can be cost-effective
+
+#### Aurora Global
+
+- Aurora cross-regional replicas - simple to create, good for disaster recovery
+- Aurora Global Database (recommended):
+   - 1 primary region for read and write
+   - Up to 5 secondary read-only regions with replication lag < 1 second
+   - Up to 16 read replicas per secondary region!
+   - Good for decreasing read latency
+   - Promoting another region for disaster recovery has RTO (Recovery Time 
+     Objective) of less than 1 minute 
+
+
+
+
+
+
+
+
+    
