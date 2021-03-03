@@ -564,7 +564,8 @@ See [Mounting EFS](https://docs.aws.amazon.com/efs/latest/ug/mounting-fs.html)
 ### Multi-AZ for Disaster Recovery
 
 - Synchronous replication to a different AZ
-- Endpoint is a single DNS name which allows automatic failover
+- Endpoint is a _single DNS name_ which allows automatic failover - ie Multi AZ 
+  keeps the same connection string regardless of which database is up 
 - Cannot read from, or write to the standby database - it is just there for 
   disaster recovery
 - However, Read Replicas _can_ be set up as Multi-AZ for disaster recovery.  
@@ -665,11 +666,69 @@ See [Mounting EFS](https://docs.aws.amazon.com/efs/latest/ug/mounting-fs.html)
    - Promoting another region for disaster recovery has RTO (Recovery Time 
      Objective) of less than 1 minute 
 
+---
+
+## ElastiCache
+
+- Managed Redis or Memcached
+- Caches are in-memory databases with very high performance and low latency
+- Used to reduce load on databases for read-intensive workloads
+- Can be used to store application state
+- Write scaling using sharding
+- Read scaling using read replicas
+- Multi-AZ with failover
+
+### Uses in application architecture
+
+#### Data Store
+
+- App tries to fetch data from a cache
+- If there (_cache hit_) retrieval is very fast
+- If not there (_cache miss_) app will fetch from RDS and then store in cache
+
+![cache data](./elasticache.png)
 
 
+#### User Session - Stateless Apps
+
+- Multi node app can be stateless if session data stored in a cache
+- Initial login saves session data to cache
+- Subsequent app requests, from any active node, fetch session data from cache 
+
+![cache session](./elasticache2.png)
 
 
+#### Redis vs Memcached
 
+- Redis can be used as a database, cache and message broker
+- Memcached is a pure, high-performance cache
+- Redis has MultiAZ, auto failover, AOF persistence, backup and restore
+- Memcached uses sharding and multi-threaded architecture (fast) but has no 
+  persistence and hence no backup / restore.
+  
+#### Cache Strategies
 
-
+- Suitability of data for caching depends a lot on type and structure of data 
+- **Lazy Loading** (aka Cache-Aside, Lazy Population):
+   - Cache hit or cache miss, on miss data retrieved from DB and then cached
+   - Pros:
+      - Only requested data is cached so cache not full of unnecessary data 
+      - Node failures are not fatal, just increased latency
+    - Cons:
+       - Cache miss incurs _read penalty_ as 3 round trips to cache data
+       - Data in cache can be stale depending on TTL, ie _eventually consistent_
+- **Write Through**:
+   - Add / update cache when database is updated
+   - Often combined with lazy loading  
+   - Pros:
+      - Data in cache is _never_ stale
+      - Write penalty (2 round trips) probably better UX than read penalty  
+   - Cons:
+      - Data is not in cache until added to DB can mitigate with lazy loading
+      - _Cache churn_ - a lot of cache data will never be read
+- **Cache Eviction and TTL** - three ways:
+   - Explicitly delete cached item
+   - Evict LRU (Least Recently Used) because memory is full
+   - Set a suitable TTL - from a few seconds to hours or days, depends on data 
+   - If cache is always full my need to scale cache up or out
     

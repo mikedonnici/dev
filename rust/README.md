@@ -132,6 +132,377 @@ fn main() {
 }
 ```
 
+##### Arrays
+
+- Elements must be same type
+- Like tuples, arrays have a fixed length
+- Allocated on the stack, not the heap
+
+```rust
+fn main() {
+  // type specification [type; count]:
+  let a1: [u32; 5] = [1, 2, 3, 4, 5];
+  
+  // Without...
+  let a2 = [1, 2, 3, 4, 5];
+  
+  // initialising with same value for each element
+  let a3 = [3; 5]; // same as [3, 3, 3, 3, 3]
+}
+```
+
+- An array is a single chuck of memory on the stack, so can be accessed with 
+  indexing:
+  
+### Functions
+
+- Snake case is convention for func and var names
+- `{}` block is an expression so return is implicit:
+
+```rust
+fn main() {
+  let first_num = 2;
+  let second_num = 4;   
+  let s = sum_numbers(2, 4);
+  println!("Sum of {} and {} is {}", first_num, second_num, s);
+}
+
+fn sum_numbers(a: u32, b: u32) -> u32 {
+  // return of {} block implicit if no ; after expression a + b
+  // If the ; was there get a compilation error
+  a + b
+  // Could also do 
+  // return a + b;
+}
+```
+
+### Control Flow
+
+#### `if`, `else if` and `else`
+
+- The usual syntax
+
+```rust
+fn main() {
+  let n = 4;
+  if n > 5 {
+    println!("n is greater than 5");
+  } else if n == 4 {
+    println!("n is equal to 4");
+  } else {
+    println!("n is less than 4");
+  }
+}
+```
+
+- `if` is an expression so can use like this:
+
+```rust
+fn main() {
+  let condition = true;
+  let number = if condition { 5 } else { 6 };
+  println!("The value of number is: {}", number);
+}
+```
+
+#### loop, while and for
+
+- `loop`:
+
+```rust
+fn main() {
+  loop {
+    println!("this goes forever...or until control c")
+  }
+}
+```
+
+- can return an expression from `loop` at the `break`
+
+```rust
+fn main() {
+  let mut count = 0;
+  let result = loop {
+    count += 1;
+    println!("Count is now {}", count);
+    if count >= 4 {
+      println!("break and return value from loop");
+      break count + 100;
+    }
+  };
+  println!("result from loop is {}", result);
+}
+```
+
+- `while`:
+
+```rust
+fn main() {
+    let mut number = 3;
+
+    while number != 0 {
+        println!("{}!", number);
+
+        number -= 1;
+    }
+    println!("LIFTOFF!!!");
+}
+```
+
+- `for` loops are safer as can't run out of range:
+
+```rust
+fn main() {
+  let a = [1, 2, 3];
+  for n in a.iter() {
+    println!("{}", n);
+  }
+}
+```
+
+- can loop over a range `(n..m)`:
+
+```rust
+fn main() {
+  // range 1,2,3
+  for n in 1..4 {
+    println!("{}", n);
+  }
+  // reversed  
+  for n in (1..4).rev() {
+    println!("{}", n);
+  }
+}
+```
+
+## Ownership
+
+ref: <https://doc.rust-lang.org/book/ch04-01-what-is-ownership.html>
+
+- Some languages require explict memory allocation and release, eg C
+- Others have garbage collection that takes care of memory management, eg Go
+- Rust uses _ownership_ - a central feature that ensures memory safety without 
+  the need for garbage collection
+
+### Stack and Heap Memory
+
+- Stack memory is _LIFO_ - Last In First Out
+- Items are _pushed_ onto stack and _popped_ off stack
+- Items stored on the stack must be of a known, fixed size
+- The stack is faster
+- Items of unknown or variable size must be stored on the heap which is less 
+  organised and slower  
+- Memory allocator finds a space that is big enough and returns a _pointer_ 
+  (the address) to the memory location - this process is called _allocating on 
+  the heap_ or just _allocating_.
+- The _pointer_ itself is a memory location which is of a known and fixed size, 
+  so the pointer can be stored on the stack.
+- The data itself is retrieved by following the pointer to the heap location.
+- When a function is called the arguments that get passed to the function, and 
+  the functions local variables, get pushed to the stack. When the function is 
+  over these values are popped off the stack.
+
+### Ownership Rules
+
+- Each value in Rust has a variable that is its _owner_
+- Can only be _one_ owner at a time
+- When the owner goes out of scope, the value will be dropped
+
+### Scope, Move and Copy
+
+- Example using strings...
+- A string literal is immutable, known and fixed size so its value can be 
+  hardcoded into the final executable - faster:
+  
+```rust
+let s = "a string literal";
+```
+
+- Rust has another string type - `String` which is allocated onto the heap and 
+  therefore can be used to store an amount of text that is unknown at compile 
+  time
+- Heap memory is requested from the memory allocator at run time - slower
+- When variable is out of scope Rust automatically calls the `drop` function 
+  which has the code to free the assigned heap memory:
+
+```rust
+{
+    let s = String::from("a variable string"); // s in scope
+} // s out of scope, so drop is called by Rust
+```
+
+- Semantics are similar to a slice in Go
+- For example:
+
+```rust
+let s1 = String::from("Mike");
+let s2 = s1;
+println!("s1 = {}", s1);
+```
+- Here s1 and s2 both contain a `ptr`, `len` and `capacity`
+- The `ptr` points to the same location in the heap, so both `s1` and `s2` are 
+  pointing to the same location on the heap, and hence the same value.
+- In other languages this would be referred to as a _shallow_ copy - ie, copying 
+  the `ptr`, `len` and `capacity` but not the actual data.   
+- However, when `s1` is out of scope Rust would call `drop` to release the heap 
+  memory. This means that `s2` would have nothing to point to and would result 
+  in what's called a _double-free_ error - That's why the above won't compile.
+- Instead what Rust does is referred to as a _move_. This means it _invalidates_ 
+  `s1` and effectively _moves_ the data to `s2`.
+  
+- Deep copies _can_ be made, eg:
+
+```rust
+let s1 = String::from("Mike");
+let s2 = s1.clone();
+println!("s1 = {}", s1);
+```
+
+- Scalar values that are stored on the stack do _not_ go out of scope like this
+- Instead of being _moved_ thought invocation of the `drop` trait, they are 
+  _copied_ through invocation of the `copy` trait:
+  
+```rust
+let a = 5; 
+let b = a;
+println!("a and b are still both in scope, a = {}, b = {}", a, b);
+```
+
+- When args are passed to a function they function takes ownership and they go 
+  out of scope:
+  
+```rust
+// Here a and b stay in scope as they are stack values
+let a = 5;
+let b = 7;
+let sum = sum_numbers(a, b);
+println!("{}, {}", a, b); // <-- OK
+
+// But here they are deactivated (or moved)
+let a = String::from("dog");
+let b = String::from("cat");
+print_strings(a, b);
+println!("{}, {}", a, b); // <-- compilation error
+```
+
+### References and Borrowing
+
+ref: <https://doc.rust-lang.org/book/ch04-02-references-and-borrowing.html>
+
+- As in Go, referencing operator is `&`, dereferencing operator is `*`
+- Instead of passing ownership of a value to a function, can pass a _reference_:
+
+```rust
+fn main() {
+  let s = String::from("abc");
+  // &s is a reference to the value of s, but does not own it
+  let len = str_len(&s);
+  println!("string_len({}) = {}", s, len)
+}
+
+fn str_len(s: &String) -> usize {
+  s.len()
+} // here s goes out of scope but as it does not have ownership of what 
+// it refers to nothing happens (maybe the stored memory address is removed??)
+```
+
+- Using _references_ as function parameters is called _borrowing_
+
+```rust
+fn change_str(s: &String) {
+   s.push_str(", world"); // <- will error with:
+   // ^ `s` is a `&` reference, so the data it refers to cannot be borrowed as mutable
+}
+```
+
+- So, need to specify `mut` for the var and `&mut` for the reference:
+
+```rust
+fn main() {
+  let mut s = String::from("Hello");
+  change_str(&mut s);
+}
+
+fn change_str(s: &mut String) {
+   s.push_str(", world");
+}
+```
+
+- **Note**: can only have _one_ mutable reference to the same data in a 
+  particular scope. This is to prevent data _races_ at compile time.
+  
+```rust
+let mut s = String::from("hello");
+let r1 = &mut s;
+let r2 = &mut s; // < -- not allowed
+```
+
+- Can use curly brackets to create a new scope and allow for multiple, mutable
+  references:
+
+```rust
+let mut s = String::from("hello");
+{
+    let r1 = &mut s;
+} // r1 is now out of scope so new ref is allowed
+let r2 = &mut s;
+```
+
+- Multiple immutable references are ok, but cannot mix immutable and mutable 
+  references and this could effectively alter an immutable reference.
+  
+```rust
+let s = String::from("hello");
+let r1 = &s; // ok
+let r2 = &s; // ok
+let r3 = &mut s; // NOT ok
+println!("{}, {}, and {}", r1, r2, r3);
+```
+
+- Scope of a reference starts where it is created and ends at its last use, so 
+  this is ok:
+  
+```rust
+fn main() {
+    let mut s = String::from("hello");
+
+    let r1 = &s; // no problem
+    let r2 = &s; // no problem
+    println!("{} and {}", r1, r2);
+    // r1 and r2 are no longer used after this point
+
+    let r3 = &mut s; // no problem
+    println!("{}", r3);
+}
+```
+
+- _Dangling references_ are pointers to data that has been de-allocated
+- Rust prevents dangling references:
+
+```rust
+fn dangle() -> &String { // dangle returns a reference to a String
+    // But the string itself is created inside this function...
+    let s = String::from("hello");
+    &s // return a reference to the String
+} // but here s goes out of scope, and is dropped. Its memory goes away.
+```
+
+- To avoid this can just return the string:
+
+```rust
+fn no_dangle() -> String {
+    let s = String::from("hello");
+    s
+}
+```
+  
+
+
+
+
+
+
+
 
 
 
