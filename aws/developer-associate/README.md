@@ -732,3 +732,61 @@ See [Mounting EFS](https://docs.aws.amazon.com/efs/latest/ug/mounting-fs.html)
    - Set a suitable TTL - from a few seconds to hours or days, depends on data 
    - If cache is always full my need to scale cache up or out
     
+---
+
+## Route 53 DNS Service
+
+- Public or private domains
+- $0.50 per month per hosted zone
+  
+
+### DNS Record TTL 
+- TTL specifies record lookup cache time  
+- High TTL (eg 24 hours) reduced queries to DNS but may have outdated records
+- Low TTL (eg 60 seconds) high queries but less chance of outdated records
+- Default is 300 seconds (5 min)
+- in a `dig` query the number beside the domain is the cache TTL remaining 
+  before a new lookup - below it is `12`:
+  
+```shell
+;; ANSWER SECTION:
+mikedonnici.com.        12      IN      A       54.206.231.79
+mikedonnici.com.        12      IN      A       54.206.202.192
+```
+
+### CNAME vs Alias
+
+- CNAME:
+   - Points a hostname to any other hostname
+   - Only work for NON-root domains:
+      - `host.dom1.com` -> `host.dom2.com`
+- Alias:
+   - Point a hostname to an AWS resource
+   - Work for root and non-root domain names:
+      - `host.dom1.com` -> `foo.amazonaws.com`
+      - `dom2.com` -> `bar.amazonaws.com`
+   - Free of charge
+   - Native health check
+- If pointing to an AWS resource use an Alias!
+
+
+### Routing Policies
+
+- **Simple**:
+   - Redirect to a single resource
+   - Cannot attach health checks
+   - If multiple values are returned one is chosen at random by the _client_ - 
+     client-side load balancing
+
+- **Weighted**:
+   - Control specific % of requests that go to endpoints
+   - Eg: 70, 20, 10 - NB weights do not need to add to 100
+   - Helpful to split traffic between regions
+   - Can be associated with health checks 
+   - Client is not aware of multiple IPs - ie only one is returned 
+    
+- **Latency**:
+   - Redirect to server with lowest latency, ie closest
+    
+
+
