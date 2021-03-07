@@ -17,7 +17,7 @@
 
 ## Learning Resources
 
-**[Learn Go with tests]**(https://quii.gitbook.io/learn-go-with-tests)
+**[Learn Go with tests](https://quii.gitbook.io/learn-go-with-tests)**
 
 **[Go By Example](https://gobyexample.com/)**
 
