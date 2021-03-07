@@ -14,8 +14,6 @@ import (
 )
 
 const (
-	waitMinSeconds = 5
-	waitMaxSeconds = 10
 	port           = ":50051"
 )
 
