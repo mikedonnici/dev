@@ -17,6 +17,8 @@
 
 ## Learning Resources
 
+**[Learn Go with tests](https://quii.gitbook.io/learn-go-with-tests)**
+
 **[Go By Example](https://gobyexample.com/)**
 
 **[Hoanh An Ultimate Go](https://github.com/hoanhan101/ultimate-go)** Awesome set of notes, including Ultimate Go
