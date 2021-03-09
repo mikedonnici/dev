@@ -787,6 +787,41 @@ mikedonnici.com.        12      IN      A       54.206.202.192
     
 - **Latency**:
    - Redirect to server with lowest latency, ie closest
+
+- **Geolocation**:
+    - Different from latency-based!
+    - Routing based on the user's location - continent, country or US state
+    - Requires a default policy for when there is no match
     
+- **Failover**:
+   - Based on health checks (see below)
+   - Mandatory health check on a primary endpoint
+   - If primary is unhealthy DNS will respond with address of secondary 
+    
+- **Multi-Value**:
+   - Used to route traffic to multiple resources
+   - Also to associate Route53 health checks with records
+   - Will return up to 8 of N records for each multi-value query
+   - **NOT** a substitute for an ELB
+    
+    
+
+    
+### Health Checks
+- Set up in Route53 
+- N health checks fail (default 3) -> _unhealthy_
+- N health checks pass (default 3) -> _healthy_
+- Default health check interval is 30 seconds
+- Can increase frequency to 10 seconds for increased cost
+- Approx 15 health checkers will check endpoint health so 15 every 30 seconds 
+  means an average of 2 seconds between health check requests
+- Health checks can be HTTP, HTTPS, TCP but no SSL cert. verification
+- Can integrate health checks with CloudWatch
+- Health checks can then be used in failover routing policy
+
+
+
+
+
 
 
