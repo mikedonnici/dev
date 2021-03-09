@@ -496,15 +496,320 @@ fn no_dangle() -> String {
 }
 ```
   
+### Slice Type
+
+- Does not have ownership
+- References a contiguous sequence of elements in a collection (like Go slice)
+
+```shell
+let s = String::from("hello world");
+let s1 = s[..4];  // index 0 to index 3
+let s2 = s[3..7]; // index 3 to index 6
+let s3 = s[4..];  // index 4 to the end
+let s4 = s[..];   // slice of entire string
+```
+
+### Structs
+
+- Named custom data type that groups related values (fields) and behaviour 
+  (methods)
+- Field labels add more meaning to data  
+
+```rust
+struct User {
+ username: String,
+ email: String,
+ full_name: String,
+}
+
+let u1 = User {
+  username: String::from("miked"),
+  email: String::from("miked"),
+  full_name: String::from("Michael Donnici"),
+}
+```
+
+- Field values are retrieved and set using dot notation
+- To mutate a struct value the entire instance must be mutable - cannot just 
+  specify some fields as mutable. 
+  
+#### Field  Init Shorthand
+
+- Can use _field init shorthand_ to initialise field values:
+
+```rust
+fn new_user(username: String, email: String, full_name: String) -> User {
+  // Field Init Shorthand: because field names match param names
+  User {
+    username,
+    email,
+    full_name,
+  }
+}
+```
+
+#### Struct Update Syntax
+
+- Create a new instance and copy remaining values from another instance
+
+```rust
+
+struct CountThings {
+  foo: uint32,
+  bar: uint32,
+  baz: uint32,
+  bing: uint32,
+}
+
+let things1 = CountThings {
+    foo: 8,
+    bar: 8,
+    baz: 10,
+    bing: 10,
+}
+
+let things2 = CountThings {
+    foo: 10,
+    bar: 10,
+    ..things1
+}
+```
+
+#### Tuple structs
+
+- Structs without field names
+- Each is still a distinct type:
+
+```rust
+fn main() {
+    struct Color(i32, i32, i32);
+    struct Point(i32, i32, i32);
+
+    let black = Color(0, 0, 0);
+    let origin = Point(0, 0, 0);
+}
+```
+
+#### Unit-Like Structs without Fields
+
+- Used when need to implement a trait on a type but don't need any data
+
+#### Printing struct values using `println!`
+
+- Default behaviour for `println!` using `{}` is to to use `Display`
+- Primitives implement `Display` by default but structs do not
+- `{:?}` or `{:#?}` (pretty print) specifies print format using the `Debug` 
+- Adding the annotation `#[derive(Debug)]` will implement the `Debug` trait:
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+fn main() {
+    let rect1 = Rectangle {
+        width: 30,
+        height: 50,
+    };
+
+    println!("rect1 is {:?}", rect1);
+}
+// -> rect1 is Rectangle { width: 30, height: 50 }
+```
+
+### Methods
+
+- Functions defined within the context of a struct
+- First arg is always `self` - the instance
+- Define an `impl` (implementation block) ... like a receiver (?)
+- Can have multiple methods in an `impl` block and can also have multiple 
+  `impl` blocks for the same receiver.
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+}
+
+fn main() {
+    let rect1 = Rectangle {
+        width: 30,
+        height: 50,
+    };
+    println!("rect1 area {}", rect1.area());
+}
+```
+
+#### Associated Functions
+
+- Functions defined in an `impl` block that _don't_ take self as a parameter
+- Are not methods as they don't need an instance - so like _static_ functions
+- Invoked using `::`, eg `String::from("hello")`
+- Often used as a constructor, ie to return an instance of the type
+
+```rust
+#[derive(Debug)]
+struct Rectangle {
+    width: u32,
+    height: u32,
+}
+
+impl Rectangle {
+    fn area(&self) -> u32 {
+        self.width * self.height
+    }
+
+    fn square(size: u32) -> Rectangle {
+        Rectangle {
+            width: size,
+            height: size,
+        }
+    }
+}
+
+fn main() {
+    let rect = Rectangle {
+        width: 30,
+        height: 50,
+    };
+    println!("rect area {}", rect.area());
+
+    let squ = Rectangle::square(10);
+    println!("squ = {:?}", squ);
+}
+```
+
+### Enums and Pattern Matching
+
+- Enumerations or _enums_ allow a type to be defined by enumerating its possible 
+  variants
+- Can define enums with, or without associated data types
+- Enum values are namespaced by identifier and use `::`
+- Provide a more compact way to do what could be done with a struct
+- Can also create methods using a `impl` block
+
+```rust
+// These would be analogous to iota enums in Go
+#[derive(Debug)]
+enum Fruit {
+  Apple,
+  Orange,
+  Banana,
+}
+
+impl Fruit {
+  fn eat(&self) {
+    println!("You ate the {:?}", self);
+  }
+}
+
+// More enums, some with associated data types
+enum Message {
+  Quit,                        // no data type
+  Move { x: i32, y: i32 },     // an anonymous struct
+  Write(String),               // a String
+  ChangeColor(i32, i32, i32),  // a three item Tuple of i32 
+}
+
+fn main() {
+  let f1 = Fruit::Apple;
+  f1.eat();
+  let msg = Message::Write(String::from("hello"));
+}
+```
+
+#### The Option Enum
+
+- `Option` enum is defined by the standard library and provides a type that can 
+   be used where a value could be something, or could be nothing
+- As such, Rust does not have `null`
+
+```rust
+enum Option<T> {
+    Some(T),
+    None,
+}
+```
+
+- `Option` is included in the _prelude_ so does not have to be brought into 
+  scope - and its variants can be used without the `Option::` prefix.
+- `<T>` is a generic type parameter so the `Some` variant of the enum `Option` 
+  can hold data of any type:
+  
+```rust
+fn main() {
+  let some_number = Some(5);
+  let some_string = Some("a string"); 
+  let absent_number: Option<i32> = None;
+}
+```
+
+- So a data type can really never be null, unless it is an `Option` and, when 
+  this is the case, the possibility of a null value _must_ be handled explicitly 
+  or there will be compiler errors:
+  
+```rust
+fn main() {
+  let x: i8 = 5;
+  let y: Option<i8> = Some(5);
+
+  let sum = x + y; // <- error!
+}
+```
+
+- See the [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) docs 
+  for more info. 
+
+#### `match` control flow operator
+
+- Used to execute code based on pattern matches 
+- Used for handling `enum` variants
+- Similar to a `switch`
+- Form:
+
+```
+match [expression] { <-- expression can be any value
+    [pattern] => [code; expression], <-- match arm
+    [pattern] => [code; expression], <-- match arm
+    [pattern] => [code; expression], <-- match arm
+}
+```
+
+- First arm that matches will return that expression from the `match {}` block
+- Can run multiple lines of code from a `match` arm:
+
+```rust
+enum Coin {
+  Penny,
+  Nickel,
+  Dime,
+  Quarter,
+}
+
+fn value_in_cents(coin: Coin) -> u8 {
+  match coin {
+    Coin::Penny => {
+      println!("Lucky penny!");
+      1
+    }
+    Coin::Nickel => 5,
+    Coin::Dime => 10,
+    Coin::Quarter => 25,
+  }
+}
+```
 
 
 
 
 
-
-
-
-
-
-
-
+  
