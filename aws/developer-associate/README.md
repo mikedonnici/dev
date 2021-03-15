@@ -805,7 +805,6 @@ mikedonnici.com.        12      IN      A       54.206.202.192
    - **NOT** a substitute for an ELB
     
     
-
     
 ### Health Checks
 - Set up in Route53 
@@ -820,8 +819,31 @@ mikedonnici.com.        12      IN      A       54.206.202.192
 - Health checks can then be used in failover routing policy
 
 
+### VPC - Virtual Private Cloud
 
+- A VPC is a _regional_ resource
+- **Subnets** (AZ resource) used to partition VPC:
+   - _Public Subnet_ - accessible from the internet
+   - _Private Subnet_ - not accessible from the internet
+- **Route Tables** define access to the internet and between subnets
 
+![VPC](./vpc1.png)
 
+- Default VPC is created automatically in every region
+- Each default VPC will have a default public subnet
 
+#### Internet Gateways and NAT Gateways
 
+- _Public_ subnets have a route to an internet gateway (IGW) so instances added 
+  to a public subnet have access to tne internet via this gateway.
+- **NAT** allows access to the internet for instances in a private subnet
+- _Private_ subnets can have access to the internet via: 
+   - a NAT Gateway (AWS-managed), or
+   - a NAT Instance (Self-managed)
+- A NAT Gateway / Instance is deployed in a _public_ subnet and then the 
+  _private_ subnet is given a route to the NAT Gateway / Instance, which in turn
+  has access to the internet gateway.
+
+![NAT](./vpc_nat.png)
+
+ 
