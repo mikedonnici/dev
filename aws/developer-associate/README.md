@@ -847,3 +847,72 @@ mikedonnici.com.        12      IN      A       54.206.202.192
 ![NAT](./vpc_nat.png)
 
  
+#### Network ACL and Security Groups
+
+- **Network Access Control List**:
+   - NACL is a firewall that controls traffic to and from the subnet
+   - ALLOW and DENY rules
+   - NACLs attached at subnet level 
+   - Rules are at subnet level
+   - Default is everything in and everything out
+    
+- **Security Groups**:
+   - Firewall that controls access to ENI (Elastic Network Interface) / EC2 instance
+   - Only has ALLOW rules
+   - Rules include other security groups as well as IP addresses 
+
+![NACL - Sec Grp](./nacl-sec.png)
+
+- **VPC Flow Logs**:
+   - Captures info about IP traffic to interfaces:
+      - VPC Flow Logs
+      - Subnet Flow Logs
+      - Elastic Network Interface Logs
+- Use to monitor and troubleshoot connectivity issues:
+   - Subnets -> Internet
+   - Subnets -> Subnets
+   - Internet -> Subnets 
+- Captures network info for AWS-managed  interfaces as well, ElastiCache, RDS, Load Balancers etc
+- VPC Flow Logs can be sent to S3 or CloudWatch
+
+#### VPC Peering
+
+- Creates private connection between two VPCs so they behave as if in the same network
+- Must not have overlapping CIDR range
+- Not _transitive_, ie if A <--> B and A <--> C the A |--| C - must be explicitly connected
+
+![VPC Peering](./vpc-peering.png)
+
+
+#### VPC Endpoints
+
+- VPC Endpoints allow private network connection to AWS services instead of the public internet (default)
+- Enhanced security and lower latency
+- **VPC Endpoint Gateway** for connection to S3 and DynamoDB
+- **VPC Endpoint Interface** for connection to other services
+- Only used within your VPC
+
+![VPC Endpoint](./vpc-endpoint.png)
+
+
+#### Site-to-Site VPN and Direct Connect
+
+- Site-to-site VPN:
+   - Connect on-premises VPN to AWS
+   - Encrypted connection over the public internet
+- Direct Connect (DX)
+   - Establish a physical connection between premises and AWS
+   - Private, secure and fast over _private_ network
+   - Takes a month or so to set up
+- Neither of these options can access VPC Endpoints
+
+
+![VPN Connect](./vpn-connect.png)
+
+
+### Solution Architecture
+
+![3-Tier Architecture](./3-tier-architecture1.png)
+
+
+
