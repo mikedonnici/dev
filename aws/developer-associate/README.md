@@ -914,5 +914,126 @@ mikedonnici.com.        12      IN      A       54.206.202.192
 
 ![3-Tier Architecture](./3-tier-architecture1.png)
 
+--
 
+## Amazon S3
+
+### Buckets and Objects
+
+- Directories (Buckets) and Files (Objects)
+- **Buckets**/l
+   - Must have globally unique name
+   - Despite the above, buckets are defined at the _regional_ level
+   - Bucket naming conventions:
+      - 3-36 characters, no uppercase, no underscore
+      - Not an IP
+      - Must start with lowercase letter, or a number 
+- **Objects**:
+   - Have a key which is _full path_ (excluding bucket name) to the object
+   - Key _prefix_ is the virtual dir path up the the file name
+   - `s3:/bucket-name/this/is/the/prefix/somefile.png` 
+- No real concept of directories, just keys that contain slashes    
+- Object _values_ are the contens of the body:
+   - Max object size is 5000GB (5TB)
+   - For upload more than 5GB must use _multi-part upload_
+- Metadata key-value pairs can be added to objects
+- Tags (unicode, up to 10) can also be added - useful for security or lifecycle
+  policy
+- Versioning is also available
+
+### S3 Versioning
+
+- Enabled at the bucket level
+- If upload a file with same key will create a new version
+- Is best practice to enable versioning to protect against accidentaql deletes
+- Files not versioned _prior_ to enabling versioning will have Version ID `null`
+- Suspending versioning does not delete previous versions
+- Deleting an object creates a _delete marker_ on that object
+- The delete marker is like a version of the object with a Version ID and size 
+  0 bytes  
+- To undelete the object the _delete marker_ Version ID can be deleted - 
+  this is a _permanent delete_ and the object is restored to the previous version.  
+- To rollback the later version is _permanently deleted_
+
+### S3 Encryption for Objects
+
+- Four methods of at-rest encryption:
+   - **SSE-C3**:
+      - Server-Side Encryption with AES-256 encryption algorithm
+      - Keys managed by AWS
+      - Required header: `"x-amz-server-side-encryption": "AES256"`
+      - HTTP or HTTPS
+   - **SSE-KMS**:
+      - Server-Side Encryption using keys managed with KMS
+      - Advantages are user control and audit trail
+      - Required header: `"x-amz-server-side-encryption": "aws:kms"`
+      - HTTP or HTTPS    
+   - **SSE-C**:
+      - Server-Side Encryption using own keys managed outside of AWS
+      - S3 does _not_ store the provided encryption key
+      - Encryption key must be provided in the headers with each request
+      - HTTPS only
+   - **Client-side encryption**:
+      - Can use client library such as Amazon S3 Encryption Client
+      - Client-side encryption before sending and decryption on retrieval
+      - Customer manages keys and encryption
+- Encryption in transit:
+   - S3 exposes HTTP and HTTPS endpoints, latter providing in-transit encryption
+   - Uses SSL/TLS certificates 
+
+### S3 Security
+
+- User-based:
+   - IAM policies - which API calls allowed for specific IAM users
+- Resource-based:
+   - Bucket policies - bucket-wide rules, allow cross-account access
+   - Object Access Control List (ACL) - finer grained control at object level
+   - Bucket ACL - as above, at bucket level (less common)
+- An IAM principal (ie account, user, role) can access an S3 object if:
+   - The User IAM allows it, OR the resource policy allows it
+   - AND there is no explicit DENY policy
+    
+#### S3 Bucket Policies
+
+- JSON format
+- Effect: Allow or Deny
+- Principal: The account, user, role targeted by the policy
+- Actions: Set of API calls included in policy
+- Resources: the buckets and objects affected
+
+```json
+{
+  "Statement": [
+    {
+      "Effect": "Allow",
+      "Principal": "*",
+      "Action": "s3:GetObject",
+      "Resource": [
+        "arn:aws:s3:::examplebucket",
+        "arn:aws:s3:::examplebucket/*"
+      ]
+    }
+  ]
+}
+```
+
+- Use cases for bucket policies:
+   - Grant public access
+   - Force encryption at upload
+   - Grant cross-account access
+    
+- Blocking public access (to avoid company data leaks) can be done via:
+   - _New_ ACLs
+   - _Any_ ACLs
+   - _New_ pubic bucket or access point policies
+- Blocked public access should be left on unless public access is required
+- Can be set at the account level
+
+- Private access to S3 can be provided via VPC endpoints
+- Logging and Audit:
+   - S3 logs stored in S3
+   - API calls logged to CloudWatch
+- User Security:
+   - MFA delete can be required in versioned buckets
+   - Pre-signed URLs for objects
 

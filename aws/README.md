@@ -18,4 +18,14 @@ Resources:
 - https://thefreeccp.com (free practitioner)
 - https://www.exampro.co (paid - cheaper that cloud guru)
 
+## Disable MFA 
 
+- If MFA stops working, but still have cli access, can disable MFA:
+
+```shell
+$ aws iam list-mfa-devices --user-name SomeUser
+# copy SerialNumber in response
+$ aws iam deactivate-mfa-device --user-name SomeUser --serial-number [SerialNumber]
+```
+
+- Can then log into console and re-activate MFA
