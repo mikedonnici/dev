@@ -696,6 +696,8 @@ export class Service2 {
 
 - This allows Angular to _lazy load_ code and may result in better performance
   for larger apps.
+  
+---
 
 ## Routing
 
@@ -897,10 +899,21 @@ export class SomeComponent {
 }
 ```
 
-```typescript
+[incomplete]
+
+- Navigating to routes should be done with the `routerlink` directive, rather
+  than `href`, as the latter will reload the page and lose state.
+- Each of the following will work:
+
+```angular2html
 
 ```
 
+
+```typescript
+
+```
+---
 
 ## Observables
 
@@ -911,17 +924,105 @@ export class SomeComponent {
     - Handles errors
     - Handles completion (where applicable)
 - An alternative approach to promises
-
-```
-
-- Navigating to routes should be done with the `routerlink` directive, rather 
-than `href`, as the latter will reload the page and lose state.
-- Each of the following will work:   
+- Observable is an object imported from a 3rd=party package such as `rxjs`, that 
+  follows the _observable_ pattern:
+   - observable -> trigger emits data -> observer
+- The _observer_ is you own code that _subscribes_ to the observable
+- `rxjs` package provides multiple ways for creating an observable, eg a simple
+  one is `interval`
   
-```angular2html
+```ts
+import { Component, OnInit } from '@angular/core';
+import {interval} from 'rxjs';
+
+@Component({
+  selector: 'app-root',
+  templateUrl: './app.component.html',
+  styleUrls: ['./app.component.css']
+})
+export class AppComponent implements OnInit {
+  title = 'observables';
+
+  ngOnInit(): void {
+    interval(1000).subscribe((n) => {
+      console.log(n);
+    });
+  }
+}
+```
+
+- This will log an incrementing number to the console, indefinitely, so it is 
+  important to `unsubscribe()` from observables in order to prevent memory leaks.
+- Revisiting this component will also create a separate observable each time so 
+  can also compound memory use.
+- So would do something like:
+
+```ts
+import {Component, OnDestroy, OnInit} from '@angular/core';
+import {interval, Subscription} from 'rxjs';
+
+@Component({
+  selector: 'app-obs',
+  templateUrl: './obs.component.html',
+  styleUrls: ['./obs.component.css']
+})
+export class ObsComponent implements OnInit, OnDestroy {
+
+  private counterSubs = new Subscription();
+
+  constructor() { }
+
+  ngOnInit(): void {
+    this.counterSubs = interval(3000).subscribe(n => {
+      console.log(`Obs count = ${n}`);
+    });
+  }
+
+  ngOnDestroy(): void {
+    console.log('Unsubscribe()');
+    this.counterSubs.unsubscribe();
+  }
+}
+```
+
+- Observables that are part of angular packages normally take care of 
+  _unsubscribing_ for you, so don't generally have to worry about it.
+  
+- Building a _custom_ observable:
+
+```ts
+const customIntervalObservable = new Observable(observer => {
+  let count = 0;
+  setInterval(() => {
+    count++;
+    if (Math.floor(Math.random() * 5) === 3) {
+      observer.error(new Error('1 in 5 chance of an error'));
+    }
+    if (count === 10) {
+      observer.complete();
+    }
+    observer.next(count);
+  }, 1000);
+});
 
 ```
 
+- When the observable throws an error it also stops emitting data and there 
+  is no need to unsubscribe.
+- Second argument to `subscribe()` is an error handling function
+- Third arg to `subscribe()` is a function to handle the `.complete()` call
 
 
-
+```ts
+this.counterSubs = customIntervalObservable.subscribe(
+      n => {
+        console.log(`Obs2 count = ${n}`);
+      },
+      e => {
+        alert(`Error: ${e.message}`);
+      },
+      () => {
+        console.log('Complete');
+      }
+    );
+```

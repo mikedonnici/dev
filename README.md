@@ -13,6 +13,7 @@
 - [Postgres](./postgres/)
 - [Practice](./practice/)
 - [Python](./python/)
+- [Rust](./rust/)  
 - [TDD](./tdd/)
 - [UML](./uml/)
 - [Vue / Nuxt](./vue/)

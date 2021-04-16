@@ -1,6 +1,7 @@
 # Rust
 
 - [The Rust Book](https://doc.rust-lang.org/stable/book)
+- [Rust By Example](https://doc.rust-lang.org/stable/rust-by-example)  
 - [Cargo Guide](https://doc.rust-lang.org/cargo/guide/)
 - [Crate Register](https://crates.io/)
 

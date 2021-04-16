@@ -1037,3 +1037,47 @@ mikedonnici.com.        12      IN      A       54.206.202.192
    - MFA delete can be required in versioned buckets
    - Pre-signed URLs for objects
 
+### S3 Static Web Sites
+
+- Can serve a bucket as a static web site
+- Enable _Static Website Hosting_
+- Disable _Block all Public Access_
+- Create a bucket policy, `Allow * GetObject`
+- Availavle at https://<bucket>-s3-website-<region>.amazonaws.com
+
+### CORS
+
+- Cross Origin Resource Sharing
+- _Origin_ is a _scheme_ (protocol), _host_ (domain) and _port_, eg 
+  https://foo.somewhere.com:443
+- Browser-based security that allows requests to _other_ origins if _other_ 
+  origins allow it, using CORS header `Access-Control-Allow-Origin`
+- Example:
+   - Browse to https://www.8o8.io - this is the _origin_
+   - Retrieves `index.html` which makes a _cross origin_ request to 
+     https://img.8o8.io/dog.png 
+   - Browser will do a _preflight request_ (`OPTIONS`) to https://img.8o8.io 
+     in order to find out what it will allow as far as CORS goes
+   - -preflight response_ from https://img.8o8.io responds with headers:
+      - `Access-Control-Allow-Origins: https://www.8o8.io`
+      - `Access-Control-Allow-Methods: GET`
+   -  Browser makes `GET` request for https://img.8o8.io/dog.png
+
+- Same rules apply for cross-origin requests to S3 buckets serving websites
+- CORS headers must be defined on the _cross origin_ site to allow requests 
+  from the _origin_, or any origins with `"*"` 
+
+### S3 Consistency Model
+
+- Read after write consistency for `PUT` of new objects, `PUT 200 => GET 200`
+- Unless you check for object first and not there, then get _eventual_ 
+  consistency, `GET 404 => PUT 200 => GET 404 ... GET 200` 
+- _Eventual_ consistency for `DELETE` and `PUT` of existing objects so original 
+  object may be available until object is updated / deleted.
+- NO OPTION for _strong_ consistency
+
+
+  
+
+
+
