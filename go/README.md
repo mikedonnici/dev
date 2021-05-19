@@ -1,5 +1,7 @@
 # Go
 
+- [Notes](./notes/) - My notes, from various sources
+
 - [Code organisation](./code-organisation/) - HTTP service example
 - [Dependencies](./dependencies/)
 - [Functional Programming](./functional-programming/)
@@ -16,6 +18,9 @@
 - [Clean Go Code](https://github.com/Pungyeon/clean-go-article)
 
 ## Learning Resources
+
+**[Learning Go - Joe Bodner](https://learning.oreilly.com/library/view/learning-go/)**
+- Great book on idiomatic Go
 
 **[Learn Go with tests](https://quii.gitbook.io/learn-go-with-tests)**
 

@@ -1,5 +1,6 @@
 import {Component, OnDestroy, OnInit} from '@angular/core';
 import {Observable, Subscription} from 'rxjs';
+import {map, filter} from 'rxjs/operators';
 
 @Component({
   selector: 'app-obs-two',
@@ -19,14 +20,14 @@ export class ObsTwoComponent implements OnInit, OnDestroy {
       let count = 0;
       setInterval(() => {
         count++;
-        if (Math.floor(Math.random() * 5) === 3) {
-          observer.error(new Error('1 in 5 chance of an error'));
+        if (Math.floor(Math.random() * 20) === 3) {
+          observer.error(new Error('1 in 20 chance of an error'));
         }
-        if (count === 10) {
+        if (count === 20) {
           observer.complete();
         }
         observer.next(count);
-      }, 1000);
+      }, 500);
     });
 
     this.counterSubs = customIntervalObservable.subscribe(
@@ -40,6 +41,19 @@ export class ObsTwoComponent implements OnInit, OnDestroy {
         console.log('Complete');
       }
     );
+
+    // Add an operator to transform the observable data on the fly
+    const newObservable = customIntervalObservable.pipe(
+      filter( (data: any) => {
+          return data % 3 !== 0;
+      }),
+      map((data: any) => {
+        return `Transformed ${data}`;
+      })
+    );
+    newObservable.subscribe(n => {
+      console.log(n);
+    });
   }
 
   ngOnDestroy(): void {

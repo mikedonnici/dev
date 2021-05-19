@@ -1080,4 +1080,63 @@ mikedonnici.com.        12      IN      A       54.206.202.192
   
 
 
+## ECS, ECR & Fargate
+
+- Docker images stored in Docker Repositories, eg:
+   - Docker Hub
+   - Amazon Elastic Container Registry (ECR)
+
+### ECS Clusters
+
+- Logical grouping of EC2 instances running ECS agent (Docker container)
+- ECS agent registers the instance with the ECS cluster
+- EC2 instances runa  special AMI made specifically for ECS.
+
+### ECS Task Definitions
+
+- JSON metadata that tells ECS _how_ to run a Docker container
+- Contains things like:
+   - Image name
+   - Port bindings for container and host
+   - Memory and CPU allocation
+   - Env vars
+   - Networking config (nb. default is `Bridge`)
+- It is a _definition_ (ie a plan) for how somethign should be run    
+
+### ECS Service
+
+- Defines a number of tasks that should be run, and how they should be run
+- Ensures that tasks are running across available EC2 instances in the cluster
+- Can also be linked to load balancers (ELB, NLB, ALB) if needed
+  
+### ECS Service Load Balancing
+
+- When containers are run without host port forwarding docker starts them on 
+  random ports like `32657`
+- Application Load Balancer has _dynamic port forwarding_ which can pick up these
+  port numbers and forward the inbound port (eg 80) to the random ports 
+  opened by running docker containers.
+- Thus, can run multiple containers (based on the same image) on multiple EC2 
+  instances without port clashes.
+- Note: Still need to specify the _Container port_ in the task container 
+  definition, but leave the _Host port_ empty:
+  
+![port mapping](./port-mapping.png)
+  
+
+### ECR
+
+- Elastic Container Registry for private images
+- Access is controlled through IAM
+- To login (with Docker) to ECR:
+   - AWS CLI v1:
+      - `$(aws ecr get-login -no-include-email --region ap-southeast-2)`
+      - `$()` executes the output of the command inside the brackets
+   - AWS CLI v2:
+      - `aws ecr get-login-passwd --region ap-aoutheast-2 | docker login 
+        --username --passwd-stdin 485629009920.dkr.ecr.ap-southeast-2.amazonaws.com`
+- Auth credentials are then stored in `.docker/config.json`       
+- Can also generate the auth command when a repo is created in ECR
+- Note: may also need to use `aws --profile [someone]` 
+- Once authenticated can use `docker push` and `docker pull` as usual
 

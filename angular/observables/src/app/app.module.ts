@@ -7,12 +7,14 @@ import {AppComponent} from './app.component';
 import { HomeComponent } from './home/home.component';
 import { ObsOneComponent } from './obs-one/obs-one.component';
 import { ObsTwoComponent } from './obs-two/obs-two.component';
+import { SubjectExampleComponent } from './subject-example/subject-example.component';
 
 
 const appRoutes: Routes = [
   {path: '', component: HomeComponent},
   {path: 'obs1', component: ObsOneComponent},
   {path: 'obs2', component: ObsTwoComponent},
+  {path: 'subject', component: SubjectExampleComponent},
 ];
 
 @NgModule({
@@ -20,7 +22,8 @@ const appRoutes: Routes = [
     AppComponent,
     ObsOneComponent,
     ObsTwoComponent,
-    HomeComponent
+    HomeComponent,
+    SubjectExampleComponent
   ],
   imports: [
     BrowserModule,

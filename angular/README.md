@@ -1012,7 +1012,6 @@ const customIntervalObservable = new Observable(observer => {
 - Second argument to `subscribe()` is an error handling function
 - Third arg to `subscribe()` is a function to handle the `.complete()` call
 
-
 ```ts
 this.counterSubs = customIntervalObservable.subscribe(
       n => {
@@ -1026,3 +1025,44 @@ this.counterSubs = customIntervalObservable.subscribe(
       }
     );
 ```
+- Rarely build your own observables and will usually use `subscribe()` by 
+  passing in functions that deal with data, errors or completion.
+
+### Operators
+
+- Operators are a useful feature of the `rxjs` library that enable 
+  transformation of the data being emitted by the observable.
+- `rxjs` has many [built-in operators](https://rxjs-dev.firebaseapp.com/guide/operators)
+- Observables have `pipe()` method which receive an operator function arg, 
+  which itself receives the same _data_ that is passed to `subscribe()`
+- Returns a new observable so need to subscribe to that to get the transformed 
+  data:
+
+```ts
+// Using the map operator from rxjs
+import {map} from 'rxjs/operators';
+// ... //
+const newObservable = originalObservable.pipe(map((data: any) => {
+  return `Transformed ${data}`;
+}));
+newObservable.subscribe( n => {
+  console.log(n);
+});
+```
+
+- Note that `pipe()` can take multiple arguments which are sequentially applied
+  to the data
+
+### Subject
+
+- A `Subject` is an `rxjs` class that can be used in place of an `EventEmitter`
+- It is a special type of `Observable` that allows for `.next()` to be called 
+  from _outside_ the observable, can be triggered from code.
+- Should also `unsubscribe` from `Subjects` in `onDestroy`
+- This mechanism is only really used across components via a service - for 
+  events within a component would still use Angular's `EventEmitter`. 
+
+  
+
+  
+
