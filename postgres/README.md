@@ -56,3 +56,19 @@ Restart server:
 ```
 $ /etc/init.d/postgresql restart
 ```
+
+
+## Drop database when `database "foo" is being accessed by other users`
+
+From [here](https://stackoverflow.com/questions/17449420/postgresql-unable-to-drop-database-because-of-some-auto-connections-to-db)
+
+```sql
+REVOKE CONNECT ON DATABASE foo FROM public;
+
+-- May nbeed to run this a few times?
+SELECT pg_terminate_backend(pg_stat_activity.pid)
+FROM pg_stat_activity
+WHERE pg_stat_activity.datname = 'foo';
+
+DROP database foo;
+```
