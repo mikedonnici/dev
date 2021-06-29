@@ -669,44 +669,6 @@ Secrets require compose file version `3.1` or later.
 
 
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
 ## Port Mapping
 
 ## Volumes
@@ -836,6 +798,7 @@ Get only latest commit on a single branch
 RUN git clone --branch <branch name> --single-branch  --depth 1 <repo url>
 ```
 
+## [Docker Swarm](./swarm)
 
 
 ## References and Resources
@@ -844,7 +807,3 @@ RUN git clone --branch <branch name> --single-branch  --depth 1 <repo url>
 * https://www.bretfisher.com/docker/
 * https://labs.play-with-docker.com/
 
-
-
-
- 
