@@ -543,3 +543,143 @@ services:
     deploy:
       mode: global
 ```
+
+#### Placement preferences
+
+- _Soft_ requirement, so tries but will carry on if it does not succeed
+- Works on `service create` and `service update`
+- Can add multiple preferences for multi-layer placement control
+- Only one strategy at the moment - `spread`:
+    - spreads tasks amongst all values of a label
+    - Useful for ensuring distribution across availability zones, subnets etc
+- Won't move service tasks if labels are changed
+- Use with constraints if the targeted label is not specified on all nodes. This
+  is because a missing label is treated as though the label exists, but has a
+  null value.
+
+**Example: Spreading tasks across AWS AZs**
+
+```shell
+# Label ALL nodes
+docker node update --label-add azone=1 node1
+docker node update --label-add azone=2 node2
+docker node update --label-add azone=3 node3
+
+# Deploy service across all availability zones
+docker service create placement-pref spread=node.labels.azone --replicas 3 nginx
+```
+
+Could also spread across subnets in a similar way
+
+Ref: <https://docs.docker.com/engine/swarm/services/#placement-constraints>
+
+**Example: Placement preference in a stack file**
+
+```yaml
+version: "3.1"
+services:
+  web:
+    image: nginx
+    deploy:
+      placement:
+        preferences:
+          spread: node.labels.azone
+```
+
+#### Node availability
+
+- Each node can have one of three states:
+    - `active` - runs existing tasks, available for new tasks
+    - `pause` - runs existing tasks, NOT available for new tasks, good for
+      troubleshooting
+    - `drain` - reschedules existing tasks, not available for new tasks, good
+      for maintenance / updates
+- Note that paused or drained nodes won't get service updates
+
+**Examples:**
+
+```shell
+# pause node 2
+docker node update --availability pause node2
+
+# drain node 3
+docker node update --availability drain node3
+```
+
+#### Resource requirements
+
+- `docker run` has many options, `service create` has fewer
+- set at `service create/ update` but are controlled per container
+- set for cpu and memory, reserving and limiting
+- Limiting: eg maximum given to a container
+    - `--limit.cpu .5`
+    - `--limit-memory 256M`
+- need to be very careful about limiting memory
+- Reservations: ensure minimum free resources in order to schedule a container
+    - Swarm keeps track in its database
+    - Does NOT involve and actual process monitoring so has no relationship to
+      the actual amount being used by a task, rather is a promise to ensure a
+      certain amount of resource will be available, eg:
+    - `--reserve-cpu .5`
+    - `--reserve-memory 256M`
+
+**Examples:**
+
+```shell
+# Full CPU for MySQL
+docker service create --reserve-memory 800M --reserve-cpu 1 mysql
+
+# Limit resource for nginx
+docker service create --limit-memory 150M --limit-cpu .25 nginx
+
+# To remove limits / reservations (not actually set to 0)
+docker service update --limit-memory 0 --limit-cpu 0 mysql 
+```
+
+**Stack file example:**
+
+```yaml
+version: "3.1"
+service:
+ database:
+  image: mysql
+  deploy: 
+    resources:
+      limits:
+        cpus: '1'
+        memory: 1G
+      reservations:
+        cpus: '0.5'
+        memory: 500M
+```
+
+---
+
+## Swarm Operation in Production
+
+### Service Logs
+
+- Same as `docker container logs` but aggregates all service tasks
+- Can return all tasks at once, or just one task's logs
+- Great for real time cli troubleshooting 
+- Can follow and tail logs, and other options 
+- Not for log storage or searching or feeding into other systems
+- Does _not_ work if you use `--log-driver` for sending logs off server
+
+**Examples:**
+
+```shell
+# Return all logs for a service
+docker service logs <servicename/id>
+
+# Return all logs for a single task
+docker service logs <taskid>
+
+# Return unformatted logs with no trunking
+docker service logs --raw --no-trunc <servicename/id>
+
+# Return last 50 and all future logs
+docker service logs --tail 50 --follow <servicename/id>
+```
+
+
