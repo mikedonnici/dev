@@ -641,16 +641,16 @@ docker service update --limit-memory 0 --limit-cpu 0 mysql
 ```yaml
 version: "3.1"
 service:
- database:
-  image: mysql
-  deploy: 
-    resources:
-      limits:
-        cpus: '1'
-        memory: 1G
-      reservations:
-        cpus: '0.5'
-        memory: 500M
+  database:
+    image: mysql
+    deploy:
+      resources:
+        limits:
+          cpus: '1'
+          memory: 1G
+        reservations:
+          cpus: '0.5'
+          memory: 500M
 ```
 
 ---
@@ -661,8 +661,8 @@ service:
 
 - Same as `docker container logs` but aggregates all service tasks
 - Can return all tasks at once, or just one task's logs
-- Great for real time cli troubleshooting 
-- Can follow and tail logs, and other options 
+- Great for real time cli troubleshooting
+- Can follow and tail logs, and other options
 - Not for log storage or searching or feeding into other systems
 - Does _not_ work if you use `--log-driver` for sending logs off server
 
@@ -682,4 +682,361 @@ docker service logs --raw --no-trunc <servicename/id>
 docker service logs --tail 50 --follow <servicename/id>
 ```
 
+Reminder: `docker service ps <service name / id>`shows the _processes_ (tasks),
+belonging to that service, and the task id for each - eg:
 
+```shell
+docker service ps web01
+```
+
+Although logging is not very sophisticated can `grep` logs to find particular
+lines. Note that need to ensure both stderr and stdout are grep'd:
+
+```shell
+docker service logs <service name> 2>&1 | grep <search term>
+```
+
+### Docker Events
+
+- Shows _actions taken_ in docker engine and swarm, eg `network create`,
+  `service update`
+- Has search filtering and formatting
+- Limited to last 1000 events, not stored on disk so no long term logs.
+- Good for watching real-time events.
+- Two scopes "swarm" - see things on swarm managers, and "local" - confined to
+  events on each worker node.
+
+**Examples:**
+
+```shell
+# watch events from now, swarm scope if on manager, else local 
+docker events
+
+# Filter by time - lots of formats, see docs
+docker events --since YYYY-MM-DD
+docker events --since YYYY-MM-DDTHH:MM:SS
+docker events --since 30m
+docker events --since 2h30m 
+
+# Last hour of events, with filters- note same filter key acts like OR
+# and diff filter keys is like AND 
+docker events --since 1h --filter event=start
+docker events --since 1h --filter scope=swarm --filter type=network
+```
+
+## Swarm Configs
+
+- Available since 17.06+
+- Provides a way to map strings or files to _any_ file path in a task
+- Similar to secrets but files can be stored anywhere in container
+- Useful for things like nginx, mysql configuration files
+- Benefit is being able to tweak a configuration without having to create a
+  custom image or use a bind mount
+- Immutable, so need to use a rotation process to rollout
+- Can be removed once service is removed
+- Strings are saved to the Raft log, so are highly available
+- Should _NOT_ be used for private keys or other sensitive data (use secrets)
+- Should _NOT_ be used in place of env vars
+
+**Examples:**
+
+```shell
+# create a new config from an existing nginx config
+docker config create nginx01 ./nginx.conf
+# Use the above config
+docker service create --config source=nginx01,target=/etc/nginx/conf.d/default.conf
+
+# To update the above config
+docker config create nginx02 ./nginx.conf
+docker service update --config-rm nginx01 \ 
+  --config-add source=nginx02,target=/etc/nginx/conf.d/default.conf
+```
+
+**Stack file:**
+
+```yaml
+version: "3.3" # minimum
+services:
+  web:
+    image: nginx
+    configs:
+      - source: nginx-proxy
+        target: /etc/nginx/conf.d/default.conf
+
+configs:
+  nginx-proxy:
+    file: ./nginx-app.conf
+```
+
+## Limiting downtime with rolling updates, healthchecks and rollbacks
+
+### Rolling service updates
+
+- Most 'Day 2' ops involve `docker service update` so understanding how these
+  work is crucial
+- By default, `service update` replaces each replica one at a time, but many
+  things can be customised.
+- Update processes should be very thoroughly tested before going into production
+  because different applications handle sessions and reconnections differently.
+
+Testing tools:
+
+- `httping` - Like ping but uses TCP instead of ICMP. Can install with `apt` or
+  `docker run bretfisher/httping localhost`
+- `browncoat` - simple web app with settings for acting badly
+  <https://hub.docker.com/r/bretfisher/browncoat/>
+
+#### A sample run
+
+- Create a network
+
+```shell
+docker network create --driver overlay --attachable verse
+```
+
+- Create browncoat service at v1 - returns a 201
+
+```shell
+docker service create --name firefly -p80:80 --network verse --replicas 5 bretfisher/browncoat:v1
+```
+
+- Run httping with a few options
+
+```shell
+docker run --rm --network verse bretfisher/httping -i .1 -GsY firefly/healthz
+```
+
+- Rolling update to the v2 image - returns a 202
+
+```shell
+docker service update --image bretfisher/browncoat:v2 firefly
+```
+
+- Slow the container start up
+
+```shell
+docker service update --env-add DELAY_STARTUP=5000
+```
+
+#### Timeline of a service update
+
+This process happens for each task:
+
+1. Swarm will update N instances at a time, defaults to 1 but can be updated
+   with `update-parallelism`
+1. New tasks are created, and their desired state set to **Ready**:
+    1. Ensures resource availability - **Pending**
+    1. Pulls the image, if necessary - **Pending**
+    1. Creates the container without starting it - **Ready**
+    1. If task fails to achieve **Ready** state it is deleted and a new one
+       started
+1. When the new task is **Ready**, desired state for old one is set to
+   **Shutdown** - this may take some time, depending on the task and its current
+   state.
+1. When the old task achieves **Shutdown** the new task is started and set to **
+   Running**
+1. Waits for `update-delay` (default is 0) and continues with next task
+
+#### Update options
+
+- `--stop-grace-period` - time to wait before force killing container
+  (ns|us|ms|m|h)
+- `--stop-signal <string>` - signal to stop the container
+- `--update-delay` - Delay between updates
+- `--update-failure-action` - Action on update failure, `pause`|`continue`
+  |`rollback` - in a test env probably `pause` or `continue`, in production
+  probably `rollback`
+- `--update-max-failure-ratio` - Tolerable failure rate during an update
+- `--update-monitor` - Duration after each update to monitor for failure
+- `--update-order` - Update order, `start-first`|`stop-first`
+- `--update-parallelism` - Max tasks updated simultaneously
+
+**Examples:**
+
+```shell
+# Monitor for 5 mins before next, rollback on failure
+docker service update --update-failure-action rollback --update-monitor 5m node
+
+# Update 5 at a time, up to 25% can fail until failure action
+# If lots of containers and distributed failures are ok
+docker service update --update-parallelism 5 --update-max-failure-ratio .25
+
+# Start a new container BEFORE killing the old one
+# Good for single replica services, but NOT for databases with vol storage
+docker service update --update-order start-first wordpress
+```
+
+**Sample run:**
+
+```shell
+# Create a service, constrain to current node
+docker network create --driver overlay --attachable verse
+docker service create --name firefly -p 80:80 --network verse --replicas 5 --constraint node.hostname==node1 bretfisher/browncoat:v1
+
+# Monitor for 15 seconds before next task (no op)
+docker service update --update-monitor 15s firefly
+# View the change in monitor time
+docker service inspect --pretty firefly
+
+# Scale up and then update 3 at a time, force update without any changes
+docker service scale firefly=15
+docker service update --update-parallelism=3 --force firefly 
+
+# Start new container before killing old one (watch with docker events)
+docker service scale firefly=1
+docker service update --update-order start-first --force firefly
+```
+
+### Healthchecks and Updates
+
+#### Healthcheck options
+
+- `--health-cmd` - command to check health
+- `--health-interval` - time between health checks, `ms`|`s`|`m`|`h`,
+  default `30s`
+- `--health-retries` - consecutive failures before considered unhealthy,
+  default `3`
+- `--health-start-period` - grace time for container to start before considered
+  unstable, default `0s`
+- `--health-timeout` - Max time for a check to run, default `30s`
+
+- `--stop-grace-period` - Time to wait before force killing container,
+  `ns`|`us`|`ms`|`s`|`m`|`h`, default `10s`
+- `--no-healthcheck` - disable container-specific healthcheck
+
+
+- Generally good to start simple and use defaults, then tune over time.
+- Examples:
+    - Ensure web app returns 200
+    - Ensure nginx returns 200 for `/ping`
+    - Ensure db accepts connects, return a tmp db
+- Remember that container healthchecks are not useful for _integration_ checks -
+  these should be left for external monitoring (Prometheus etc), eg:
+    - Web API returns valid data
+    - DB record has proper count
+    - Web front end can query API, etc
+
+Checkout <https://github.com/docker-library/healthcheck>
+
+### Service Rollbacks - handling failures gracefully
+
+Two main ways rollbacks are used:
+
+**1. Manual rollback**
+
+```shell
+# New way
+docker service rollback <service>
+
+# Old way
+docker service update --rollback
+```
+
+- No options, goes back to last service definition
+- Only one previous _spec_ stored to rollback to, so successive rollbacks will
+  _toggle_ between the current and previous state
+
+**2. Automated rollback during update**
+
+```shell
+docker service update --on-failure-action ...
+```
+
+- Last resort if update doesn't go as planned
+- Should set if possible as default may not be useful
+
+**Rollback options:**
+
+- `--rollback-delay` - delay between task rollbacks, `ns`|`us`|`ms`|`s`|`m`|`h`
+- `--rollback-failure-action` - action on rollback failure, `pause`|`continue`
+- `--rollback-max-failure-ratio` - tolerable rollback failure rate
+- `--rollback-monitor` - duration after each task rollback to monitor for
+  failure
+- `--rollback-order` - Rollback order, `start-first`|`stop-first`
+- `--rollback-parallelism` - max simultaneous rollbacks
+
+Timeline of rollback is similar to service update.
+
+### Stack compose file example
+
+```yaml
+version: '3.9'
+services:
+  redis:
+    image: redis
+    networks:
+      - frontend
+    healthcheck:
+      test: [ "CMD", "redis-cli", "-h", "localhost", "ping" ]
+      interval: 10s
+      timeout: 5s
+      retries: 3
+      start_period: 30s
+    deploy:
+      replicas: 1
+      update_config:
+        failure_action: rollback
+  db:
+    image: postgres:13
+    volumes:
+      - db-data:/var/lib/postgresql/data
+    networks:
+      - backend
+    environment:
+      - POSTGRES_HOST_AUTH_METHOD=trust
+    healthcheck:
+      test: [ "CMD-shell", "pg_isready"]
+      interval: 10s
+      timeout: 5s
+      retries: 5
+    deploy:
+      replicas: 1
+      update_config:
+        failure_action: rollback
+  vote:
+    image: bretfisher/examplevotingapp_vote
+    networks:
+      - frontend
+    deploy:
+      replicas: 3
+      update_config:
+        failure_action: rollback
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 20s
+    ports:
+      - '5000:80'  
+  result:
+    image: bretfisher/examplevotingapp_result
+    networks:
+      - backend
+    deploy:
+      replicas: 3
+      update_config:
+        failure_action: rollback
+    healthcheck:
+      test: [ "CMD", "curl", "-f", "http://localhost" ]
+      interval: 30s
+      timeout: 5s
+      retries: 3
+      start_period: 10s
+    ports:
+      - '5001:80'  
+  worker:
+    image: bretfisher/examplevotingapp_worker
+    networks:
+      - frontend
+      - backend
+    deploy:
+      replicas: 2
+      update_config:
+        failure_action: rollback
+networks:
+  frontend:
+  backend:
+volumes:
+  db-data:
+```
