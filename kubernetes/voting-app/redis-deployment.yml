@@ -1,0 +1,26 @@
+apiVersion: apps/v1
+kind: Deployment
+metadata:
+  name: redis-deploy
+  labels:
+    name: redis-deploy
+    tier: backend
+spec:
+  replicas: 1
+  selector:
+    matchLabels:
+      name: redis
+      tier: backend
+  template:
+    metadata:
+      name: redis
+      labels:
+        name: redis
+        tier: backend
+    spec:
+      containers:
+        - name: redis
+          image: redis
+          ports:
+            - containerPort: 6379
+
