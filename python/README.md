@@ -1,5 +1,21 @@
 # Python Notes
 
+
+## Virtual env tools (from PythonCon Au 2021)
+
+These tools were mentioned:
+
+- https://github.com/pyenv/pyenv 
+- https://github.com/pyenv/pyenv-virtualenv
+- https://pypi.org/project/virtualenvwrapper
+
+
+- https://github.com/pypa/pipx
+
+
+- https://github.com/direnv/direnv
+
+
 ## Setup
 
 - [Intro to pip and virtualenv](https://www.dabapps.com/blog/introduction-to-pip-and-virtualenv-python/)
