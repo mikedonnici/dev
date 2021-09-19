@@ -1,0 +1,16 @@
+apiVersion: v1
+kind: Pod
+metadata:
+  labels:
+    run: postgres-custom
+  name: postgres-custom
+spec:
+  containers:
+  - image: ghcr.io/gs-nsw/igda/postgres-minreps-data:latest
+    name: postgres-custom
+    env:
+    - name: POSTGRES_PASSWORD         
+      value: "postgres"
+  imagePullSecrets:
+  - name: regcred         
+

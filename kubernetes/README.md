@@ -5,8 +5,12 @@
     - [Create and Configure PODs](#create-and-configure-pods)
 - [Configuration](#configuration)
     - [Commands and Arguments](#commands-and-arguments)
-    - ConfigMaps
-    -
+    - [Environment Vars](#environment-vars)
+    - [ConfigMaps](#configmaps)
+    - [Secrets](#secrets)
+    - [SecurityContexts](#securitycontexts)
+    - [ServiceAccounts](#service-accounts)
+
 - Multi-Container PODs
 - Observability
 - POD Design
@@ -253,17 +257,284 @@ CMD ["5"]
 ```
 
 - Then:
-  - `docker run custom-ubuntu sleep` will run `sleep 5`
-  - `docker run custom-ubuntu sleep 10` will run `sleep 10` 
+    - `docker run custom-ubuntu sleep` will run `sleep 5`
+    - `docker run custom-ubuntu sleep 10` will run `sleep 10`
 
 - `--entrypoint` can also be used to override the default `ENTRYPOINT` command
-  - `docker run --entrypoint someothercommand custom-ubuntu`
+    - `docker run --entrypoint someothercommand custom-ubuntu`
+
+### Environment Vars
+
+- Env vars can be set using a plain key-value pair, ConfigMap or Secrets
+
+_set an env var with a key-value pair_:
+
+```yaml
+spec:
+  containers:
+    - name: webapp
+      image: webapp
+      env:
+        - name: APP_COLOUR
+          value: blue
+```
+
+#### ConfigMaps
+
+- ConfigMaps are used to centrally manage environment data and to pass key-value
+  data to pods, and hence containers.
+- ConfigMaps are created, then injected into a POD definition
+- Stored in plain text, so not good for sensitive information
+
+_Imperative creation of a configMap_:
+
+```shell
+# using literals
+kubectl create configmap \
+   <config-name> --from-literal=ENV_VAR_1=value \
+             --from-literal=ENV_VAR_2=value
+             
+# from a file
+kubectl create configmap \
+   <config-name> --from-file=<path-to-file> 
+```
+
+_Declarative creation of a ConfigMap_:
+
+```yaml
+apiVersion: v1
+kind: ConfigMap
+metadata:
+  name: app-config
+data:
+  APP_COLOUR: blue
+  APP_MODE: prod
+```
+
+- Can then inject a ConfigMap into a POD definition:
+
+```yaml
+# ... # 
+spec:
+  containers:
+    - # ... #
+      envFrom:
+        - configMapRef:
+            name: app-config
+```
+
+- Can use a single env var:
+
+```yaml
+# ... # 
+spec:
+  containers:
+    - # ... #
+      env:
+        - name: APP_COLOUR
+          valueFrom:
+            configMapKeyRef:
+              name: app-config
+              value: APP_COLOUR    
+```
+
+- Inject as a volume:
+
+```yaml
+# ... # 
+volumes:
+  - name: app-config-volume
+    configMapKeyRef:
+      name: app-config    
+```
+
+#### Secrets
+
+- Used to store sensitive information
+- Similar to `ConfigMap` except stored in a hashed format
+
+_Imperative creation of a secret from literals_:
+
+```shell
+kubectl create secret generic <secrete-name> \
+  --from-literal=<key1>=<value1> \
+  --from-literal=<key2>=<value2>
+```
+
+_Imperative creation of a secret from a file_:
+
+```shell
+kubectl create secret generic <secrete-name> --fromt-file=<path-to-file>
+```
+
+_Declarative creation of a secret_:
+
+- Values should be base64 encoded, ie `echo -n 'value' | base64`
+
+```yaml
+# secret-data.yml
+apiVersion: v1
+kind: Secret
+metadata:
+  name: app-secrets
+data:
+  DB_HOST: ZGJob3N0
+  DB_USER: ZGJ1c2Vy
+  DB_PASSWORD: c2VjcmV0cGFzc3dvcmQ=
+```
+
+- Create with `kubectl create -f secret-data.yml`
+- To view:
+    - `kubectl get secrets`
+    - `kubectl describe secret app-secrets`
+    - `kubectl get secret app-secrets -o yaml` (shows hashed values)
+- To decode a secret `echo -n 'c2VjcmV0cGFzc3dvcmQ=' | base64 --decode`
 
 
+- Inject Secret into a POD and values will be available as env vars:
 
+_Inject all of the Secret data_:
 
+```yaml
+# ... # 
+spec:
+  containers:
+    - # ... #
+      envFrom:
+        - secretRef:
+            name: app-secrets
+```
 
+_Inject a single value from the Secret_:
 
+```yaml
+# ... # 
+spec:
+  containers:
+    - # ... #
+      env:
+        - name: DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: app-secrets # Secrete object name
+              key: DB_PASSWORD
+```
+
+_Inject as a volume_:
+
+```yaml
+# ... # 
+volumes:
+  - name: app-secrets-volume
+    secret:
+      secretName: app-secrets    
+```
+
+- When injected as a volume, each secret is created as a file, with the value as
+  its content.
+
+```shell
+ls /opt/app-secrets-volume
+DB_HOST  DB_USER  DB_PASSWORD
+```
+
+#### SecurityContexts
+
+- Docker container processes are run directly on the host machine, but in their
+  own namespace.
+- The pid for the same running process will be different when viewed on the host
+  vs the container - processes isolation.
+- By default, Docker runs processes as `root`, however the root user in the
+  container hs fewer privileges (capabilities).
+  See `/usr/include/linux/capabilities.h`
+- Can run a containers as a different user with `--user=1000`, for example.
+- Can also specify the user in the `Dockerfile`:
+
+```dockerfile
+FROM ubuntu
+USER 1000
+```
+
+- The `root` user in the container can have capabilities adjusted
+  with `--cap-add`, `--cap-drop` or `--privileged` to add all.
+
+**In Kubernetes:**
+
+- The same Docker security privileges can be managed in k8s as well.
+- Security can be set at a container or POD level
+- If set at POD level will carry over to container
+- If set at both POD and container, container settings will override POD
+
+_Set run-as-user at the POD level_:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: some-pod
+spec:
+  securityContext:
+    runAsUser: 1000
+  containers:
+    - name: ubuntu
+      image: ubuntu
+      command: [ "sleep", "3600" ]
+```
+
+_Set run-as-user at the container level_:
+
+```yaml
+apiVersion: v1
+kind: Pod
+metadata:
+  name: some-pod
+spec:
+  containers:
+    - name: ubuntu
+      image: ubuntu
+      command: [ "sleep", "3600" ]
+      # just move into the container
+      securityContext:
+        runAsUser: 1000
+        capabilities:
+          add: [ "MAC_ADMIN" ]
+```
+
+- Note that capabilities are only supported at the container level.
+
+#### Service Accounts
+
+- Two types of accounts in K8s:
+    - User Accounts - used by humans, eg admin, dev
+    - Service Accounts - used by machines, eg promethius, jenkins
+- A `ServiceAccount` is required for an application to access to K8s api.
+- Create: `kubectl create serviceaccount account-name`
+- View: `kubctl get serviceaccunt`
+- When a `ServiceAccount` is created a token is automatically generated, and is
+  stored as a secret object
+- The token can be viewed by describing the secret:
+  `kubectl describe secrete secret-name`
+- This token can be used as an authentication bearer token when contacting the
+  K8s api, eg:
+  `curl https:k8s-hostname:6443/api -insecure --header "Athorization: Bearer <token>"`
+- A `ServiceAccount` can be givens access-based roles and permissions
+
+- When the third-party application is hosted on the same K8s cluster, the
+  process is easier
+- The service token secret can be automatically mounted as a volume on the pod
+  running the third-party application so it can be accessed easily.
+
+- Each namespace has its own `default` service account
+- Whenever a pod is created, the default service account and its token, are
+  automatically mounted to that pod as a volume mount
+- This default service account has restricted permissions and can only run basic
+  api queries
+- A `serviceAccount:` field can be added to the pod `spec:` to use a different
+  service account
+- You must delete and re-create the pod to change the service account, or update
+  the deployment which will trigger a new rollout
+- Can choose _not_ to mount the default service account with `spec`:
+  `automountServiceAccountToken: false`
 
 
 
