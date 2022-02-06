@@ -9,25 +9,25 @@
 
 ```script
 # Installation
-$ $ curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
+curl --proto '=https' --tlsv1.2 https://sh.rustup.rs -sSf | sh
 
 # rustup toolchain manager
-$ rustup --version
+rustup --version
 
 # rust compiler
-$ rustc --version
+rustc --version
 
 # update
-$ rustup update
+rustup update
 
 # uninstall
-$ rustup self uninstall
+rustup self uninstall
 ```
 
 ## Local Docs
 
 ```shell
-$ rustup doc
+rustup doc
 ```
 
 ## Build & Run
@@ -36,26 +36,30 @@ With the compiler:
 
 ```script
 $ rustc main.rs
-$ ./main
+./main
 ```
 
 With cargo:
 
 ```script
 # create a new package
-$ cargo new pkgname
-$ cd pkgname
+cargo new pkg_name
+cd pkg_name
 
-# build
-$ cargo build
+# build - also downloads depedencies in Cargo.toml
+cargo build
+
 # run
-$ ./target/debug/pkgname
+./target/debug/pkg_name
 
-# build and run
-$ cargo run
+# build and run - from project root
+cargo run
 
 # compilation check only (no build)
-$ cargo check
+cargo check
+
+# Update depedencies - ignored Cargo.lock
+cargo update 
 ```
 
 ## Language Fundamentals
