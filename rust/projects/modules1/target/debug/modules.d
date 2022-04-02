@@ -1,0 +1,1 @@
+/home/mike/code/dev/rust/projects/modules1/target/debug/modules: /home/mike/code/dev/rust/projects/modules1/src/child.rs /home/mike/code/dev/rust/projects/modules1/src/lib.rs /home/mike/code/dev/rust/projects/modules1/src/main.rs /home/mike/code/dev/rust/projects/modules1/src/parent.rs

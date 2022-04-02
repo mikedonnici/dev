@@ -919,4 +919,383 @@ fn main() {
     }
 }
 ```
- 
+
+## Code organisation - the module system
+
+Ref: <https://doc.rust-lang.org/cargo/guide/project-layout.html>
+
+### Packages and Crates
+
+- A _crate_ is a binary or library
+- The `crate root` is a source file that the compiler starts from and makes up
+  the root module of the crate.
+- A _package_ is one or more crates that provides a set of functionality
+- A _package_ contains a `Cargo.toml` file that describes how to build the
+  crates.
+- A _package_ must contain:
+    - at least one crate
+    - zero or one library crates
+    - any number of binary crates
+
+Example:
+
+```shell
+cargo new my-pkg
+
+my-pkg     # the pkg name
+├── Cargo.toml
+└── src/
+    ├── lib.rs   # a library crate
+    ├── main.rs  # the module root for binary crate named my-pkg
+    └── foo.rs   # a second binary crate
+```
+
+### Modules - controlling scope and privacy
+
+- Modules are used to organise code within a crate for readability and re-use
+- Modules control _public_ / _private_ access to items (privacy boundary)
+
+Example:
+
+```shell
+cargo new --lib restaurant 
+```
+
+```shell
+restaurant
+├── Cargo.toml
+└── src/
+    └── lib.rs
+```
+
+`lib.rs` with some nested (parent / child) modules defined with `mod` keyword
+
+```rust
+mod front_of_house {
+    mod hosting {
+        fn add_to_waitlist() {}
+
+        fn seat_at_table() {}
+    }
+
+    mod serving {
+        fn take_order() {}
+
+        fn server_order() {}
+
+        fn take_payment() {}
+    }
+}
+```
+
+This equates to the following module _tree_:
+
+```shell
+crate
+└── front_of_house
+    ├── hosting
+    │   ├── add_to_waitlist
+    │   └── seat_at_table
+    └── serving
+        ├── take_order
+        ├── serve_order
+        └── take_payment
+```
+
+### Paths - referencing items in a module tree
+
+- _Absolute path_ starts from crate root or literal crate
+- _Relative path_ starts from current module with `self`, `super` or an
+  identifier in the current module.
+- Both types are followed by one or more identifiers separated by `::`
+
+Example:
+
+```rust
+mod front_of_house {
+    mod hosting {
+        fn add_to_waitlist() {}
+    }
+}
+
+pub fn eat_at_restaurant() {
+
+    // Absolute path
+    crate::front_of_house::hosting::add_to_waitlist();
+
+    // Relative path
+    front_of_house::hosting::add_to_waitlist();
+}
+```
+
+- This would not compile because child modules are not accessible by their
+  parent modules (see `pub` section below).
+- Child modules _can_ access their ancestors because they are defined _within_
+  the scope of their ancestors (like closures).
+- use the `pub` keyword to expose paths, eg to expose the `add_to_waitlist()`
+  function above:
+
+```rust
+mod front_of_house {
+    pub mod hosting {
+        pub fn add_to_waitlist() {}
+    }
+}
+```
+
+- can also use `super` at the start of the module path to refer to the _parent_
+  module - analogous to `..` in a file system path
+
+## Privacy for structs and enums
+
+- Structs can be declared `pub` but the struct fields will remain private by
+  default.
+- Each field must be explicitly declared `pub`, as required
+- In the case where some struct fields remain private, a _public_, _associated_
+  function is required to create an instance of the struct.
+
+```rust
+mod some_mod_name {
+    pub struct Foo {
+        pub a: string,
+        b: string,
+    }
+
+    impl Foo {
+        pub fn new(a_val: string) -> Foo {
+            Foo {
+                a: a_val,
+                b: "default b",
+            }
+        }
+    }
+}
+```
+
+- If an `enum` is made public, all of its variants are public
+
+```rust
+mod some_mod_name {
+    pub enum Colour {
+        Red,
+        Green,
+        Blue,
+    }
+}
+
+pub fn do_thing() {
+    let red = some_mod_name::Colour::Red;
+    let green = some_mod_name::Colour::Green;
+}
+```
+
+## `use` - bringing modules into scope
+
+- Can access module items with the full path each time:
+
+```rust
+fn some_func() {
+    let res1 = crate::parent_mod::child_mod::some_fn();
+    let res2 = crate::parent_mod::child_mod::some_fn();
+}
+```
+
+- Easier with `use` paths:
+
+```rust
+use crate::parent_mod::child_mod;
+
+fn some_func() {
+    let res1 = child_mod::some_fn();
+    let res2 = child_mod::some_fn();
+}
+```
+
+- Note that the above is the _idiomatic_ way to implement `user` - that is, to
+  import the parent module and call the function by referencing the parent
+  module. This makes it clear that the function is _not_ locally defined while
+  still reducing the path clutter.
+- It is possible to do it like this as well, but not idiomatic:
+
+```rust
+use crate::parent_mod::child_mod::some_fn;
+
+fn some_func() {
+    let res1 = some_fn();
+    let res2 = some_fn();
+}
+```
+
+- Conversely, it _is_ idiomatic to use the full path when importing structs and
+  enums:
+
+```rust
+use crate:: mod::SomeStruct;
+use crate:: mod::SomeEnum;
+```
+
+- If there is a name clash can `use ... as ...`:
+
+```rust
+use crate::mod_one::FooStruct as FooOne;
+use crate::mod_two::FooStruct as FooTwo;
+```
+
+- Items brought into scope are private to the local scope, however they can be _
+  re-exported_ and thus made available to calling code:
+
+```rust
+pub use crate::mod1::mod1::item;
+
+```
+
+- [External packages](https://crates.io) must first be added to `Cargo.toml`
+- The standard library `std` is also _external_ but is shipped with Rust so does
+  not need to be added to `Cargo.toml`, but still need to bring into scope, eg:
+
+```rust
+use std::collections::HashMap;
+```
+
+- _Nested paths_ can be used to clean up large `use` lists
+- Paths can be nested from any level in the path
+
+```rust
+use std: io;
+use std::cmp::Ordering;
+```
+
+can be:
+
+```rust
+use std::{io, cmp::Ordering};
+```
+
+- _Glob_ operator `*` can also be used to bring _all_ items
+- Can make it hard to know where names came from or how they came into scope
+
+```rust
+use std::collections::*;
+```
+
+## Separating modules into different files
+
+Excellent
+article: [Rust modules and project structure](https://medium.com/codex/rust-modules-and-project-structure-832404a33e2e)
+
+- Rust requires you to explicitly include code in your application
+- All files and folders and _modules_
+- `mod` imports code from a module to the location where the `mod` statement is
+  used
+- Importing a module automatically creates a namespace (from the file name) to
+  avoid name conflicts
+- `use` provides a convenience to map fully qualified type names to something
+  shorter
+
+Example:
+
+```
+crate
+└── lib.rs
+├── main.rs
+│   ├── add_to_waitlist
+│   └── seat_at_table
+└── serving
+├── take_order
+├── serve_order
+└── take_payment
+```
+
+```rust
+// lib.rs
+
+
+```
+
+```rust
+// main.rs
+fn main() {}
+```
+
+Rust 2015 used `dir/mod.rs` to define sub modules but in
+
+See `modules` projects herein, and
+also [project layout](https://doc.rust-lang.org/cargo/guide/project-layout.html)
+.
+
+## Collections
+
+- [Collections](https://doc.rust-lang.org/std/collections/) are data structures
+  for storing a dynamic number of values
+- As size is dynamic, collections are stored on the _heap_
+- Three commonly used types
+  are [vectors](https://doc.rust-lang.org/std/vec/struct.Vec.html),
+  [strings](https://doc.rust-lang.org/std/string/)
+  and [hash maps](https://doc.rust-lang.org/std/collections/hash_map/struct.HashMap.html)
+
+### Vectors - Vec<T>
+
+- Stores multiple values of same type
+- Implemented with generics
+- Provided with `std` library
+- Create a new, empty Vec
+
+```rust
+let v1<i32> = Vec::new();
+```
+
+- Infer type with initial values using `vec!` macro
+
+```rust
+let v2 = vec![1, 2, 3, 4];
+```
+
+- Update a vector
+  ([play](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=da21d80b31211078d9c92cfa45c61078))
+
+```rust
+fn main() {
+    {
+        let mut v = vec![1, 2, 3];
+        v.push(4);
+        v.push(5);
+        println!("{:?}", v);
+    } // <- v out of scope and is freed
+    println!("{:?}", v); // <- error
+}
+```
+
+- 2 ways to read elements of a vector
+  ([play](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=f61b5b0b85311c72e785311756402d5d)):
+
+```rust
+fn main() {
+    let v = [1, 2, 3, 4, 5];
+
+    // Use indexing - pointer to value
+    let a: &i32 = &v[2];
+    println!("v[{}] = {}", 2, a);
+
+    // Panics when the index is out of range
+    // let b: &i32 = &v[99]; // <-- this will panic
+    // println!("v[{}] = {}", 99, b);
+
+    // Using .get(n) returns an Option enum so is best option if don't want 
+    // a panic when the index is out of range.
+    match v.get(2) { // returns an Option<T>
+        Some(n) => println!("3rd element is {}", n),
+        None => println!("There is no 3rd element."),
+    }
+    match v.get(99) { // returns an Option<T>
+        Some(n) => println!("100th element is {}", n),
+        None => println!("There is no 100th element."),
+    }
+}
+```
+
+
+
+
+
+
+
