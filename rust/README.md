@@ -1265,7 +1265,7 @@ fn main() {
 }
 ```
 
-- 2 ways to read elements of a vector
+- 2 ways to read elements of a vector, `&[]` and `get()`
   ([play](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=f61b5b0b85311c72e785311756402d5d)):
 
 ```rust
@@ -1292,10 +1292,23 @@ fn main() {
     }
 }
 ```
+- Iterating over a Vec [play](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=7d9507be9d6a22b60e67df9f51b59742)
 
+```rust
+fn main() {
 
+  let mut v = [1, 2, 3, 4, 5];
+  for i in &v {
+    println!("{}", i)
+  }
 
+  // loop with mutable references to change items in the vec
+  for i in &mut v {
+    *i += 10;
+  }
 
-
-
-
+  for i in &v {
+    println!("{}", i)
+  }
+}
+```
