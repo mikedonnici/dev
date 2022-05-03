@@ -5,6 +5,7 @@
 - [Angular](./angular/)
 - [AWS](./aws/)
 - [Docker](./docker/)
+- [General](./general/)
 - [Geospatial](./geospatial/)
 - [Git](./git/)
 - [Go](./go/)

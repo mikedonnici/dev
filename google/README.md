@@ -63,7 +63,7 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 
 - Web console
 - Cloud shell / SDK cli tools: `gcloud`, `gsutil` and `bq`
-- Cloud console mobile app
+- Cloud console mobile a
 - REST APIs - can be turned on / off and tested with APIs Explorer
 
 ### Virtual Private Cloud (VPC) Network
@@ -185,7 +185,6 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Supports sql-like queries
 - Offers free daily quota
 
-
 #### Cloud SQL
 
 - Managed RDBMS - MySQL and PostgreSQL
@@ -199,7 +198,7 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 
 - horizontally scalable RDBMS
 - Transactional consistency at a global scale
-- Managed instances, high availability 
+- Managed instances, high availability
 
 #### Big Query
 
@@ -207,10 +206,146 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 
 #### Use cases
 
-![storage table](storage.png)
+![storage](storage.png)
 
+### Kubernetes Engine
 
+### App Engine
 
+- Compute engine and Kubernetes Engine require some management of underlying
+  infrastructure.
+- App Engine is a PaaS and manages all the underlying infrastructure
+  automatically, including scaling.
+- Especially suited for application where workload is highly variable or
+  unpredictable.
+- Two App Engine environments: _Standard_ and _Flexible_
+
+- Standard (very similar to Heroku):
+    - Simple deployment experience, free tier
+    - SDKs available for testing App locally in same environment before
+      uploading
+    - Uses a runtime provided by Google, eg Java, Python, PHP, Go.
+    - If need other language must use _flexible_ environment
+    - App runs in a sandbox with the following constraints:
+        - No writing to local files
+        - All requests timeout at 60 seconds
+        - Limits on third-party software
+
+- Flexible environment:
+    - App runs in Docker containers on VMs, no sandbox constraints
+    - Container platform is managed by App Engine and can choose region
+    - Can access standard App Engine resources and can use any language
+    - ssh access
+
+![app engine](app-engine.png)
+
+### GC Endpoints and Apigee Edge
+
+- Two API management tools
+- Cloud Endpoints:
+    - Distributed API management with a web console
+    - Expose APi through RESTful interface
+    - Ideal for providing API to other GC developers
+    - Easily deployed proxy for other GC services
+    - Access control with JWT and Google API keys
+    - User auth with Auth0 and Firebase Auth
+    - Generate client libraries
+    - Supports App Engine (Flexible), Kubernetes Engine and Compute Engine
+- Apigee Edge:
+    - Focus on business issues like rate limited, quota and analytics
+    - Ideal for providing API services to other businesses
+    - Contains analytics, monetization and developer portal
+    - Backend services don't have to be GCP so it is also good when taking apart
+      a legacy application and slowly moving it over to GCP
+
+### Cloud Source Repositories
+
+- Full-featured git repos hosted on GCP
+- Any number of private repos and can use IAM for access
+- Includes source viewer
+
+### Cloud Functions
+
+- Single-purpose functions that respond to events
+- No server or runtime to manage
+- Written in JS and run on managed Node.js on GCP
+- Triggered by events like save to Cloud Storage, Pub Sub, HTTP call
+
+### Deployment Manager: Infrastructure as Code
+
+- Setting up infrastructure manually with cli commands (ie, an _imperative_
+  approach) is unless things need to be changed regularly
+- A _declarative_ approach, using templates, is easier to manage and repeat
+- Uses a yaml or python markup file
+
+### Monitoring: Proactive instrumentation
+
+- Google provides Stackdriver for this purpose
+- Six areas:
+    - Monitoring of platform, system and application metrics, uptime, health etc
+    - Logging of various things
+    - Trace latency reporting and sampling
+    - Error reporting
+    - Debugging
+    - Profiler - continuous profiling of cpu and memory usage
+
+### Big data platform
+
+- GC big data services are fully managed and scalable
+
+#### Cloud Dataproc
+
+- Managed Apache Hadoop
+- Fast and easy way to run Hadoop, Spark/Hive/Pig on GCP
+- Hadoop is a MapReduce, ie a "map" function running on large data set and
+  creating an intermediate result and a "reduce" function that produced a final
+  result from the intermediate results
+- Can scale up or down while jobs are running
+- Can monitor with Stackdriver
+- Can save money by using preemptible instance for batch processing
+- Once data is in a cluster can use Spark Machine Learning Libraries (MLlib) to
+  run classification algorithms
+
+#### Cloud Dataflow
+
+- A good choice for realtime or unpredictable data
+- Used to build data pipelines which work for both batch and streaming data -
+  Extract, Transform and Load (ETL), batch computation and continuous
+  computation
+- eg: Source from BigQuery -> Transform -> Sink to Cloud Storage
+
+#### BigQuery
+
+- Fully managed data warehouse
+- Provides near real-time interactive analysis of massive data sets using SQL
+  2011 syntax
+- Charges are separated for storage and queries so can store data and other
+  parties can run queries at their own cost
+
+#### Cloud Pub/Sub
+
+- Supports many-to-many async messaging
+- App components make push /pull subscriptions to topics
+- Includes support for offline consumers
+- Good for high / unpredictable data such as IoT, and other streaming data
+
+#### Cloud Datalab
+
+- Integrated tool for large scale data analysis, transformation and
+  visualization
+- Built on Jupyter
+- Integrated with BigQuery, Compute Engine and Cloud Storage and these are what
+  is charged, Datalab itself has no additional charge.
+
+#### Machine Learning Platform
+
+- Provides pre-trained models and a platform to generate your own models
+- TensorFlow can be run on CPU or GPU
+- Range of machine learning APIs that can be integrated into apps
+- Cloud Vision API can analyse images with REST api, eg logo / label detection
+- Cloud Speech API can transcribe and analyse speech in real time
+- Cloud Translation API translates an arbitrary string into another language
+- Cloud Video Intelligence API can annotate the contents of video
 
 
 

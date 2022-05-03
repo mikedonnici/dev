@@ -53,7 +53,13 @@ cargo build
 ./target/debug/pkg_name
 
 # build and run - from project root
+# compiles binary with debug symbols by default -> debug/ folder
 cargo run
+
+# --release build without debug symbols, slower to compile -> release/ folder
+cargo run --release 
+
+
 
 # compilation check only (no build)
 cargo check
@@ -75,8 +81,10 @@ let mut y = 10; // mutable
 ```
 
 - Constants are always immutable
-- Convention is UPPERCASE_UNDERSCORES
+- Convention is UPPERCASE_UNDERSCORES (screaming snakecase)
+- Type annotation always required
 - Can only set with a _constant expression_, not func call or computed value
+- Can be module scope (global) and are inlined at compile time so very fast
 
 ```rust
 const MAX_NUM: u32 = 9;
@@ -108,7 +116,8 @@ let x = 2; // shadows x above
 ##### Tuples
 
 - Tuples: grouping of typed values into a single type
-- Fixed length once declared
+- Fixed length once declared (arity)
+- Limited to size of 12
 - Each position has a type:
 
 ```rust
@@ -141,6 +150,7 @@ fn main() {
 
 - Elements must be same type
 - Like tuples, arrays have a fixed length
+- Limited to size of 32, after which us a Vec
 - Allocated on the stack, not the heap
 
 ```rust
@@ -175,6 +185,7 @@ fn main() {
 fn sum_numbers(a: u32, b: u32) -> u32 {
     // return of {} block implicit if no ; after expression a + b
     // If the ; was there get a compilation error
+    // this is called a 'tail expression'
     a + b
     // Could also do 
     // return a + b;
@@ -239,6 +250,20 @@ fn main() {
 }
 ```
 
+- to `break` or `continue` nested loops label a single tick identifier:
+
+```rust
+fn main() {
+    'l1 loop {
+        loop {
+            loop {
+                break 'l1;
+            }
+        }
+    }
+}
+```
+
 - `while`:
 
 ```rust
@@ -275,6 +300,10 @@ fn main() {
     }
     // reversed  
     for n in (1..4).rev() {
+        println!("{}", n);
+    }
+    // range inclusive of last item
+    for n in 1..=4 {
         println!("{}", n);
     }
 }
@@ -736,10 +765,11 @@ fn main() {
 }
 ```
 
-#### The Option Enum
+#### Option Enum
 
-- `Option` enum is defined by the standard library and provides a type that can
-  be used where a value could be something, or could be nothing
+- [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) enum is
+  defined by the standard library and provides a type that can be used where a
+  value could be something, or could be nothing
 - As such, Rust does not have `null`
 
 ```rust
@@ -777,6 +807,39 @@ fn main() {
 
 - See the [`Option`](https://doc.rust-lang.org/std/option/enum.Option.html) docs
   for more info.
+
+#### Result Enum
+
+- [`Result`](https://doc.rust-lang.org/std/result/enum.Result.html) enum is when
+  return may be a value or an error
+- `must_use` annotation creates a compiler warning if all possible variants of
+  the Result are not considered in some way
+- `Result` is generic over separate types for return value (T) and an error (U)
+
+```rust
+#[must_use]
+enum Result<T, U> {
+    Ok(T),
+    Err(U),
+}
+```
+
+```rust
+fn main() {
+    let res = do_thing(true);
+    match res {
+        Ok(c) => println!("Result ok, code = {}", c),
+        Err(e) => println!("Error, code = {}", e),
+    }
+}
+
+fn do_thing(ret_err: bool) -> Result<i32, i32> {
+    if ret_err {
+        return Err(1);
+    }
+    Ok(0)
+}
+```
 
 #### `match` control flow operator
 
@@ -1292,23 +1355,111 @@ fn main() {
     }
 }
 ```
-- Iterating over a Vec [play](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=7d9507be9d6a22b60e67df9f51b59742)
+
+- Iterating over a
+  Vec [play](https://play.rust-lang.org/?version=stable&mode=debug&edition=2021&gist=7d9507be9d6a22b60e67df9f51b59742)
 
 ```rust
 fn main() {
+    let mut v = [1, 2, 3, 4, 5];
+    for i in &v {
+        println!("{}", i)
+    }
 
-  let mut v = [1, 2, 3, 4, 5];
-  for i in &v {
-    println!("{}", i)
-  }
+    // loop with mutable references to change items in the vec
+    for i in &mut v {
+        *i += 10;
+    }
 
-  // loop with mutable references to change items in the vec
-  for i in &mut v {
-    *i += 10;
-  }
+    for i in &v {
+        println!("{}", i)
+    }
+}
+```
 
-  for i in &v {
-    println!("{}", i)
-  }
+## Closures
+
+- Closures are anonymous, inline functions, like a `lamda` in Python.
+- format is param list followed by a block, eg  `|x, y| {x + y}`
+
+```rust
+fn main() {
+    let p = |x| { x * 2 };
+    let nn = vec![1, 2, 3, 4, 5];
+    for n in nn {
+        println!("2 x {}= {}", n, p(n));
+    }
+}
+```
+
+- a closure will borrow a reference to a variable in its scope which is fine
+  provided the closure does not outlive the variable it is referencing
+
+So, this is fine:
+
+```rust
+fn main() {
+    let s = "dog".to_string();
+    let p = || {
+        println!("The string is '{}'", s)
+    };
+    p();
+}
+```
+
+But this throws an error:
+
+```rust
+fn main() {
+    {
+        let s = "dog".to_string();
+    } // <-- s is out of scope   
+    let p = || {
+        println!("The string is '{}'", s)
+    };
+    p();
+}
+```
+
+- Can use `move` semantics to force the closure to take ownership of a variable:
+
+```rust
+fn main() {
+    let s = "dog".to_string();
+    let p = move || {
+        println!("The string is '{}'", s);
+    };
+    p();
+}
+```
+
+## Threads
+
+- Like go routines
+- Portable, so works on various platforms
+- Require overhead for context switching so best for situations where can take
+  advantage of multiple cpu cores
+- For situations where delay is related to network or disk, `async await` is a
+  better choice
+
+```rust
+use std::thread;
+
+fn main() {
+
+    // pass in a closure with no arguments which runs the main fn of the thread 
+    let handle = thread::spawn(move || {
+        run();
+    });
+
+    // do some other stuff in main thread
+    println!("running main()");
+
+    // wait until the 'run' thread has exited
+    handle.join().unwrap();
+}
+
+fn run() {
+  println!("running run()");
 }
 ```
