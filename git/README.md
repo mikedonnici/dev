@@ -236,12 +236,68 @@ See also: #456, #789
 
 - Shows nice log format to see merges
 
+## Log
 
-## Mike's `.gitconfig` set up
+### `git log --pretty=oneline`
+
+- Shows nice on-liner for each commit
+
+
+## Tagging
+
+- Git supports two types of tags:
+  - _lightweight_ - a reference to a specific commit
+  - _annotated_ - full object with name, email, message etc (generally recommended)
+
+- ref: <https://git-scm.com/book/en/v2/Git-Basics-Tagging>
+
+### `git tag v1.2.3`
+
+- Create a _lightweight_ tag `v1.2.3`
+
+### `git tag -a v1.2.3 -m "My message about v1.2.3"`
+
+- Create an annotated (`-a`) tag with a message (`-m`)
+- Without `-m` git launches editor (same as `commit`)
+
+### `git tag -a v1.2.3 9fceb02`
+
+- Tags a specific commit (in case you forget!)
+- See commits with `git log --pretty=oneline` 
+
+### `git tag -d v1.2.3`
+
+- Delete tag locally 
+
+### `git push origin --delete v1.2.3`
+
+- Delete tag from remote
+
+### `git show v1.2.3`
+
+- Outputs tag data and the commit that was tagged
+
+### `git tag` or `git tag -l`
+
+- List tags
+- With `-l` can match patterns, eg `git tag -l "1.8.*"`
+
+### `git push origin v1.2.3`
+
+- By default, git does not push tags, so push just like sharing branches
+- Can do `git push --tags` to push all tags, but not recommended as can make a mess that is hard to clean up
+
+### `git checkout v1.2.3`
+
+- Checkout file versions tag is pointing at
+
+
+
+## `.gitconfig`
 
 ```
 [user]
-  email = michael@mesa.net.au
+  email = michael.donnici@gmail.com
   name = Mike Donnici
 [core]
   editor = vim
