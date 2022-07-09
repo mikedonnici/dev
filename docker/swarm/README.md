@@ -2,7 +2,7 @@
 
 Check if swarm enabled:
 
-```shell
+```bash
 docker info
 ...
 Swarm: inactive
@@ -11,7 +11,7 @@ Swarm: inactive
 
 Activate swarm:
 
-```shell
+```bash
 docker swarm init
 ```
 
@@ -26,7 +26,7 @@ docker swarm init
 `docker swarm` is a narrow-scope command, for joining / leaving swarms,
 promoting managers etc.
 
-```shell
+```bash
 docker swarm --help
 ```
 
@@ -34,7 +34,7 @@ docker swarm --help
 
 Eg, show nodes:
 
-```shell
+```bash
 docker node ls
 ID                            HOSTNAME   STATUS    AVAILABILITY   MANAGER STATUS   ENGINE VERSION
 se34h87576uup25vtwu4fo3c3 *   gsnsw      Ready     Active         Leader           20.10.6
@@ -44,14 +44,14 @@ se34h87576uup25vtwu4fo3c3 *   gsnsw      Ready     Active         Leader        
 
 Create a service:
 
-```shell
+```bash
 docker service create alpine ping 8.8.8.8
 rn1yfs2802a7tiynil1or8eqq <--- this is the service id
 ```
 
 List services:
 
-```shell
+```bash
 docker service ls
 ID             NAME            MODE         REPLICAS   IMAGE           PORTS
 rn1yfs2802a7   elastic_nobel   replicated   1/1        alpine:latest 
@@ -59,7 +59,7 @@ rn1yfs2802a7   elastic_nobel   replicated   1/1        alpine:latest
 
 List tasks (service processes):
 
-```shell
+```bash
 docker service ps elastic_nobel # <-- name or service id
 ID             NAME              IMAGE           NODE      DESIRED STATE   CURRENT STATE           ERROR     PORTS
 bunbot099yq2   elastic_nobel.1   alpine:latest   gsnsw     Running         Running 3 minutes ago
@@ -67,7 +67,7 @@ bunbot099yq2   elastic_nobel.1   alpine:latest   gsnsw     Running         Runni
 
 Scale service up:
 
-```shell
+```bash
 docker service update elastic_nobel --replicas 3
 ...
 docker service ls
@@ -83,7 +83,7 @@ ruib2ac070fg   elastic_nobel.3   alpine:latest   gsnsw     Running         Runni
 
 Remove the service:
 
-```shell
+```bash
 docker service rm elastic_nobel
 ```
 
@@ -91,7 +91,7 @@ docker service rm elastic_nobel
 
 Init swarm and advertise an IP accessible by other nodes
 
-```shell
+```bash
 docker swarm init --advertise-addr [IP]
 ```
 
@@ -101,7 +101,7 @@ the join command can run
 
 Swarm Visualiser, run this on one node
 
-```shell
+```bash
 docker service create --name=viz --publish=8080:8080/tcp --constraint=node.role==manager --mount=type=bind,src=/var/run/docker.sock,dst=/var/run/docker.sock bretfisher/visualizer 
 ```
 
@@ -117,7 +117,7 @@ Then access on  `:8080`
 
 Example - Creating a drupal network:
 
-```shell
+```bash
 docker network create --driver overlay mydrupal
 docker network ls
 docker service create --name psql --network mydrupal -e POSTGRES_PASSWORD=mypass postgres
@@ -169,7 +169,7 @@ running on one node. This is because of the _routing mesh_.
 
 - Example run:
 
-```shell
+```bash
 docker stack deploy -c app-stack.yml appname
 #... to deploy and then can look at things with:
 docker stack ls
@@ -199,13 +199,13 @@ docker stack ps appname
 
 Create a secret from a file:
 
-```shell
+```bash
 docker secret create psqluser psql_user.txt
 ```
 
 Echo a secret and read from stdin:
 
-```shell
+```bash
 echo "superSecretPassword" | docker secret create psql_pass -
 ```
 
@@ -214,14 +214,14 @@ Note: need to ensure that secrets are not visible in bash history etc.
 Can list and inspect secrets but will not be able to read the actual value -
 this is only available to running containers.
 
-```shell
+```bash
 docker secret ls
 ID                          NAME        DRIVER    CREATED         UPDATED
 k1heq0feos0tzkyexc2llb9y4   psql_pass             3 minutes ago   3 minutes ago
 m0gjg9yz42d4fakvgiklxr5h0   psql_user             2 minutes ago   2 minutes ago
 ```
 
-```shell
+```bash
 docker secret inspect psql_user
 [
     {
@@ -248,7 +248,7 @@ So to use swarm secrets as below the image would have to support a similar
 convention so that it could read to secrets from the container
 at `/run/secrets/`.
 
-```shell
+```bash
 docker service create --name psql \
   --secret psql_user \
   --secret psql_pass \
@@ -260,7 +260,7 @@ docker service create --name psql \
 Can add or remove secrets for an existing service however this will recreate the
 container:
 
-```shell
+```bash
 docker service update --secret-rm [list]
 docker service update secret-add [secret]
 ```
@@ -295,7 +295,7 @@ secrets:
 
 To start:
 
-```shell
+```bash
 docker stack deploy -c docker-compose.yml mydb
 ```
 
@@ -322,31 +322,31 @@ configuration but is _not_ secure. It is not _intended_ to be secure because
 
 - Update image to a newer version
 
-```shell
+```bash
 docker service update --image fooapp:1.2.1 <servicenmae>
 ```
 
 - Add env var and remove a port:
 
-```shell
+```bash
 docker service update --env-add MODE_ENV=production --publish-rm 8080
 ```
 
 - Change replicas for two services:
 
-```shell
+```bash
 docker service scale web=8 api=6 
 ```
 
 - In a stack file just edit the `YAML` file and:
 
-```shell
+```bash
 docker stack deploy -c file.yaml <stackname>
 ```
 
 Example run:
 
-```shell
+```bash
 # Create a service
 docker service create -p 8088:80 --name web nginx:1.13.7
 
@@ -387,7 +387,7 @@ docker service rm web
 
 **`docker run` example using Elastic Search image:**
 
-```shell
+```bash
 docker run  \
   --health-cmd="curl -f localhost:9200/_cluster/health || false" \  
   --health-interval=5s \
@@ -413,7 +413,7 @@ HEALTHCHECK --interval=30s --timeout=3s CMD curl -f http://localhost/ || exit 1
 
 - If above is built and run can inspect health with:
 
-```shell
+```bash
 docker inspect <container_id> | jq .[0].State
 ```
 
@@ -438,7 +438,7 @@ services:
 
 **`docker service` example using postgres:**
 
-```shell
+```bash
 docker service create --name pg --health-cmd="pg_isready -U postgres || exit 1" -e POSTGRES_PASSWORD="abc123" postgres
 ```
 
@@ -473,7 +473,7 @@ docker service create --name pg --health-cmd="pg_isready -U postgres || exit 1" 
 
 - Place only on a manager (`node.role` is built-in):
 
-```shell
+```bash
 docker service create --constraint=node.role==manager nginx
 # OR
 docker service create --constraint=node.role!=worker nginx
@@ -481,7 +481,7 @@ docker service create --constraint=node.role!=worker nginx
 
 - Add label to node2 and a constraint:
 
-```shell
+```bash
 docker node update --label-add=dmz=true node2
 docker service create --constraint=node.labels.dmz==true nginx
 ```
@@ -523,13 +523,13 @@ services:
 
 Put nginx on all nodes:
 
-```shell
+```bash
 docker service create --name web1 --mode global nginx
 ```
 
 Put nginx on all workers:
 
-```shell
+```bash
 docker service create --name web2 --constraint node.role==worker --mode global nginx
 ```
 
@@ -559,7 +559,7 @@ services:
 
 **Example: Spreading tasks across AWS AZs**
 
-```shell
+```bash
 # Label ALL nodes
 docker node update --label-add azone=1 node1
 docker node update --label-add azone=2 node2
@@ -598,7 +598,7 @@ services:
 
 **Examples:**
 
-```shell
+```bash
 # pause node 2
 docker node update --availability pause node2
 
@@ -625,7 +625,7 @@ docker node update --availability drain node3
 
 **Examples:**
 
-```shell
+```bash
 # Full CPU for MySQL
 docker service create --reserve-memory 800M --reserve-cpu 1 mysql
 
@@ -668,7 +668,7 @@ service:
 
 **Examples:**
 
-```shell
+```bash
 # Return all logs for a service
 docker service logs <servicename/id>
 
@@ -685,14 +685,14 @@ docker service logs --tail 50 --follow <servicename/id>
 Reminder: `docker service ps <service name / id>`shows the _processes_ (tasks),
 belonging to that service, and the task id for each - eg:
 
-```shell
+```bash
 docker service ps web01
 ```
 
 Although logging is not very sophisticated can `grep` logs to find particular
 lines. Note that need to ensure both stderr and stdout are grep'd:
 
-```shell
+```bash
 docker service logs <service name> 2>&1 | grep <search term>
 ```
 
@@ -708,7 +708,7 @@ docker service logs <service name> 2>&1 | grep <search term>
 
 **Examples:**
 
-```shell
+```bash
 # watch events from now, swarm scope if on manager, else local 
 docker events
 
@@ -740,7 +740,7 @@ docker events --since 1h --filter scope=swarm --filter type=network
 
 **Examples:**
 
-```shell
+```bash
 # create a new config from an existing nginx config
 docker config create nginx01 ./nginx.conf
 # Use the above config
@@ -790,31 +790,31 @@ Testing tools:
 
 - Create a network
 
-```shell
+```bash
 docker network create --driver overlay --attachable verse
 ```
 
 - Create browncoat service at v1 - returns a 201
 
-```shell
+```bash
 docker service create --name firefly -p80:80 --network verse --replicas 5 bretfisher/browncoat:v1
 ```
 
 - Run httping with a few options
 
-```shell
+```bash
 docker run --rm --network verse bretfisher/httping -i .1 -GsY firefly/healthz
 ```
 
 - Rolling update to the v2 image - returns a 202
 
-```shell
+```bash
 docker service update --image bretfisher/browncoat:v2 firefly
 ```
 
 - Slow the container start up
 
-```shell
+```bash
 docker service update --env-add DELAY_STARTUP=5000
 ```
 
@@ -853,7 +853,7 @@ This process happens for each task:
 
 **Examples:**
 
-```shell
+```bash
 # Monitor for 5 mins before next, rollback on failure
 docker service update --update-failure-action rollback --update-monitor 5m node
 
@@ -868,7 +868,7 @@ docker service update --update-order start-first wordpress
 
 **Sample run:**
 
-```shell
+```bash
 # Create a service, constrain to current node
 docker network create --driver overlay --attachable verse
 docker service create --name firefly -p 80:80 --network verse --replicas 5 --constraint node.hostname==node1 bretfisher/browncoat:v1
@@ -924,7 +924,7 @@ Two main ways rollbacks are used:
 
 **1. Manual rollback**
 
-```shell
+```bash
 # New way
 docker service rollback <service>
 
@@ -938,7 +938,7 @@ docker service update --rollback
 
 **2. Automated rollback during update**
 
-```shell
+```bash
 docker service update --on-failure-action ...
 ```
 

@@ -23,7 +23,7 @@ These tools were mentioned:
 This approach stores the complete Python environment, and all packages, into an 
 arbitrary directory, eg:
 
-```shell
+```bash
 $ pip install virtualenv
 $ virtualenv venv
 $ source venv/bin/activate
@@ -31,7 +31,7 @@ $ source venv/bin/activate
 
 To deactivate a virtual env:
 
-```shell
+```bash
 $ deactivate
 ```
 
@@ -39,7 +39,7 @@ To use a virtual env with Jupyter:
 - Activate the virtual env, as shown above
 - Run the following:
 
-```shell
+```bash
 # $ pip install --user ipykernel
 # Note: Above pip install failed when run from a virtual env with msg:
 # ERROR: Can not perform a '--user' install. User site-packages are not visible in this virtualenv. 
@@ -53,7 +53,7 @@ that is added is the currently activated one.
  
 To list virtual envs available to jupyter:
 
-```shell
+```bash
 $ jupyter kernelspec list
 Available kernels:
   python3    /home/mike/.local/share/jupyter/kernels/python3
@@ -62,7 +62,7 @@ Available kernels:
 
 To remove a virtual env from jupyter:
 
-```shell
+```bash
 $ jupyter kernelspec uninstall display_name
 ```
 

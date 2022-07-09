@@ -26,7 +26,7 @@ rustup self uninstall
 
 ## Local Docs
 
-```shell
+```bash
 rustup doc
 ```
 
@@ -536,7 +536,7 @@ fn no_dangle() -> String {
 - Does not have ownership
 - References a contiguous sequence of elements in a collection (like Go slice)
 
-```shell
+```bash
 let s = String::from("hello world");
 let s1 = s[..4];  // index 0 to index 3
 let s2 = s[3..7]; // index 3 to index 6
@@ -1002,7 +1002,7 @@ Ref: <https://doc.rust-lang.org/cargo/guide/project-layout.html>
 
 Example:
 
-```shell
+```bash
 cargo new my-pkg
 
 my-pkg     # the pkg name
@@ -1020,11 +1020,11 @@ my-pkg     # the pkg name
 
 Example:
 
-```shell
+```bash
 cargo new --lib restaurant 
 ```
 
-```shell
+```bash
 restaurant
 ├── Cargo.toml
 └── src/
@@ -1053,7 +1053,7 @@ mod front_of_house {
 
 This equates to the following module _tree_:
 
-```shell
+```bash
 crate
 └── front_of_house
     ├── hosting

@@ -7,13 +7,13 @@
 
 - Set up preferred path for third-party packages:
 
-```shell
+```bash
 # add to $HOME/.profile
 export GOPATH=$HOME/go
 export PATH=$PATH:$GOPATH/bin
 ```
 
-```shell
+```bash
 source $HOME/.profile
 ```
 
@@ -28,7 +28,7 @@ source $HOME/.profile
 - `go fmt` is standard
 - `goimports` - enhanced version of `go fmt` which cleans up import statements
 
-```shell
+```bash
 go install golang.org/x/tools/cmd/goimports@latest
 goimports -l -w . # -l show files, -w in place
 ```
@@ -43,14 +43,14 @@ _Don't assume any of these are 100% accurate_
   
 - `golint` - Enforces style, ie syntax structure
 
-```shell
+```bash
 go install golang.org/x/lint/golint@latest
 golint ./...
 ```
 
 - `go vet` - Picks up programmatic errors, unused vars etc
 
-```shell
+```bash
 go vet ./...
 ```
 

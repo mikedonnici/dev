@@ -19,12 +19,12 @@ With gRPC we can define our service once in a `.proto` file and implement client
 ## Example code and setup
 
 The example code for our tutorial is in [grpc/grpc-go/examples/route_guide](https://github.com/grpc/grpc-go/tree/master/examples/route_guide). To download the example, clone the `grpc-go` repository by running the following command:
-```shell
+```bash
 $ go get google.golang.org/grpc
 ```
 
 Then change your current directory to `grpc-go/examples/route_guide`:
-```shell
+```bash
 $ cd $GOPATH/src/google.golang.org/grpc/examples/route_guide
 ```
 
@@ -93,13 +93,13 @@ Next we need to generate the gRPC client and server interfaces from our `.proto`
 
 For simplicity, we've provided a [bash script](https://github.com/grpc/grpc-go/blob/master/codegen.sh) that runs `protoc` for you with the appropriate plugin, input, and output (if you want to run this by yourself, make sure you've installed protoc and followed the gRPC-Go [installation instructions](https://github.com/grpc/grpc-go/blob/master/README.md) first):
 
-```shell
+```bash
 $ codegen.sh route_guide.proto
 ```
 
 which actually runs:
 
-```shell
+```bash
 $ protoc --go_out=plugins=grpc:. route_guide.proto
 ```
 

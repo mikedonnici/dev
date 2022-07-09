@@ -13,13 +13,13 @@ development, whereas dynamic types in JavaScript with throw issues at runtime.
 
 To install:
 
-```shell
+```bash
 $ sudo npm install -g typescript
 ```
 
 TypeScript compiler is then available as `tsc`:
 
-```shell
+```bash
 $ tsc foo.ts
 # Compiles foo.ts -> foo.js
 ```
@@ -473,7 +473,7 @@ function infiniteLoop(): never {
 
 Run the compiler each time a file changes:
 
-```shell
+```bash
 $ tsc --watch file.ts
 # or
 $ tsc -w file.ts
@@ -483,20 +483,20 @@ $ tsc -w file.ts
 
 Initialise a project:
 
-```shell
+```bash
 $ tsc --init
 # -> tsconfig.json
 ```
 
 Compile all `.ts` files:
 
-```shell
+```bash
 $ tsc
 ```
 
 Watch all files, recompile on any change:
 
-```shell
+```bash
 $ tsc --watch
 ```
 

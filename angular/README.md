@@ -38,7 +38,7 @@
 
 ## CLI fundamentals
 
-```shell script
+```bash script
 # create a new app
 $ ng new app-name
 
@@ -173,7 +173,7 @@ and
 - Angular will instantiate the class and pass the ElementRef to `constructor()`
 - Directive needs to be imported in `app.module.ts`
 
-```shell
+```bash
 # Generate a directive
 $ ng generate directive greenText 
 # or ng g d greenText

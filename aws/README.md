@@ -22,7 +22,7 @@ Resources:
 
 - If MFA stops working, but still have cli access, can disable MFA:
 
-```shell
+```bash
 $ aws iam list-mfa-devices --user-name SomeUser
 # copy SerialNumber in response
 $ aws iam deactivate-mfa-device --user-name SomeUser --serial-number [SerialNumber]

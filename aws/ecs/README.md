@@ -19,7 +19,7 @@ Steps to authenticate with ECR:
 In short, command below fetches an auth token and pipes that to 
 [docker login](https://docs.docker.com/engine/reference/commandline/login/#login-to-a-self-hosted-registry):
 
-```shell
+```bash
 $ aws ecr get-login-password --region ap-southeast-2 / 
   | docker login --username AWS --password-stdin / 
   896154582544.dkr.ecr.ap-southeast-2.amazonaws.com

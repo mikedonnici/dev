@@ -167,7 +167,7 @@ spec:
 - Larger environments may require additional namespace, eg `DEV`, `PROD`
 - A `Namespace` object can be created with cli:
 
-```shell
+```bash
 kubectl create namespace dev
 ```
 
@@ -288,7 +288,7 @@ spec:
 
 _Imperative creation of a configMap_:
 
-```shell
+```bash
 # using literals
 kubectl create configmap \
    <config-name> --from-literal=ENV_VAR_1=value \
@@ -355,7 +355,7 @@ volumes:
 
 _Imperative creation of a secret from literals_:
 
-```shell
+```bash
 kubectl create secret generic <secrete-name> \
   --from-literal=<key1>=<value1> \
   --from-literal=<key2>=<value2>
@@ -363,7 +363,7 @@ kubectl create secret generic <secrete-name> \
 
 _Imperative creation of a secret from a file_:
 
-```shell
+```bash
 kubectl create secret generic <secrete-name> --fromt-file=<path-to-file>
 ```
 
@@ -433,7 +433,7 @@ volumes:
 - When injected as a volume, each secret is created as a file, with the value as
   its content.
 
-```shell
+```bash
 ls /opt/app-secrets-volume
 DB_HOST  DB_USER  DB_PASSWORD
 ```
@@ -582,7 +582,7 @@ spec:
 
 ### `kubectl` commands
 
-```shell
+```bash
 kubectl run hello-minicube
 kubectl cluster-info
 kubectl get nodes

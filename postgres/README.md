@@ -3,19 +3,19 @@
 
 Install postgresql and postgis:
 
-```shell script
+```bash script
 $ sudo apt-get install postgresql postgresql-contrib postgresql-postgis 
 ```
 
 Connect as postgres user:
 
-```shell script
+```bash script
 $ sudo -u postgres psql 
 ```
 
 Create db, role, and add postgis extension:
 
-```shell script
+```bash script
 # create database foo;
 CREATE DATABASE
 # create role foouser with password 'foopass';
@@ -39,14 +39,14 @@ By default, local connections use `peer` auth, ie, the user needs to exist on
 the local operating system. To allow a 'role' to connect local postgresql server
 without having an OS user account, edit `pg_hba.conf`:
 
-```shell script
+```bash script
 # Note version here is 12
 $ sudo vi /etc/postgresql/12/main/pg_hba.conf
 ```
 
 ...and make this change:
 
-```shell script
+```bash script
 # "local" is for Unix domain socket connections only
 local   all  all md5 # <- change this from peer to md5
 ```

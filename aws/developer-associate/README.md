@@ -97,7 +97,7 @@ _Elastic Compute Cloud_
 
 Example User Data script:
 
-```shell script
+```bash script
 #!/bin/bash
 yum update -y
 yum install -y httpd.x86_64
@@ -748,7 +748,7 @@ See [Mounting EFS](https://docs.aws.amazon.com/efs/latest/ug/mounting-fs.html)
 - in a `dig` query the number beside the domain is the cache TTL remaining 
   before a new lookup - below it is `12`:
   
-```shell
+```bash
 ;; ANSWER SECTION:
 mikedonnici.com.        12      IN      A       54.206.231.79
 mikedonnici.com.        12      IN      A       54.206.202.192

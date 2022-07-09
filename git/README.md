@@ -11,7 +11,7 @@ Refs:
 
 - Using `diff`
 
-```shell
+```bash
 $ diff file1.py file2.py 
 2c2,3 <-- indicates line format and change (c)
 <     return n * n
@@ -22,7 +22,7 @@ $ diff file1.py file2.py
 
 - Using `diff -u` (unified format)
 
-```shell
+```bash
  $ diff -u file1.py file2.py 
 --- file1.py    2021-01-26 12:29:54.881984323 +1100
 +++ file2.py    2021-01-26 12:34:41.767966975 +1100
@@ -37,13 +37,13 @@ $ diff file1.py file2.py
 - Other diff tools include `kdiff3`, `meld`, `vimdiff`, `wdiff`
 - Create a diff file:
 
-```shell
+```bash
 $ diff -u file1.py file2.py > changes.diff
 ```
 
 - Apply a diff file using `patch`
 
-```shell
+```bash
 $ patch file1.py < changes.diff 
 patching file file1.py
 ```
@@ -55,7 +55,7 @@ Version Control Systems (VCS) use this approach under the hood.
 
 ## Config
 
-```shell
+```bash
 $ git config --global user.email "michael@mesa.net.au"
 $ git config --global user.name "Mike Donnici"
 ```
@@ -88,7 +88,7 @@ $ git config --global user.name "Mike Donnici"
    - **Committed** - a snapshot of the _staged_ changes has been recorded
 - Basic workflow:
 
-```shell
+```bash
 $ git init
 $ git config -l # check identity for commits
 $ git status
