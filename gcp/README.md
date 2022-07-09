@@ -22,7 +22,7 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Organisation -> Folders (optional) -> Project -> GCP Resources
 - Resources are always placed in a single project
 - Projects can optionally be organised with folders
-- Folders can be placed beneath a Organisation Nodes
+- Folders can be placed beneath an Organisation Nodes
 - Policies can be defined at any level in the hierarchy and are applied top-down
   to all items below it in the hierarchy - this means lower-level policies take
   precedence
@@ -33,24 +33,71 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 
 - Folders provide a convenient way of grouping Projects so that policies may be
   applied to multiple projects at once - less error-prone
-- To user Folders must have an Organisation node at the top of the hierarchy
+- To use Folders must have an Organisation node at the top of the hierarchy
 - If account is part of a Workspace account then there will be one automatically
   created
 - If not, can use Google Cloud Identity to create one
 
-### Identity and Access Management
+### Cloud Identity
 
-- IAM Policies define _WHO_, _CAN DO WHAT_ on _WHICH RESOURCE_
-- WHO can be a google account, group, a service account, entire workspace or a
-  cloud identity domain
-- CAN DO WHAT is defined by an IAM Role which is a set of related permissions
-- IAM Primitive Roles are fixed, coarse-grained levels of access - Owner,
-  Editor, Viewer, Billing Administrator
-- IAM Pre-defined Roles apply to a particular GCP service in a project and offer
-  more fine-grained permissions, depending on where they are applied
-- IAM Custom Roles are even finer and are defined by the user and can only be
-  defined at the project or organisation level - they cannot be applied to a
-  folder
+- IDaaS - Identity as a Service
+- Arose from GSuite with management via Google Admin
+- Now integrated into GCP
+- Used to manage resources hierarchically
+- Can assign _unmanaged_ (outside) accounts to projects
+- Allows single sign on
+
+
+### IAM - Identity and Access Management
+
+- IAM is a _unified resource access management system_ for both users and services
+- Three main components:
+  - Policies
+  - Roles
+  - Resources
+- IAM Policies define _WHO_ (member), _CAN DO WHAT_ (role) on _WHICH RESOURCE_ (resource)
+- Identities (the _WHO_) can be:
+  - Google (managed) account, unmanaged account
+  - Service account
+  - Google Group, Workspace or Cloud Identity Domain
+- Roles (the _CAN DO WHAT_) are sets of related permissions:
+  - Primitive Roles are fixed, coarse-grained levels of access - Owner,
+    Editor, Viewer, Billing Administrator
+  - Pre-defined Roles apply to a particular GCP service in a project and offer
+    more fine-grained permissions, depending on where they are applied
+  - Custom Roles are even finer and are defined by the user and can only be
+    defined at the project or organisation level - they cannot be applied to a
+    folder
+- Resources:
+  - Projects and folders
+  - Cloud services
+  - Aspects of services, eg buckets, topics etc
+
+### Cloud KMS - Key Management System
+
+- Under _Security_ in console
+- Cryptographic keys used to encrypt / decrypt files
+- Project-based resource
+- Hierarchical like IAM:
+  - Project > Location > Key Ring > Key > Key Version
+- Key ring location can be regional, multi-regional or global
+- Key ring is a collection of keys in a specified location for a specific project
+- Individual keys inherit permissions from the key ring
+- Different key versions have different encryption / decryption values
+- Key version states: enabled, disabled, scheduled for destruction, destroyed
+- Key versions can be rotated regularly - automatically or manually
+
+### Cloud IAP - Identity Aware Proxy
+
+- Under _Security_ in console
+- Application-level authorization service
+- Based on internal Google enterprise security model called BeyondCorp
+- Supplements network-level firewalls
+- Ideal for line-of-business apps
+- No VPN needed so easy to implement for admins, and easy to use for remote workers
+- No additional charges
+
+
 
 #### Service Accounts
 
@@ -127,7 +174,7 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Data encrypted server-side, before it is written to disk (encryption at rest)
 - Data in transit is also encrypted with HTTPS
 
-- Objects are are assigned to _buckets_ which have a globally unique name, a
+- Objects are assigned to _buckets_ which have a globally unique name, a
   geographic location and a storage class
 - Bucket access managed with IAM policies or Access Control Lists (ACLs)
 - Object access controlled with ACLs
@@ -140,19 +187,31 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Versioning can be managed with lifecycle policies
 
 
-- Storage classes:
+- Location Type:
     - **Multi-regional**:
-        - geographically redundant
+        - high availability, low latency across many regions
         - highest storage cost per GB, low transfer cost
         - best for content storage and delivery
+    - **Dual-region**:
+        - high availability, low latency across two regions
+        - lower storage cost than multi-regional, low transfer cost
     - **Regional**:
+        - high availability, low latency within a single region
         - not geographically redundant
         - lower storage cost than multi-regional, low transfer cost
         - good for analytics, transcoding
+
+- Storage classes:
+    - **Standard**
+        - higher storage cost
+        - for frequent access
     - **Nearline**:
         - lower storage cost, higher transfer cost
         - good for infrequent access, eg once per month, backups
     - **Coldline**:
+        - lower storage cost, highest transfer cost
+        - good for archiving, disaster recovery, eg yearly access
+    - **Archive**:
         - lowest storage cost, highest transfer cost
         - good for archiving, disaster recovery, eg yearly access
 
@@ -166,7 +225,28 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 
 - Cloud storage works with other GCP services such as databases etc
 
-#### Bigtable
+#### Cloud Databases
+
+##### Relational
+
+**Cloud SQL**
+
+- Managed RDBMS - MySQL, PostgreSQL and SQLServer
+- Provides replica services: read, failover, external replica
+- Managed backups
+- Vertical scaling (read / write)
+- Horizontal scaling (read)
+- Security firewalls and data encryption
+
+**Cloud Spanner**
+
+- horizontally scalable RDBMS
+- Transactional consistency at a global scale
+- Managed instances, high availability
+
+#### Non-Relational
+
+**Bigtable**
 
 - Fully managed NoSQL wide-column database service for terabyte applications
 - Like a persistent hash table
@@ -175,32 +255,22 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Data encrypted in flight and at rest
 - Access control with IAM
 
-#### Cloud Datastore
+**Cloud Datastore** (FireStore?)
 
 - Horizontally scalable NoSQL document database
 - Designed for application backends storing structured data
-- Can span App Engines and Compute Engine applications
+- Can span App Engine and Compute Engine applications
 - Automatically handles scaling - sharding and replication
 - Supports transactions (unlike Bigtable)
 - Supports sql-like queries
 - Offers free daily quota
 
-#### Cloud SQL
+**Memory Store**
 
-- Managed RDBMS - MySQL and PostgreSQL
-- Provides replica services: read, failover, external replica
-- Managed backups
-- Vertical scaling (read / write)
-- Horizontal scaling (read)
-- Security firewalls and data encryption
+- managed in-memory data store
+- Redis or Memcache
 
-#### Cloud Spanner
-
-- horizontally scalable RDBMS
-- Transactional consistency at a global scale
-- Managed instances, high availability
-
-#### Big Query
+**Big Query**
 
 (see later)
 
@@ -217,7 +287,8 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - App Engine is a PaaS and manages all the underlying infrastructure
   automatically, including scaling.
 - Especially suited for application where workload is highly variable or
-  unpredictable.
+  unpredictable
+- Deploys to a single region (?)
 - Two App Engine environments: _Standard_ and _Flexible_
 
 - Standard (very similar to Heroku):
@@ -230,12 +301,27 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
         - No writing to local files
         - All requests timeout at 60 seconds
         - Limits on third-party software
+    - Faster spin up, cheaper
 
 - Flexible environment:
     - App runs in Docker containers on VMs, no sandbox constraints
     - Container platform is managed by App Engine and can choose region
     - Can access standard App Engine resources and can use any language
     - ssh access
+    - Slower spin up, more expensive
+
+- App engine can have multiple services and versions of each
+- Other features:
+  - security scans, 
+  - firewall
+  - rate / access / spending limits
+  - Memcache
+  - Search
+  - custom domain management
+  - SSL
+  - Additional email addresses
+
+
 
 ![app engine](app-engine.png)
 
@@ -347,13 +433,48 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Cloud Translation API translates an arbitrary string into another language
 - Cloud Video Intelligence API can annotate the contents of video
 
+### Billing
 
+- Billing accounts sit under Organisations and inherit organisation roles and policies
+- Projects must be associated with a billing account
+- Project cost management performed at the billing account level
+- Billing account management can also be controlled with IAM - ie, a billing account is considered to be a resource
+- Roles:
+    - _Billing Account Administrator_
+        - Owns the billing account, manages access by others
+    - _Billing Account Creator_
+        - Creates new billing accounts, but cannot assign rights to others
+    - _Billing Account User_
+        - Associate billing accounts with projects
+        - Prevents unrestricted creation of billable resources
+        - Often paired with _Project Creator_ role
+- Best practices
+    - Principle of least privilege
+    - Assign multiple billing account admins in case one is not available
 
+#### Billing Reports
 
+- Provides visibility into cost details and trends
+- Can export data to BigQuery for more detailed / custom analysis
+- Can set up budgets and alerts to prevent accidental overages
+- Can also send notifications to pub/sub
 
+#### Cost control
 
-
-
+- Automatic features for cost management
+    - _Rightsizing VMs_ - suggestions made based on metrics over 8 days
+    - _Sustained use discounts_ - automatic discount for continuous CPU/RAM across multiple compute instances, up tp 30%
+    - _Committed use discounts_ - pre-billed for 1 or 3 year commitment, saves up to 70% across multiple instances.
+      Committed use discounts are not eligible for _sustained use discounts_ but additional resources, above the
+      committed one, are.
+- Preemptible VMs
+  - Short-lived, low-cost instances that can be up to 80% cheaper
+  - Provided as stand-by compute resources that can be shut down if needed somewhere else
+  - Hence, only good for transient / intermittent compute requirements, fault-tolerant batch jobs
+  - Max life of 24 hours, even if not _preempted_
+- Lower cost storage classes for infrequently accessed data
+- Storage lifecycle policies allow data class to be changed over time, or data to be deleted
+- Free tier available for various GCP resources at low end of usage
 
 
 

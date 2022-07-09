@@ -9,6 +9,7 @@
 - [Geospatial](./geospatial/)
 - [Git](./git/)
 - [Go](./go/)
+- [Google Cloud Platform](./gcp/)
 - [gRPC](./grpc/)  
 - [Kotlin](./kotlin/)
 - [Kubernetes](./kubernetes/)
