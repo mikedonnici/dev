@@ -18,11 +18,19 @@
     auto2top: true,
     // coverpage: true, // from _coverpage.md or specify name
     // executeScript: true,
-    // loadSidebar: true, // from _sidebar.md or specify name
+    loadSidebar: true, // from _sidebar.md or specify name
     // loadNavbar: true, // from _navbar.md or specify name
     // mergeNavbar: true,
     maxLevel: 4,
     subMaxLevel: 4,
+    search: {
+      maxAge: 86400000,
+      paths: 'auto',
+      placeholder: 'Search',
+      noData: 'No results',
+      depth: 6,
+      hideOtherSidebarContent: false,
+    }
   }
 </script>
 <script src="//cdn.jsdelivr.net/npm/docsify@4"></script>
