@@ -1,4 +1,4 @@
-AWS Certifications
+# AWS Certification
 
 Suggested Path for Cloud Architect gig:
 
