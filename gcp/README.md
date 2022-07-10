@@ -47,31 +47,30 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Can assign _unmanaged_ (outside) accounts to projects
 - Allows single sign on
 
-
 ### IAM - Identity and Access Management
 
 - IAM is a _unified resource access management system_ for both users and services
 - Three main components:
-  - Policies
-  - Roles
-  - Resources
+    - Policies
+    - Roles
+    - Resources
 - IAM Policies define _WHO_ (member), _CAN DO WHAT_ (role) on _WHICH RESOURCE_ (resource)
 - Identities (the _WHO_) can be:
-  - Google (managed) account, unmanaged account
-  - Service account
-  - Google Group, Workspace or Cloud Identity Domain
+    - Google (managed) account, unmanaged account
+    - Service account
+    - Google Group, Workspace or Cloud Identity Domain
 - Roles (the _CAN DO WHAT_) are sets of related permissions:
-  - Primitive Roles are fixed, coarse-grained levels of access - Owner,
-    Editor, Viewer, Billing Administrator
-  - Pre-defined Roles apply to a particular GCP service in a project and offer
-    more fine-grained permissions, depending on where they are applied
-  - Custom Roles are even finer and are defined by the user and can only be
-    defined at the project or organisation level - they cannot be applied to a
-    folder
+    - Primitive Roles are fixed, coarse-grained levels of access - Owner,
+      Editor, Viewer, Billing Administrator
+    - Pre-defined Roles apply to a particular GCP service in a project and offer
+      more fine-grained permissions, depending on where they are applied
+    - Custom Roles are even finer and are defined by the user and can only be
+      defined at the project or organisation level - they cannot be applied to a
+      folder
 - Resources:
-  - Projects and folders
-  - Cloud services
-  - Aspects of services, eg buckets, topics etc
+    - Projects and folders
+    - Cloud services
+    - Aspects of services, eg buckets, topics etc
 
 ### Cloud KMS - Key Management System
 
@@ -79,7 +78,7 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Cryptographic keys used to encrypt / decrypt files
 - Project-based resource
 - Hierarchical like IAM:
-  - Project > Location > Key Ring > Key > Key Version
+    - Project > Location > Key Ring > Key > Key Version
 - Key ring location can be regional, multi-regional or global
 - Key ring is a collection of keys in a specified location for a specific project
 - Individual keys inherit permissions from the key ring
@@ -96,8 +95,6 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Ideal for line-of-business apps
 - No VPN needed so easy to implement for admins, and easy to use for remote workers
 - No additional charges
-
-
 
 #### Service Accounts
 
@@ -163,7 +160,7 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 
 ### GCP Storage Options
 
-#### Cloud Storage - Binary Object Storage
+#### Cloud Storage - Binary Large Object Storage (BLOB)
 
 - Cloud storage is NOT a file system with a hierarchy of folders, and is not the
   same as block storage, ie os-managed chunks on disk
@@ -174,8 +171,10 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Data encrypted server-side, before it is written to disk (encryption at rest)
 - Data in transit is also encrypted with HTTPS
 
-- Objects are assigned to _buckets_ which have a globally unique name, a
-  geographic location and a storage class
+- Objects are assigned to _buckets_ each of which:
+    - is project-based
+    - has a _globally_ unique id
+    - has a specific geographic location related to storage class
 - Bucket access managed with IAM policies or Access Control Lists (ACLs)
 - Object access controlled with ACLs
 - Each ACL consists of two pieces of information:
@@ -240,35 +239,41 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 
 **Cloud Spanner**
 
-- horizontally scalable RDBMS
+- Horizontally scalable RDBMS
 - Transactional consistency at a global scale
 - Managed instances, high availability
+- Cloud Spanner is industrial-grade SQL, just as BigTable is industrial-grade NoSQL
 
 #### Non-Relational
 
 **Bigtable**
 
 - Fully managed NoSQL wide-column database service for terabyte applications
-- Like a persistent hash table
+- Like a persistent hash table, ie a single key per row
+- No SQL-like language available
 - For storing large amounts of data with low-latency
 - Accessed using HBase API (Apache Hadoop Project)
 - Data encrypted in flight and at rest
 - Access control with IAM
+- Managed with cli utility
+- Used for Google's own services
 
 **Cloud Datastore** (FireStore?)
 
 - Horizontally scalable NoSQL document database
 - Designed for application backends storing structured data
+- Supports nesting _entities_ (parent-child)
 - Can span App Engine and Compute Engine applications
 - Automatically handles scaling - sharding and replication
-- Supports transactions (unlike Bigtable)
-- Supports sql-like queries
+- Supports ACID transactions (unlike Bigtable)
+- Supports sql-like queries (GQL)
 - Offers free daily quota
 
 **Memory Store**
 
-- managed in-memory data store
+- Managed in-memory data store
 - Redis or Memcache
+- Extremely low-latency
 
 **Big Query**
 
@@ -312,16 +317,14 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 
 - App engine can have multiple services and versions of each
 - Other features:
-  - security scans, 
-  - firewall
-  - rate / access / spending limits
-  - Memcache
-  - Search
-  - custom domain management
-  - SSL
-  - Additional email addresses
-
-
+    - security scans,
+    - firewall
+    - rate / access / spending limits
+    - Memcache
+    - Search
+    - custom domain management
+    - SSL
+    - Additional email addresses
 
 ![app engine](app-engine.png)
 
@@ -468,10 +471,10 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
       Committed use discounts are not eligible for _sustained use discounts_ but additional resources, above the
       committed one, are.
 - Preemptible VMs
-  - Short-lived, low-cost instances that can be up to 80% cheaper
-  - Provided as stand-by compute resources that can be shut down if needed somewhere else
-  - Hence, only good for transient / intermittent compute requirements, fault-tolerant batch jobs
-  - Max life of 24 hours, even if not _preempted_
+    - Short-lived, low-cost instances that can be up to 80% cheaper
+    - Provided as stand-by compute resources that can be shut down if needed somewhere else
+    - Hence, only good for transient / intermittent compute requirements, fault-tolerant batch jobs
+    - Max life of 24 hours, even if not _preempted_
 - Lower cost storage classes for infrequently accessed data
 - Storage lifecycle policies allow data class to be changed over time, or data to be deleted
 - Free tier available for various GCP resources at low end of usage
