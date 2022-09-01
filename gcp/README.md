@@ -149,7 +149,7 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
     - Regional - Any traffic, any port number (TCP/UDP)
     - Regional Internal - Same but for internal VPC traffic
 
-### Cloud DNS
+### Cloud DNS 
 
 - Managed DNS service accessible via console, SDK
 
@@ -157,6 +157,31 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 
 - Globally distributed edge caches
 - Some other CDN service can interconnect with Google's
+- Supports SSL, HTTP 1 and 2
+- Caching is reactive and cannot be preloaded
+- Sits in front of a load balancer (cache origin)
+
+### Cloud VPN
+
+- Provides secure connection between on-premise and Cloud VPC
+- Best for low-medium traffic: 3Gbps with direct peering, 1.5Gbps without
+
+### Cloud Interconnect
+
+- Like VPN but provides higher capacity
+- Two tiers:
+  - dedicated interconnect
+    - direct physical connection
+    - routing equipment placed in one of 69 colocations in 17 regions
+    - highest bandwidth: 10Gbps per circuit, up to 8 circuits so 80Gbps
+  - partner interconnect
+    - via 3rd party service provider
+    - many more connection possibilities
+    - 50Mbps to 10Gbps
+    - Routing equipment not required
+- Public internet is bypassed
+- VPN tunnels or NAT devices not needed for connection itself
+- Traffic is NOT encrypted so still need VPN from perm to cloud
 
 ### GCP Storage Options
 
@@ -382,9 +407,39 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 
 - GC big data services are fully managed and scalable
 
+#### BigQuery
+
+- Fully managed data warehouse
+- Provides near real-time interactive analysis of massive data sets using SQL
+  2011 syntax (terabytes in seconds)
+- Charges are separated for storage and queries so can store data and other
+  parties can run queries at their own cost
+- Can query public or commercial data sets
+- Can query data in other services such as Cloud Storage, Cloud Bigtable and Google Drive
+- Can copy tables between databases if in same region or multi-region location
+- Can export up to 1GB per file
+- Automatic data replication
+- Modify data with DDL
+
+#### Cloud Dataflow
+
+- Fully managed, serverless service for creating data processing pipelines
+- Based on Apache Beam
+- Can process data on multiple machines, in parallel
+- Can handle both streaming (live) and batch (archived) data
+- A good choice for realtime or unpredictable data  - Extract, Transform and Load (ETL), batch
+  computation and continuous computation
+- Easy replication of services with templates:
+  - No need to recompile code before processing a pipeline
+  - Execute pipeline without dev env and dependencies
+  - Customise execution with template parameters
+  - Execute via console or gcloud command
+- eg: Source from BigQuery -> Transform -> Sink to Cloud Storage
+
 #### Cloud Dataproc
 
-- Managed Apache Hadoop
+- Fully managed cluster data processing service
+- Base on Apache Hadoop
 - Fast and easy way to run Hadoop, Spark/Hive/Pig on GCP
 - Hadoop is a MapReduce, ie a "map" function running on large data set and
   creating an intermediate result and a "reduce" function that produced a final
@@ -394,26 +449,15 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Can save money by using preemptible instance for batch processing
 - Once data is in a cluster can use Spark Machine Learning Libraries (MLlib) to
   run classification algorithms
-
-#### Cloud Dataflow
-
-- A good choice for realtime or unpredictable data
-- Used to build data pipelines which work for both batch and streaming data -
-  Extract, Transform and Load (ETL), batch computation and continuous
-  computation
-- eg: Source from BigQuery -> Transform -> Sink to Cloud Storage
-
-#### BigQuery
-
-- Fully managed data warehouse
-- Provides near real-time interactive analysis of massive data sets using SQL
-  2011 syntax
-- Charges are separated for storage and queries so can store data and other
-  parties can run queries at their own cost
+- Workflow templates also available in two types:
+  - Workflow 1: Creates cluster, runs jobs, deletes cluster
+  - Workflow 2: Runs jobs on existing cluster 
+- Similar to Cloud Dataflow, both for processing streaming or batch data
 
 #### Cloud Pub/Sub
 
-- Supports many-to-many async messaging
+- Fully managed messaging middleware service
+- Supports many-to-many secure, async messaging
 - App components make push /pull subscriptions to topics
 - Includes support for offline consumers
 - Good for high / unpredictable data such as IoT, and other streaming data
@@ -425,6 +469,21 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Built on Jupyter
 - Integrated with BigQuery, Compute Engine and Cloud Storage and these are what
   is charged, Datalab itself has no additional charge.
+- Launched from console
+  - `datalab create some-name`
+  - `datalab connect --zone ... -- port 8081 some-name`
+
+#### Cloud Data Studio
+
+- Interactive report and big data visualiser
+- Creates dashboards, charts and tables
+- Connects to other services such as BigQuery, Spanner, SQL and Storage
+- Stores shareable files on Google drive
+- Steps:
+  - Connect to a data source
+  - Visual data
+  - Share report
+- Launch at: https://datastudio.google.com 
 
 #### Machine Learning Platform
 
