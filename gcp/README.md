@@ -1,7 +1,6 @@
 # Google Cloud Platform
 
-Notes
-from [Developing Applications with Google Cloud](https://www.coursera.org/specializations/developing-apps-gcp)
+ref: [Developing Applications with Google Cloud](https://www.coursera.org/specializations/developing-apps-gcp)
 
 ## Google Cloud Fundamentals: Core Infrastructure
 
@@ -242,7 +241,7 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Transfer to Cloud Storage
     - Online transfer with CLI or web UI
     - Storage Transfer Service (online) - scheduled, managed batched transfers
-      from other cloud providers or HTTP endpoint
+      from other cloud providers or HTTP endpoint, eg AWS S3
     - Transfer Appliance - a piece of hardware which is loaded with data (up to
       1PB) on-premise, then shipped to a location where data is transferred to
       Google
@@ -485,8 +484,9 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
   - Share report
 - Launch at: https://datastudio.google.com 
 
-#### Machine Learning Platform
+#### Machine Learning Platform - Cloud AI
 
+- Collection of services and apis to facilitate machine learning
 - Provides pre-trained models and a platform to generate your own models
 - TensorFlow can be run on CPU or GPU
 - Range of machine learning APIs that can be integrated into apps
@@ -537,7 +537,6 @@ from [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Lower cost storage classes for infrequently accessed data
 - Storage lifecycle policies allow data class to be changed over time, or data to be deleted
 - Free tier available for various GCP resources at low end of usage
-
 
 
 
