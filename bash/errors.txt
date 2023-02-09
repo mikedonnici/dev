@@ -1,0 +1,2 @@
+ls: cannot access 'nothere': No such file or directory
+test:

@@ -132,6 +132,9 @@ ref: [Developing Applications with Google Cloud](https://www.coursera.org/specia
   are needed elsewhere - to save cost (??)
 - Autoscaling (scale out) is available based on metrics and load balancing
 
+[Read more](./compute/README.md)
+
+
 ### Cloud Load Balancing
 
 - Fully distributed, software defined traffic management
@@ -148,7 +151,7 @@ ref: [Developing Applications with Google Cloud](https://www.coursera.org/specia
     - Regional - Any traffic, any port number (TCP/UDP)
     - Regional Internal - Same but for internal VPC traffic
 
-### Cloud DNS 
+### Cloud DNS
 
 - Managed DNS service accessible via console, SDK
 
@@ -169,15 +172,15 @@ ref: [Developing Applications with Google Cloud](https://www.coursera.org/specia
 
 - Like VPN but provides higher capacity
 - Two tiers:
-  - dedicated interconnect
-    - direct physical connection
-    - routing equipment placed in one of 69 colocations in 17 regions
-    - highest bandwidth: 10Gbps per circuit, up to 8 circuits so 80Gbps
-  - partner interconnect
-    - via 3rd party service provider
-    - many more connection possibilities
-    - 50Mbps to 10Gbps
-    - Routing equipment not required
+    - dedicated interconnect
+        - direct physical connection
+        - routing equipment placed in one of 69 colocations in 17 regions
+        - highest bandwidth: 10Gbps per circuit, up to 8 circuits so 80Gbps
+    - partner interconnect
+        - via 3rd party service provider
+        - many more connection possibilities
+        - 50Mbps to 10Gbps
+        - Routing equipment not required
 - Public internet is bypassed
 - VPN tunnels or NAT devices not needed for connection itself
 - Traffic is NOT encrypted so still need VPN from perm to cloud
@@ -247,6 +250,17 @@ ref: [Developing Applications with Google Cloud](https://www.coursera.org/specia
       Google
 
 - Cloud storage works with other GCP services such as databases etc
+
+- _Bucket Locking_ allows config of data retention policies
+    - Retention periods for bucket locking 1 day to 100 years (max)
+
+- _Object Lifecycle Management_ can set TTL for objects
+    - Delete stage takes precedence over any storage class
+        - If ObjectVersioning is enabled deleting a live version makes that version the noncurrent version. If that is
+          deleted the object is permanently deleted.
+    - SetStorageClass changes storage class over time based on a bunch of conditions
+
+
 
 #### Cloud Databases
 
@@ -426,13 +440,13 @@ ref: [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Based on Apache Beam
 - Can process data on multiple machines, in parallel
 - Can handle both streaming (live) and batch (archived) data
-- A good choice for realtime or unpredictable data  - Extract, Transform and Load (ETL), batch
+- A good choice for realtime or unpredictable data - Extract, Transform and Load (ETL), batch
   computation and continuous computation
 - Easy replication of services with templates:
-  - No need to recompile code before processing a pipeline
-  - Execute pipeline without dev env and dependencies
-  - Customise execution with template parameters
-  - Execute via console or gcloud command
+    - No need to recompile code before processing a pipeline
+    - Execute pipeline without dev env and dependencies
+    - Customise execution with template parameters
+    - Execute via console or gcloud command
 - eg: Source from BigQuery -> Transform -> Sink to Cloud Storage
 
 #### Cloud Dataproc
@@ -449,8 +463,8 @@ ref: [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Once data is in a cluster can use Spark Machine Learning Libraries (MLlib) to
   run classification algorithms
 - Workflow templates also available in two types:
-  - Workflow 1: Creates cluster, runs jobs, deletes cluster
-  - Workflow 2: Runs jobs on existing cluster 
+    - Workflow 1: Creates cluster, runs jobs, deletes cluster
+    - Workflow 2: Runs jobs on existing cluster
 - Similar to Cloud Dataflow, both for processing streaming or batch data
 
 #### Cloud Pub/Sub
@@ -469,8 +483,8 @@ ref: [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Integrated with BigQuery, Compute Engine and Cloud Storage and these are what
   is charged, Datalab itself has no additional charge.
 - Launched from console
-  - `datalab create some-name`
-  - `datalab connect --zone ... -- port 8081 some-name`
+    - `datalab create some-name`
+    - `datalab connect --zone ... -- port 8081 some-name`
 
 #### Cloud Data Studio
 
@@ -479,10 +493,10 @@ ref: [Developing Applications with Google Cloud](https://www.coursera.org/specia
 - Connects to other services such as BigQuery, Spanner, SQL and Storage
 - Stores shareable files on Google drive
 - Steps:
-  - Connect to a data source
-  - Visual data
-  - Share report
-- Launch at: https://datastudio.google.com 
+    - Connect to a data source
+    - Visual data
+    - Share report
+- Launch at: https://datastudio.google.com
 
 #### Machine Learning Platform - Cloud AI
 
