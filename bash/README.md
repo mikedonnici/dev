@@ -13,7 +13,7 @@ refs:
 ### Globbing
 
 - Globbing is used for pathname expansion (ie file matching).
-- It involves replacing syntactic _tokens_ with a situation-specific value for the toke.
+- It involves replacing syntactic _tokens_ with a situation-specific value for the token.
 
 - See: <https://guide.bash.academy/expansions/?=Pathname_Expansion#p1.1.0_4>
 - `*` matches everything (except dotfiles)

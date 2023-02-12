@@ -5,6 +5,113 @@ Refs:
 - [ProGit](https://git-scm.com/book/en/v2)
 - [Git Tutorial](https://git-scm.com/docs/gittutorial)
 - [Git Cheat Sheet](https://training.github.com/downloads/github-git-cheat-sheet.pdf)
+- [Learn Git the Hard Way](https://leanpub.com/learngitthehardway/read_full)
+
+
+## Basics
+
+- Initialise a git repository
+- creates the `.git` directory
+
+```bash
+$ git init
+$ cd .git
+$ ls
+branches  config  description  HEAD  hooks  info  objects  refs
+```
+
+### `HEAD`
+
+- A pointer to the current branch or commit ID
+
+```bash
+$ cat HEAD
+ref: refs/heads/main
+```
+
+### `config`
+
+- Contains the configuration for the repository
+
+```bash
+$ cat config
+[core]
+    repositoryformatversion = 0
+    filemode = true
+    bare = false
+    logallrefupdates = true
+```
+
+### `git log`
+
+- Shows the commit history
+
+```bash
+$ git log
+fatal: your current branch 'main' does not have any commits yet
+```
+
+### `git status`
+
+- Shows the status of the working tree
+
+```bash
+$ git status
+On branch main
+No commits yet
+nothing to commit (create/copy files and use "git add" to track)
+```
+
+### `git add`
+
+- Adds a file to the staging area (ie _local index_)
+
+```bash
+$ git add main.go
+```
+
+### `git commit`
+
+- Commits the staged files to the repository
+
+```bash
+$ git commit -m "Initial commit"
+[main (root-commit) 45bc998] Initial
+ 1 file changed, 0 insertions(+), 0 deletions(-)
+ create mode 100644 main.go
+```
+
+### `git log`
+
+- Shows the commit history
+
+```bash
+$ git log
+commit 45bc998360165a53ec212a4cc00029e98faf199b (HEAD -> main)
+Author: Mike Donnici <michael.donnici@gmail.com>
+Date:   Mon Feb 13 07:51:23 2023 +1100
+
+    Initial commit
+```    
+
+### `git diff`
+
+- Shows the difference between the working tree and the staging area
+
+```bash
+$ git diff
+diff --git a/main.go b/main.go
+index 2e222c2..3c8f88f 100644
+--- a/main.go
++++ b/main.go
+@@ -1,5 +1,5 @@
+ package main
+ 
+ func main() {
+-       fmt.Println("hello")
++       fmt.Println("bye")
+ }
+```
 
 
 ## Diffing files
