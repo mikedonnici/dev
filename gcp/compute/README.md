@@ -17,3 +17,12 @@
   - multi-zone deployed instances
   - auto-healing and updating
   - requires the use of an instance template
+
+## Managing Compute Resources
+
+- Three main areas of concern:
+   - Security - controlling access to instances, ssh keys
+   - Snapshots - point-in-time images for disaster recovery across zones
+   - Monitoring and logging - agents that give key insights to health and performance of VMs
+
+
