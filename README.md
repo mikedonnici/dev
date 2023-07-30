@@ -35,6 +35,7 @@ will be depended on by somebody._
 
 - [AWS](aws/)
 - [Docker](docker/)
+- [Github actions](gh-actions/)
 - [Google Cloud Platform](./gcp/)
 - [Kubernetes](kubernetes/)
 
