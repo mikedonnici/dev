@@ -214,20 +214,21 @@ jobs:
       - name: output step
         id: step-id
         run: echo 'value-name="some value"' >> $GITHUB_OUTPUT
-  job-two: 
+  job-two:
     needs: job-one
-    runs-on: ubuntu-latest 
-    steps: 
+    runs-on: ubuntu-latest
+    steps:
       # ... 
       - name: output value
         run: echo "${{ needs.job-one.outputs.my-output }}"
-    
+
 ```
 
 ## Dependency caching
 
 - Often installation of dependencies takes time and caching can make things faster
-- Files and folders can be cached across jobs using [`actions/cache`](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows)
+- Files and folders can be cached across jobs
+  using [`actions/cache`](https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows)
 - Caching step is added _before_ the step that produces the files, eg:
 
 ```yaml
@@ -239,7 +240,7 @@ jobs:
         uses: actions/checkout@v3
       - name: cache dependencies
         uses: actions/cache@v3
-        with: 
+        with:
           path: ~/.npm              # path to cache
           key: deps-node-modules-${{ hashFiles('**/package-lock.json') }} # key with hash
       - name: install dependencies  # generates files
@@ -248,20 +249,116 @@ jobs:
 ```
 
 - the hash key in the example will change if _any_ `package-lock.json` file changes
-- this invalidates the cache and will force re-installation of the dependencies 
-- see https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows for specific setups for different languages
+- this invalidates the cache and will force re-installation of the dependencies
+- see https://docs.github.com/en/actions/using-workflows/caching-dependencies-to-speed-up-workflows for specific setups
+  for different languages
 - *note*: the caching step must be added to all jobs where the same task is performed and the cache is required
 - caching is central and globally available to all jobs and across separate workflow executions
 
+## Environment vars and secrets
+
+- env vars can be provided at various levels in a workflow file
+- the scope of each is determined by where it is declared
+- values are overridden if re-defined in a finer scope
+- env var values can be accessed by shell interpolation or gh actions env context expression:
+    - $VAR_NAME
+    - ${{ env.VAR_NAME }}
+
+```yaml
+on: push
+env:
+  ENV_VAR_WORKFLOW: "value"
+jobs:
+  job-one:
+    env:
+      ENV_VAR_JOB: "value"
+    runs-on: ubuntu-latest
+    steps:
+      - name: step one
+        env:
+          ENV_VAR_STEP: "value"
+      - name: echo vars
+        run: |
+          echo ${ENV_VAR_WORKFLOW} 
+          echo $ENV_VAR_JOB
+          echo "$ENV_VAR_STEP" # not available in this step!
+          echo "${{ env.ENV_VAR_JOB }}"
+```
+
+- there are a number
+  of [default env vars](https://docs.github.com/en/actions/learn-github-actions/variables#default-environment-variables)
+  available
 
 
+- Secrets can be stored at the _organisation_ level or at the _repository_ level
+- they can be accessed with the `secrets` context object `${{ secrets.SOME_SECRET }}`
+- secrets are not exposed anywhere in logs etc
 
+## Repository environments
 
+- Allows for targeted configurations and environment-specific secrets, eg `dev`, `qa`, `prod`
+- Available for public repos and private repos on paid accounts
+- An environment is targeted using the `environment` key in the job definition:
 
+```yaml
+jobs:
+  test:
+    environment: testing # <-- environment name
+    env:
+      DB_HOST: 'https://somedb.com'
+      DB_USER: ${{ secrets.DB_USER }} # <-- value defined in environment 
+      DB_PASS: ${{ secrets.DB_PASS }} 
+``` 
 
+- these values would override repository secrets with the same name
 
+## Workflow and job execution
 
+- By default, workflows are a linear sequence of steps and if one step fails the whole workflow stops
+- Sometimes want to control workflows more conditionally
+- `if` field can be used in both `jobs` and `steps`
+- `continue-on-error` can be used in `steps`
 
+In this cut-down example the `test report` step will not run if the tests fail:
+
+```yaml
+jobs:
+  test:
+    steps:
+      - name: run tests
+        run: npm run test
+      - name: test report
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: test.json
+```
+
+Obviously we want the test report to be available if the tests fail, so can do:
+
+```yaml
+jobs:
+  test:
+    steps:
+      - name: run tests
+        id: test-run
+        run: npm run test
+      - name: test report
+        if: ${{ failure() && steps.test-run.outcome == 'failure' }}
+        uses: actions/upload-artifact@v3
+        with:
+          name: test-report
+          path: test.json
+```
+
+- `failure()` is
+  special [status check function](https://docs.github.com/en/actions/learn-github-actions/expressions#status-check-functions)
+  that returns `true` if _any_ previous step failed. This means the `test report` step will still execute if the
+  previous step fails _and_ the tests themselves have failed.
+- Read more about [expressions](https://docs.github.com/en/actions/learn-github-actions/expressions)
+- Read more about [steps context](https://docs.github.com/en/actions/learn-github-actions/contexts#steps-context)
+- Note also that the `${{ }}` can be omitted for the `if` expression
+    - `if: steps.test-run.outcome == 'failure'`
 
 
 
