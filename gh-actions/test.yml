@@ -1,0 +1,32 @@
+on:
+  workflow_dispatch:
+
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: step 1
+        id: step-1
+        run: echo 'step 1'
+      - name: step 2
+        id: step-2
+        if: ${{ success() && steps.step-1.outcome == 'success' }}
+        run: |
+          echo 'step 2 ran because step 1 succeeded'
+          exit 99
+      - name: step 3
+        id: step-3
+        if: ${{ failure() }}
+        run: echo 'step 3 only ran because SOME step failed'
+      - name: step 4
+        id: step-4
+        if: ${{ always() }}
+        run: echo 'step 4 runs ALWAYS'
+      - name: step 5
+        id: step-5
+        if: ${{ failure() && steps.step-2.outcome == 'failure' }}
+        run: echo 'step 5 only ran because step 2 failed'
+      - name: step 6
+        id: step-6
+        if: ${{ always() }}
+        run: echo 'step 6 - outcome of step 2 was ${{ steps.step-2.outcome }}'

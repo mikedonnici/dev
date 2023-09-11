@@ -314,12 +314,26 @@ jobs:
 
 ## Workflow and job execution
 
+### `if` field
+
 - By default, workflows are a linear sequence of steps and if one step fails the whole workflow stops
 - Sometimes want to control workflows more conditionally
 - `if` field can be used in both `jobs` and `steps`
 - `continue-on-error` can be used in `steps`
+- `failure()` is a
+  special [status check function](https://docs.github.com/en/actions/learn-github-actions/expressions#status-check-functions)
+  that returns `true` if _any_ previous step failed. This means the `test report` step will still execute if the
+  previous step fails _and_ the tests themselves have failed.
+- `success()` returns true when _none_ of the previous steps have failed
+- `always()` causes the step to execute, even when cancelled
+- `cancelled()` returns true if the workflow has been cancelled
+- Read more about [expressions](https://docs.github.com/en/actions/learn-github-actions/expressions)
+- Read more about [steps context](https://docs.github.com/en/actions/learn-github-actions/contexts#steps-context)
+- Note also that the `${{ }}` can be omitted for the `if` expression
+    - `if: failure()`
+    - `if: steps.test-run.outcome == 'failure'`
 
-In this cut-down example the `test report` step will not run if the tests fail:
+Eg: in this cut-down example the `test report` step will not run if the tests fail:
 
 ```yaml
 jobs:
@@ -351,48 +365,129 @@ jobs:
           path: test.json
 ```
 
-- `failure()` is
-  special [status check function](https://docs.github.com/en/actions/learn-github-actions/expressions#status-check-functions)
-  that returns `true` if _any_ previous step failed. This means the `test report` step will still execute if the
-  previous step fails _and_ the tests themselves have failed.
-- Read more about [expressions](https://docs.github.com/en/actions/learn-github-actions/expressions)
-- Read more about [steps context](https://docs.github.com/en/actions/learn-github-actions/contexts#steps-context)
-- Note also that the `${{ }}` can be omitted for the `if` expression
-    - `if: steps.test-run.outcome == 'failure'`
+Can do the same thing at the `jobs` level, but must use `needs` key to ensure previous jobs have completed:
 
+```yaml
+jobs:
+  test:
+  # ...
+  deploy:
+  # ...
+  report:
+    needs: [ test, deploy ]
+    if: failure()
+    # ...
+```
 
+Example: Can run this with `act -W test.yml`
 
+```yaml
+# test.yml
+on:
+  workflow_dispatch:
+jobs:
+  test:
+    runs-on: ubuntu-latest
+    steps:
+      - name: step 1
+        id: step-1
+        run: echo 'step 1'
+      - name: step 2
+        id: step-2
+        if: ${{ success() && steps.step-1.outcome == 'success' }}
+        run: |
+          echo 'step 2 ran because step 1 succeeded'
+          exit 99
+      - name: step 3
+        id: step-3
+        if: ${{ failure() }}
+        run: echo 'step 3 only ran because SOME step failed'
+      - name: step 4
+        id: step-4
+        if: ${{ always() }}
+        run: echo 'step 4 runs ALWAYS'
+      - name: step 5
+        id: step-5
+        if: ${{ failure() && steps.step-2.outcome == 'failure' }}
+        run: echo 'step 5 only ran because step 2 failed'
+      - name: step 6
+        id: step-6
+        if: ${{ always() }}
+        run: echo 'step 6 - outcome of step 2 was ${{ steps.step-2.outcome }}'
+```
 
+Can also use outputs from steps as a condition for running a step.
 
+Example: only install dependencies if they have not been cached.
+Ref: [outputs for cache action](https://github.com/actions/cache#outputs)
 
+```yaml
+steps:
+  - name: checkout
+  - uses: actions/checkout@v3
+  - name: cache dependencies
+    id: cache
+    uses: actions/cache@v3
+    with:
+      path: node_modules
+      key: deps-node-modules-${{ hashFiles('**/package-lock.json') }}
+  - name: install dependencies
+    if: steps.cache-outputs.cache-hit != 'true'
+    run: npm ci # <-- only runs if above condition is met
+```
 
+### `continue-on-error` field
 
+- Allows a job to continue when a step fails
+- Note: When a continue-on-error step fails, the outcome is `failure`, but the final conclusion is `success` -
+  see [steps context](https://docs.github.com/en/actions/learn-github-actions/contexts#steps-context)
+- Usage depends on the particular workflow, the example below is NOT a good usage as the test step will always look like
+  it passed.
 
+```yaml
+jobs:
+  test:
+    continue-on-error: true
+    # ...
+  test-report:
+    needs: [ test ]
+    # ...
+```
 
+### Matrix jobs
 
+- Allows the same job to be run with different configuration combinations
+- Use the `strategy -> matrix` field with arbitrary key names:
 
+```yaml
+jobs:
+  my-job:
+    strategy:
+      matrix:
+        my-key-1: [1,2,3]
+        my-key-2: ['a', 'b', 'c']
+```
 
+Example - this would run 6 combinations of this job:
 
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
-
+```yaml
+name: matrix example
+on: push
+jobs:
+  build:
+    continue-on-error: true # <-- handy if some combinations fail
+    strategy:
+      matrix:
+        node-version: [ 12, 14, 16 ]
+        operating-system: [ 'ubuntu-latest', 'windows-latest' ]
+    runs-on: ${{ matrix.operating-system }}
+    steps:
+      - name: checkout
+        uses: actions/checkout@v3
+      - name: install node
+        uses: actions/setup-node@v3
+        with:
+          node-version: ${{ matrix.node-version }}
+      # ...
+```
 
