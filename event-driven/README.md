@@ -136,3 +136,27 @@ delivered at least once, but it may be delivered more than once.
 _Duplicator middleware_ deliberately processes each message twice so it can be used test / ensure the the idempotency
 of handlers.
 
+Another way this can be handled is to expect an `Idempotency-Key` header in http requests to the service,
+and to propagate this key to the event handler via the message header. The event handler can then use this key to
+determine if the event has already been processed.
+
+## Outbox pattern
+
+This is a design pattern used in event-driven systems that ensures reliable message delivery and consistency between the
+data store and the messaging system.
+
+The pattern involves the addition of an `outbox` table in the database that stores messages that need to be sent.
+Database updates are performed as a transaction with changes committed to relevant tables as well as the resulting
+message being written to the `outbox`.
+
+This means a successful transaction will always result in a message being sent. Even if the publisher or message service
+is disrupted, the message will be sent when the system is back online.
+
+A separate process is responsible for reading messages from the `outbox` and sending them to the message broker. For
+example, Debezium can be used to monitor the database for changes and send messages to the message broker. This process
+is often referred to as a "message dispatcher", "message relay" or "message forwarder".
+
+![outbox pattern](./outbox-pattern.png)
+
+
+
