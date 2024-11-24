@@ -158,5 +158,41 @@ is often referred to as a "message dispatcher", "message relay" or "message forw
 
 ![outbox pattern](./outbox-pattern.png)
 
+## Commands vs Events
+
+In general terms and even-driven system should _not use passive-aggressive events_. That is, events that are published
+with the expectation that something will happen after the event is published. Events should be used to describe things
+that have happened and they should represent immutable facts.
+
+However, there are cases where it is useful to use events to trigger actions. _Commands_ are events that are published
+with the expectation that something will happen after the event and where a synchronous response is not required.
+Generally speaking, commands are intended to be consumed by only one consumer and as such, command monitoring may be set
+up differently from event monitoring.
+
+Command Query Responsibility Segregation (CQRS) is a pattern that separates the read and write sides of an application.
+In CQRS, commands are used to update the state of the system and events are used to notify other parts of the system
+that the state has changed. CQRS does not necessarily require asynchronous communication, but it is often used in
+event-driven systems.
+
+## Read Models
+
+In CQRS, the read side of the application is responsible for querying the data store and returning the data to the
+client. The read side is often implemented using a read model, which is a denormalized view of the data that is
+optimized for querying. That is, the data is stored in a format that is easy to query and does not require complex 
+transformations before it can be returned to the client.
+
+The read model is updated by event handlers that listen for events on the write side of the application. When an event 
+is received, the event handler updates the read model to reflect the changes made by the event.
+
+The read model is often stored in a separate data store from the write model, such as a relational database or a 
+NoSQL database. This allows the read model to be optimized for querying, while the write model can be optimized for 
+writing.
+
+Read models provide teams with more autonomy in how they store and query data. They can be optimized for specific 
+use cases and can be updated independently of the write model. This can lead to better performance and scalability, 
+as well as improved developer productivity.
+
+
+
 
 
