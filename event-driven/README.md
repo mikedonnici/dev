@@ -455,7 +455,177 @@ involves the points at which a message is _published_ and _received_.
 - Publishing the message (Publisher): Extract the trace ID and parent span ID from the context and store in message
   metadata `traceparent`.
 - Receive the request (message router middleware): Extract the trace ID and parent span from `traceparent` metadata and
-  store in the context of the `*message.Message`, so all message handlers will be part of the same trace. 
+  store in the context of the `*message.Message`, so all message handlers will be part of the same trace.
 
+## Fault tolerance
 
+### Throttling
 
+Limiting the number of concurrent requests is a way of ensuring that a service does not become unresponsive. For
+example, the publishing of messages may be a lightweight process in an of itself, however external resources such as
+databases have api limits and when a service scales horizontally these external services may become the bottleneck.
+
+Throttling is used to ensure sensible limits on a service so that things don't get out of control. The `watermill`
+package has throttling middleware:
+
+```go
+// Process no more than 1000 messages per minute
+t := middleware.NewThrottle(1000, time.Minute)
+
+router.AddMiddleware(t.Middleware)
+```
+
+### Circuit breakers
+
+A circuit breaker is a design pattern that can be used to prevent a service from making requests that are likely to
+fail. It's a more sophisticated method of throttling.
+
+The circuit breaker implementation for message processing would be a state machine with three states:
+
+- **closed**: Allows messages to be processed normally
+- **open**: Rejects all incoming messages right away
+- **half-open**: Allows a limited number of messages to be processed
+
+The circuit breaker transitions between these states based on the number of failed messages.
+
+The circuit breaker starts in the _closed_ state. After a configured number of fails, it moves to the _open_ state, not
+allowing any messages to be processed. After a configured time, it moves to the _half-open_ state, allowing a limited
+number of messages to be processed. If the messages keep failing, it moves back to the _open_ state; if they succeed, it
+moves to the _closed_ state instead.
+
+`Watermill` provides circuit breaker middleware that uses the [gobreaker](https://github.com/sony/gobreaker) library.
+
+### Poison Queue
+
+A poison queue or _dead-letter queue_ is a queue (topic) to which messages are moved when they are unable to be
+processed. This allows the main queue to continue processing messages without being blocked by messages that are
+causing issues. The poison queue can be monitored and messages can be reprocessed or investigated as required.
+
+A poison queue is not a _must-have_ in an event system, and in fact may not be a good choice in systems where message
+order is important.
+
+The `watermill` package provides `PoisonQueue` middleware for this purpose. All you need to specify is the publisher and
+a topic where the message should be published. When the message handler returns an error, the message is acknowledged
+(removed from the current topic) and published to the poison queue instead.
+
+```go
+pq, err := middleware.PoisonQueue(publisher, "poison_queue")
+router.AddMiddleware(pq)
+```
+
+Alternatively, you can use the `PoisonQueueWithFilter` middleware. It allows you to specify a function that decides if a
+message should be sent to the poison queue or not based on the error returned from the handler. You can use it together
+with the Permanent Error pattern to retry most messages and send only some to the poison queue.
+
+```go
+pq, err := middleware.PoisonQueueWithFilter(pub, "PoisonQueue", func (err error) bool {
+var permErr PermanentError
+if errors.As(err, &permErr) && permErr.IsPermanent() {
+return true
+}
+return false
+})
+```
+
+Finally, you can chain the `PoisonQueue` middleware with the `Retry` middleware. The message is first retried a few
+times, and if it still fails, it's sent to the poison queue.
+
+```go
+router.AddMiddleware(
+middleware.PoisonQueue(publisher, "poison_queue"),
+middleware.Retry{
+// Config
+}.Middleware,
+)
+```
+
+Moving messages to a poison queue is straightforward. The hard part is managing the messages on teh queue. After a
+message is published to the poison queue, you need to:
+
+- Be notified that it happened
+- Be able to see the message and the reason it was moved there
+- Take appropriate action
+-
+
+Metrics and alerts are a good mechanism for receiving notifications about new messages on the poison queue topic.
+
+Some Pub/Subs provide tools to preview messages on a queue or topic, but they may not fit requirements. Often custom
+tooling
+is developed to manage poison queues. This can be as simple as a CLI tool that allows you to see messages on the queue
+and take appropriate action.
+
+Watermill's poison queue middleware adds useful metadata to the message, so it's easier to understand what happened
+without going through the logs. The metadata keys are constants in the middleware package:
+
+- `middleware.ReasonForPoisonedKey`: The reason for poisoning (the original error message)
+- `middleware.PoisonedTopicKey`: The topic to which the message was originally published
+- `middleware.PoisonedHandlerKey`: The handler name that failed to process the message
+- `middleware.PoisonedSubscriberKey`: The subscriber name that originally received the message
+
+```go
+reason := msg.Metadata.Get(middleware.ReasonForPoisonedKey)
+```
+
+## Sagas and Process Managers
+
+**Sagas vs. Process Managers**
+
+Both sagas and process managers are patterns used for handling long-running processes. Often, multiple services are
+involved, and they support automatic handling of failures (rolling back each step when something goes wrong). Such kinds
+of operations are often referred to as _distributed transactions_. Because they are distributed, they can't guarantee
+atomicity at the database level.
+
+**In practice, the biggest difference between a saga and a process manager is that a saga is stateless while a process
+manager is stateful.**
+
+**Orchestration vs. Choreography**
+
+_Choreography_ is the descriptive term used when there is _NO_ central point that coordinates the whole system.
+
+Choreography looks something like this:
+
+![choreography](./choreography.png)
+
+Orchestration looks like this:
+
+![orchestration](./orchestration.png)
+
+Sagas and process managers are used as _orchestrators_.
+
+Usually, coordination by a saga / process manager is done via commands based on events that arrive. Sagas / process
+managers don't need to know who is handling those commands later. It can even be a different service.
+
+If there is no need for a supporting compensation (rollback) and the process is simple, it's a good idea to start with
+choreography. When the process becomes more complex, it's a good idea to move to orchestration with sagas or process
+managers.
+
+### Compensating Actions
+
+As with SQL transactions, _distributed_ transactions can fail. Rolling back a failed db transaction is generally
+straightforward as the heavy lifting is done by the database itself. In _distributed_ transactions, it has to be done
+manually.
+
+As in a database it is also possible to end up with a deadlock in a distributed system. So it's crucial to have proper
+alerting and tests in place.
+
+The need for _compensating actions_ means that parallel flows in sagas / process managers should be avoided. This will
+massively reduce the complexity in handling compensation actions.
+
+### When and when NOT to use sagas / process managers
+
+The price of using sagas / process managers is the complexity of the system. It's a good idea to start with a simple
+choreography and move to orchestration only when it's necessary.
+
+For example, rolling back database transactions is much easier than managing compensation amongst a set of overly
+granular microservices.
+
+There are two main scenarios where sagas / process managers are useful:
+
+1. When transactions _need_ to be distributed (for example, requiring external system calls) and you need to coordinate
+   multiple actions and compensate them if one of them fails.
+2. When an entity or process is too complex and should be decoupled into multiple services.
+
+In first case, it's evident that sagas / process managers are needed, in the second case, there is no simple answer as
+to whether it's needed or not. It's all about choosing the right set of tradeoffs.
+
+Having proper tracing and metrics is crucial for sagas / process managers.
